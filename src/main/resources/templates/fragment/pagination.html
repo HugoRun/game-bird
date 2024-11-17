@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="common-pagination">
+    <div th:if="${page.pages > 1}">
+        <div>
+            <a th:href="@{${url}(pageNo=1)}" th:if="${page.current != 1}">首页</a>
+            <a th:href="@{${url}(pageNo=${page.current - 1})}" th:if="${page.current > 1}">上页</a>
+            <a th:href="@{${url}(pageNo=${page.current + 1})}" th:if="${page.current < page.pages}">下页</a>
+            <a th:href="@{${url}(pageNo=${page.pages})}" th:if="${page.current < page.pages}">最后一页</a>
+            <form action="" class="inline-block">第 <input name="pageNo" th:value="${page.getCurrent()}" type="text"> 页 <input class="mini-button" type="submit" value="前往"></form>
+        </div>
+        <div><span class="panel" th:text="|(共${page.getTotal()}条数据, 当前第${page.current}/${page.pages}页)|"></span></div>
+    </div>
+</div>
+<div th:fragment="pack-pagination">
+    <div th:if="${page.pages > 1}">
+        <a th:href="@{${url}(feeType=${feeType}, pageNo=1)}" th:if="${page.current != 1}">首页</a>
+        <a th:href="@{${url}(feeType=${feeType}, pageNo=${page.current - 1})}" th:if="${page.current > 1}">上页</a>
+        <a th:href="@{${url}(feeType=${feeType}, pageNo=${page.current + 1})}" th:if="${page.current < page.pages}">下页</a>
+        <a th:href="@{${url}(feeType=${feeType}, pageNo=${page.pages})}" th:if="${page.current < page.pages}">最后一页</a>
+        <form action="" class="inline-block">
+            <input name="feeType" th:value="${feeType}" type="hidden">
+            第 <input class="mini-input" maxlength="3"name="pageNo" th:value="${page.getCurrent()}" type="text"/> 页 <input class="mini-button" type="submit" value="前往">
+        </form>
+        <br/>
+        <span class="panel" th:text="|(共${page.getTotal()}条数据, 当前第${page.current}/${page.pages}页)|"></span>
+    </div>
+</div>
+</body>
+</html>

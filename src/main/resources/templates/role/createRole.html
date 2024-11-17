@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>创建角色</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}" href="../../static/css/bootstrap5.3.2.css">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}" href="../../static/css/style.css" >
+</head>
+<body>
+<div class="main">
+    <h3>创建角色</h3>
+    <form action="" method="post">
+        <div class="mb-2"><input type="text" name="roleName"></div>
+        <div class="text-danger text-end mb-2" th:text="${errorMsg}" th:if="${!#strings.isEmpty(errorMsg)}"></div>
+        <div class="text-end"><input  class="btn btn-outline-primary" type="submit" value="创建角色"></div>
+    </form>
+</div>
+</body>
+</html>

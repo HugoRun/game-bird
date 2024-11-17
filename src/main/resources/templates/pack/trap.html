@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>小鸟情人</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+
+<div class="main">
+    <div>
+        <div class="pic">
+            <img alt="" src="../../static/images/logo/pack.gif" th:src="@{/assets/images/logo/pack.gif}"/>
+        </div>
+        <div>容量:<span th:text="${page.getTotal()}"></span>/3000</div>
+        <div th:replace="~{fragment/pack::packType(type='trap')}"></div>
+        <div th:replace="~{fragment/feeTypeFilter::feeTypeFilter}"></div>
+        <div th:if="${page.getTotal() == 0}">
+            <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+            <div class="npc-talk">
+                <div>您还没有任何陷阱哦,马上去<a href="../../shop/trap.html" th:href="@{/shop/trap/list.do}">商店</a>购买吧！</div>
+            </div>
+        </div>
+        <div th:if="${page.getTotal() > 0}">
+            <ul class="list1">
+                <li th:each="trapVO, stat : ${page.getRecords()}">
+                    <div class="list1-icon">
+                        <img alt="" class="icon-gray-border" src="../../static/images/trap/1.gif" th:src="@{|/assets/images/trap/${trapVO.baseId}.gif|}">
+                    </div>
+                    <div class="list1-info">
+                        <p th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${trapVO.baseTrap.name}+'×'+${trapVO.getNum()}">谷子(25级)</p>
+                        <p>功能:<span th:text="${trapVO.baseTrap.func}"></span></p>
+                        <p>耐久度:<span th:text="${trapVO.baseTrap.num}"></span> 数量:<span th:text="${trapVO.num}"></span></p>
+                        <p class="btl"><a href="#" th:href="@{/pack/trap/use.do(trapId=${trapVO.baseId})}">使用</a>
+                    </div>
+                </li>
+            </ul>
+            <div th:replace="~{fragment/pack::pagination}"></div>
+        </div>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

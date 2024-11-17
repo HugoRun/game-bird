@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>账号登录</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<div class="main">
+    <form action="" class="login-form" method="post">
+        <h3>账号登录</h3>
+        <div class="text-center mb-3">
+            <img alt="" src="../../static/images/logo.png" th:src="@{/assets/images/logo.png}">
+        </div>
+        <div class="text-success text-primary">
+            <div>200多种国内著名插画师手绘小鸟，小鸟更有4大属性、6大变异，数十种特色天赋，三次转生机会，排列组合出数百万不同形态的小鸟，没有一只完全相同，总有一款适合您！ 限时拟真婚姻系统，亲密指数，各种求婚戒指，在教堂举行专属于幸福的你的婚礼，还能让亲朋好友来领取礼金！小鸟入侵、公会副本、阿凡达守卫战、万圣塔攻
+                坚战、天梯武林大会，丰富的玩法让你欲罢不能！</div>
+            <div>种下你的小鸟，收获你的爱情，生活，开始变得不同!</div>
+        </div>
+        <div>
+            <div class="mb-1">
+                <div>账号:</div>
+                <input name="username" type="text"/>
+            </div>
+            <div class="mb-2">
+                <div>密码:</div>
+                <input name="password" type="password"/>
+            </div>
+            <div class="text-danger text-end" th:if="${!#strings.isEmpty(errorMsg)}" th:text="${errorMsg}"></div>
+            <div class="mb-1 text-end">
+                <input class="" type="submit" value="登录">
+            </div>
+            <div class="text-end">
+                <a href="/register.do">注册账号</a>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="../../static/js/bootstrap.bundle.5.3.2.js" th:src="@{/assets/js/bootstrap.bundle.5.3.2.js}"></script>
+<script th:if="${!#strings.isEmpty(error)}" th:inline="javascript">
+    alert([[${error}]]);
+</script>
+</body>
+</html>

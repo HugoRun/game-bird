@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="footDate">
+    <div class="cur-time">当前时间:[[${#dates.format(new java.util.Date().getTime(), 'MM-dd HH:mm')}]]</div>
+    <div class="text-green"><span th:text="${@gameUtils.getRandStr()}"></span></div>
+</div>
+</body>
+</html>
