@@ -23,3 +23,12 @@ JAVA语言为基础
 
 导入数据库后记得修改`application.yml`配置的数据库信息
 
+
+## 截图
+
+![](./screenshot/msedge_kBB3OpU6qk.png)
+
+![](./screenshot/msedge_QKjIDp9rRm.png)
+
+![](./screenshot/msedge_ufSK5zEqOu.png)
+
