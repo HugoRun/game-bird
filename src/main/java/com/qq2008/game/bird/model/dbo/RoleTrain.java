@@ -141,7 +141,7 @@ public class RoleTrain implements Serializable {
         return "RoleTrain{" +
             "id = " + id +
             ", roleId = " + roleId +
-            ", index = " + idx +
+            ", idx = " + idx +
             ", birdId = " + birdId +
             ", birdBaseId = " + birdBaseId +
             ", trainTime = " + trainTime +

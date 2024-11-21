@@ -32,12 +32,12 @@ public class RoleCage implements Serializable {
     /**
      * 小鸟唯一Id
      */
-    private Integer birdId;
+    private Integer idx;
 
     /**
      * 排序Id
      */
-    private Integer idx;
+    private Integer birdId;
 
     /**
      * 小鸟配置Id
@@ -52,7 +52,7 @@ public class RoleCage implements Serializable {
     /**
      * 使用鸟笼剩余次数
      */
-    private Integer useCageNum;
+    private Integer useCageNum0;
 
     public Integer getId() {
         return id;
@@ -70,20 +70,20 @@ public class RoleCage implements Serializable {
         this.roleId = roleId;
     }
 
-    public Integer getBirdId() {
-        return birdId;
-    }
-
-    public void setBirdId(Integer birdId) {
-        this.birdId = birdId;
-    }
-
     public Integer getIdx() {
         return idx;
     }
 
     public void setIdx(Integer idx) {
         this.idx = idx;
+    }
+
+    public Integer getBirdId() {
+        return birdId;
+    }
+
+    public void setBirdId(Integer birdId) {
+        this.birdId = birdId;
     }
 
     public Integer getBaseBridId() {
@@ -102,12 +102,12 @@ public class RoleCage implements Serializable {
         this.useCageId = useCageId;
     }
 
-    public Integer getUseCageNum() {
-        return useCageNum;
+    public Integer getUseCageNum0() {
+        return useCageNum0;
     }
 
-    public void setUseCageNum(Integer useCageNum) {
-        this.useCageNum = useCageNum;
+    public void setUseCageNum0(Integer useCageNum0) {
+        this.useCageNum0 = useCageNum0;
     }
 
     @Override
@@ -115,11 +115,11 @@ public class RoleCage implements Serializable {
         return "RoleCage{" +
             "id = " + id +
             ", roleId = " + roleId +
+            ", idx = " + idx +
             ", birdId = " + birdId +
-            ", index = " + idx +
             ", baseBridId = " + baseBridId +
             ", useCageId = " + useCageId +
-            ", useCageNum = " + useCageNum +
+            ", useCageNum0 = " + useCageNum0 +
         "}";
     }
 }

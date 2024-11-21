@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： 127.0.0.1
--- 生成日期： 2024-11-17 16:32:06
+-- 生成日期： 2024-11-21 15:13:39
 -- 服务器版本： 11.4.4-MariaDB
 -- PHP 版本： 8.1.17
 
@@ -50,6 +50,8 @@ CREATE TABLE IF NOT EXISTS `account` (
 --
 
 INSERT INTO `account` (`user_id`, `platform`, `username`, `password`, `nickname`, `avatar_url`, `token`, `refresh_token`, `open_id`, `create_time`, `is_admin`, `is_ban`) VALUES
+('car-5aef2f3939114287adaf3ae588d80621', 'car', 'admin', 'admin', '无名氏', '/assets/images/avatar/d.jpg', '', '', '', 1732026229, 0, 0),
+('car-8673349586c24ac596d05b4b514e3518', 'car', 'admin1', 'admin1', '无名氏', '/assets/images/avatar/d.jpg', '', '', '', 1732026229, 0, 0),
 ('car-e228955529844c9dba6e32e74264faaa', 'car', 'abc123', 'abc123', '无名氏', '/assets/images/avatar/d.jpg', '', '', '', 1731856702, 0, 0),
 ('qq-2c0e39f741304d0fae470909fbb746c0', 'qq', '', '', '重温旧梦KyTKpM', 'https://gd-hbimg.huaban.com/0ee0ff42b701eb654f768245030bb20d824baf9311952c-KEW4cS_sq75webp', 'AT-604bad2ff3404beeadd6661137b5d604', 'RT-e9e0c4f5132a4b6a9b9d3a1b97089e88', '9566ef2985b1441982261ebf0c98306e', 1731434068, 0, 0);
 
@@ -820,6 +822,31 @@ INSERT INTO `base_race` (`id`, `name`, `desc_text`) VALUES
 -- --------------------------------------------------------
 
 --
+-- 表的结构 `base_title`
+--
+
+DROP TABLE IF EXISTS `base_title`;
+CREATE TABLE IF NOT EXISTS `base_title` (
+  `id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '称号Id',
+  `name` varchar(50) NOT NULL DEFAULT '' COMMENT '称号名称',
+  `desc_text` varchar(100) NOT NULL DEFAULT '' COMMENT '称号描述',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='称号配置表';
+
+--
+-- 转存表中的数据 `base_title`
+--
+
+INSERT INTO `base_title` (`id`, `name`, `desc_text`) VALUES
+(1, '小菜鸟', ''),
+(2, '小鸟VIP', ''),
+(3, '恋上小鸟', ''),
+(4, '花仙子', ''),
+(5, '喜气洋洋', '开服称号');
+
+-- --------------------------------------------------------
+
+--
 -- 表的结构 `base_train`
 --
 
@@ -958,7 +985,7 @@ CREATE TABLE IF NOT EXISTS `log_chat` (
   `message` varchar(200) NOT NULL DEFAULT '' COMMENT '消息内容',
   `time` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '发送时间戳',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=607 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='聊天日志记录表';
+) ENGINE=InnoDB AUTO_INCREMENT=609 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='聊天日志记录表';
 
 --
 -- 转存表中的数据 `log_chat`
@@ -1570,7 +1597,9 @@ INSERT INTO `log_chat` (`id`, `role_id`, `role_name`, `title_name`, `message`, `
 (603, '49770a51d1af4cfbb1178617b6740022', '一粒尘埃', '小菜鸟', '要说战斗力', 1731828275),
 (604, '49770a51d1af4cfbb1178617b6740022', '財神爺', '小菜鸟', '啊啊', 1731828352),
 (605, '49770a51d1af4cfbb1178617b6740022', '南风知我意', '小菜鸟', '1111', 1731828489),
-(606, '49770a51d1af4cfbb1178617b6740022', '金樽清酒斗十千', '小菜鸟', '全体都有，齐步走', 1731828505);
+(606, '49770a51d1af4cfbb1178617b6740022', '金樽清酒斗十千', '小菜鸟', '全体都有，齐步走', 1731828505),
+(607, 'ae42bea3d9784f12835495c36896b71f', '蛀虫阿布', '小菜鸟', '大家好啊', 1732118601),
+(608, 'ae42bea3d9784f12835495c36896b71f', '蛀虫阿布', '小菜鸟', '你说你', 1732118961);
 
 -- --------------------------------------------------------
 
@@ -1598,19 +1627,25 @@ CREATE TABLE IF NOT EXISTS `role` (
   `role_id` varchar(50) NOT NULL DEFAULT '' COMMENT '角色Id',
   `user_id` varchar(50) NOT NULL DEFAULT '' COMMENT '所属用户Id',
   `role_name` varchar(50) NOT NULL DEFAULT '' COMMENT '用户名',
+  `level` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '等级',
+  `exp` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '当前经验值',
+  `total_exp` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '总经验值',
+  `vip` smallint(6) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'VIP等级',
+  `vip_exp` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'VIP经验',
+  `total_vip_exp` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '总VIP经验值',
+  `sex` tinyint(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT '性别,0保密/1男/2女',
   `field_id` smallint(6) UNSIGNED NOT NULL DEFAULT 0 COMMENT '当前所在场景',
   `bird_num` smallint(6) UNSIGNED NOT NULL DEFAULT 0 COMMENT '小鸟数量',
   `coin` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '金钱数量',
   `bank_coin` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '银行储存金钱数量',
   `diamond` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '钻石数量',
   `love_point` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '爱心值数量',
-  `last_login_time` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '最后一次登录时间戳',
-  `reg_time` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '注册时间戳',
-  `avatar_url` varchar(200) NOT NULL DEFAULT '' COMMENT '头像地址',
-  `level` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '等级',
-  `exp` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '当前经验值',
   `title_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '当前装备称号Id',
+  `avatar_url` varchar(200) NOT NULL DEFAULT '' COMMENT '头像地址',
   `marriage_type` tinyint(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT '婚姻类型,0无/1喜鹊之恋/2鸳鸯之恋/3比翼鸟之恋/4天使之恋',
+  `dynamic` varchar(100) NOT NULL DEFAULT '' COMMENT '心情',
+  `reg_time` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '注册时间戳',
+  `last_login_time` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '最后一次登录时间戳',
   PRIMARY KEY (`role_id`),
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='角色表';
@@ -1619,9 +1654,11 @@ CREATE TABLE IF NOT EXISTS `role` (
 -- 转存表中的数据 `role`
 --
 
-INSERT INTO `role` (`role_id`, `user_id`, `role_name`, `field_id`, `bird_num`, `coin`, `bank_coin`, `diamond`, `love_point`, `last_login_time`, `reg_time`, `avatar_url`, `level`, `exp`, `title_id`, `marriage_type`) VALUES
-('5330a7e124b54065b49ba15611f89b29', 'qq-2c0e39f741304d0fae470909fbb746c0', '半剑飘东半剑西', 1, 0, 9998, 0, 0, 0, 1731856123, 1731834110, '/assets/images/avatar/d.jpg', 1, 0, 0, 0),
-('f4af18a832b24b31ac6b35452f92faff', 'car-e228955529844c9dba6e32e74264faaa', '小镇爱情', 1, 0, 9998, 0, 0, 0, 1731857391, 1731856716, '/assets/images/avatar/d.jpg', 1, 0, 0, 0);
+INSERT INTO `role` (`role_id`, `user_id`, `role_name`, `level`, `exp`, `total_exp`, `vip`, `vip_exp`, `total_vip_exp`, `sex`, `field_id`, `bird_num`, `coin`, `bank_coin`, `diamond`, `love_point`, `title_id`, `avatar_url`, `marriage_type`, `dynamic`, `reg_time`, `last_login_time`) VALUES
+('5330a7e124b54065b49ba15611f89b29', 'qq-2c0e39f741304d0fae470909fbb746c0', '半剑飘东半剑西', 1, 0, 0, 0, 0, 0, 0, 1, 0, 9998, 0, 0, 0, 0, '/assets/images/avatar/d.jpg', 0, '', 1731834110, 1731856123),
+('7d6e0bb7594a44dba4c68aabac1b14b3', 'car-8673349586c24ac596d05b4b514e3518', '华尔街之狼', 1, 0, 0, 0, 0, 0, 0, 1, 0, 10000, 0, 0, 0, 0, '/assets/images/avatar/d.jpg', 0, '', 1732086440, 1732086440),
+('ae42bea3d9784f12835495c36896b71f', 'car-5aef2f3939114287adaf3ae588d80621', '蛀虫阿布1', 6, 550, 550, 0, 0, 0, 1, 1, 0, 0, 10750, 0, 0, 5, '/assets/images/head/1.png', 0, '修改玩家心情11', 1732026233, 1732198287),
+('f4af18a832b24b31ac6b35452f92faff', 'car-e228955529844c9dba6e32e74264faaa', '小镇爱情', 1, 0, 0, 0, 0, 0, 0, 1, 0, 9996, 0, 0, 0, 0, '/assets/images/avatar/d.jpg', 0, '', 1731856716, 1731858864);
 
 -- --------------------------------------------------------
 
@@ -1646,7 +1683,7 @@ CREATE TABLE IF NOT EXISTS `role_birth` (
   `use_nest_num` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '使用巢穴剩余次数',
   PRIMARY KEY (`id`),
   KEY `role_id` (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='孵化场数据表';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='孵化场数据表';
 
 --
 -- 转存表中的数据 `role_birth`
@@ -1654,7 +1691,9 @@ CREATE TABLE IF NOT EXISTS `role_birth` (
 
 INSERT INTO `role_birth` (`id`, `role_id`, `idx`, `bird_id`, `bird_base_id`, `match_role_id`, `match_role_name`, `match_bird_id`, `match_bird_base_id`, `birth_time`, `birth_end_time`, `use_nest_id`, `use_nest_num`) VALUES
 (2, '5330a7e124b54065b49ba15611f89b29', 1, 0, 0, 0, '', 0, 0, 0, 0, 0, 0),
-(3, 'f4af18a832b24b31ac6b35452f92faff', 1, 0, 0, 0, '', 0, 0, 0, 0, 0, 0);
+(3, 'f4af18a832b24b31ac6b35452f92faff', 1, 0, 0, 0, '', 0, 0, 0, 0, 0, 0),
+(4, 'ae42bea3d9784f12835495c36896b71f', 1, 0, 0, 0, '', 0, 0, 0, 0, 0, 0),
+(5, '7d6e0bb7594a44dba4c68aabac1b14b3', 1, 0, 0, 0, '', 0, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -1698,7 +1737,7 @@ CREATE TABLE IF NOT EXISTS `role_pack` (
   PRIMARY KEY (`id`),
   KEY `role_id` (`role_id`),
   KEY `bait_id` (`base_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='诱饵包裹数据表' ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='诱饵包裹数据表' ROW_FORMAT=DYNAMIC;
 
 --
 -- 转存表中的数据 `role_pack`
@@ -1706,7 +1745,8 @@ CREATE TABLE IF NOT EXISTS `role_pack` (
 
 INSERT INTO `role_pack` (`id`, `role_id`, `type_id`, `base_id`, `num`) VALUES
 (27, '5330a7e124b54065b49ba15611f89b29', 1, 1, 0),
-(28, 'f4af18a832b24b31ac6b35452f92faff', 1, 1, 1);
+(28, 'f4af18a832b24b31ac6b35452f92faff', 1, 1, 2),
+(29, 'ae42bea3d9784f12835495c36896b71f', 1, 1, 2);
 
 -- --------------------------------------------------------
 
@@ -1727,7 +1767,7 @@ CREATE TABLE IF NOT EXISTS `role_train` (
   `use_train_expire_time` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '使用训练场过期时间戳',
   PRIMARY KEY (`id`),
   KEY `role_id` (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='训练场数据表';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='训练场数据表';
 
 --
 -- 转存表中的数据 `role_train`
@@ -1735,7 +1775,9 @@ CREATE TABLE IF NOT EXISTS `role_train` (
 
 INSERT INTO `role_train` (`id`, `role_id`, `idx`, `bird_id`, `bird_base_id`, `train_time`, `train_end_time`, `use_train_id`, `use_train_expire_time`) VALUES
 (2, '5330a7e124b54065b49ba15611f89b29', 1, 0, 0, 0, 0, 0, 0),
-(3, 'f4af18a832b24b31ac6b35452f92faff', 1, 0, 0, 0, 0, 0, 0);
+(3, 'f4af18a832b24b31ac6b35452f92faff', 1, 0, 0, 0, 0, 0, 0),
+(4, 'ae42bea3d9784f12835495c36896b71f', 1, 0, 0, 0, 0, 0, 0),
+(5, '7d6e0bb7594a44dba4c68aabac1b14b3', 1, 0, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -1749,22 +1791,27 @@ CREATE TABLE IF NOT EXISTS `role_trap` (
   `role_id` varchar(50) NOT NULL DEFAULT '' COMMENT '所属角色Id',
   `idx` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '顺序Id',
   `bait_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '使用诱饵Id',
-  `base_bird_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '捕捉小鸟配置Id',
+  `catch_bird_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '捕捉小鸟配置Id',
+  `catch_bird_sex` tinyint(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT '捕捉小鸟性别, 0中性/1雄性/2雌性',
+  `catch_bird_weight` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '捕捉小鸟重量',
+  `catch_bird_star` tinyint(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT '捕捉小鸟星级',
   `catch_time` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '开始捕捉时间戳',
   `catch_end_time` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '捕捉结束时间戳',
   `use_trap_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '使用陷阱Id',
   `use_trap_num` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '使用陷阱剩余次数',
   PRIMARY KEY (`id`),
   KEY `role_id` (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='陷阱数据表';
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='陷阱数据表';
 
 --
 -- 转存表中的数据 `role_trap`
 --
 
-INSERT INTO `role_trap` (`id`, `role_id`, `idx`, `bait_id`, `base_bird_id`, `catch_time`, `catch_end_time`, `use_trap_id`, `use_trap_num`) VALUES
-(4, '5330a7e124b54065b49ba15611f89b29', 1, 27, 46, 1731855671, 1731855851, 0, 0),
-(5, 'f4af18a832b24b31ac6b35452f92faff', 1, 0, 0, 0, 0, 1, 10);
+INSERT INTO `role_trap` (`id`, `role_id`, `idx`, `bait_id`, `catch_bird_id`, `catch_bird_sex`, `catch_bird_weight`, `catch_bird_star`, `catch_time`, `catch_end_time`, `use_trap_id`, `use_trap_num`) VALUES
+(4, '5330a7e124b54065b49ba15611f89b29', 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(5, 'f4af18a832b24b31ac6b35452f92faff', 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(7, 'ae42bea3d9784f12835495c36896b71f', 1, 29, 1, 0, 60, 2, 1732198290, 1732198410, 0, 0),
+(8, '7d6e0bb7594a44dba4c68aabac1b14b3', 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -1774,22 +1821,130 @@ INSERT INTO `role_trap` (`id`, `role_id`, `idx`, `bait_id`, `base_bird_id`, `cat
 
 DROP TABLE IF EXISTS `storage_bird`;
 CREATE TABLE IF NOT EXISTS `storage_bird` (
-  `id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '小鸟唯一Id',
+  `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '小鸟唯一Id',
   `role_id` varchar(50) NOT NULL DEFAULT '' COMMENT '所属角色Id',
   `bird_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '配置Id',
   `level` smallint(6) UNSIGNED NOT NULL DEFAULT 0 COMMENT '等级',
   `exp` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '经验',
+  `total_exp` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '总经验',
   `sex` tinyint(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT '性别',
   `init_weight` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '初始重量, 显示时/100',
   `weight` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '当前重量, 显示时/100',
+  `star` tinyint(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT '星级',
   `grow` smallint(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT '成长, 显示时/100',
-  `restrained` smallint(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT '克制',
+  `ko` smallint(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT '克制',
   `is_lock` tinyint(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否锁定',
   `time` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '捕捉时间戳',
   PRIMARY KEY (`id`),
   KEY `role_id` (`role_id`),
   KEY `bird_id` (`bird_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='小鸟数据表';
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='小鸟数据表';
+
+--
+-- 转存表中的数据 `storage_bird`
+--
+
+INSERT INTO `storage_bird` (`id`, `role_id`, `bird_id`, `level`, `exp`, `total_exp`, `sex`, `init_weight`, `weight`, `star`, `grow`, `ko`, `is_lock`, `time`) VALUES
+(1, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732121995),
+(2, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732122106),
+(3, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732122108),
+(4, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732122134),
+(5, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732122267),
+(6, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732122324),
+(7, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732122374),
+(8, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732122426),
+(9, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732122489),
+(10, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732122491),
+(11, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732122504),
+(12, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732122505),
+(13, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732122522),
+(14, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732122576),
+(15, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732122585),
+(16, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732123994),
+(17, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732166044),
+(18, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732166108),
+(19, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732166369),
+(20, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732166456),
+(21, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732167806),
+(22, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732167948),
+(23, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732167959),
+(24, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168106),
+(25, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168113),
+(26, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168118),
+(27, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168282),
+(28, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168288),
+(29, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168291),
+(30, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168325),
+(31, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168333),
+(32, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168377),
+(33, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168387),
+(34, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168390),
+(35, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168390),
+(36, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168390),
+(37, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168390),
+(38, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168391),
+(39, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168391),
+(40, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168391),
+(41, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168391),
+(42, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168391),
+(43, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168393),
+(44, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168393),
+(45, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168393),
+(46, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168393),
+(47, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168393),
+(48, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168394),
+(49, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168394),
+(50, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168394),
+(51, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168394),
+(52, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168394),
+(53, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168394),
+(54, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168395),
+(55, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168395),
+(56, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168395),
+(57, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168395),
+(58, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168395),
+(59, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168395),
+(60, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168396),
+(61, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168396),
+(62, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168396),
+(63, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168396),
+(64, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168396),
+(65, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168396),
+(66, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168397),
+(67, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168397),
+(68, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168397),
+(69, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168397),
+(70, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168397),
+(71, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168398),
+(72, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168398),
+(73, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168398),
+(74, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168398),
+(75, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168398),
+(76, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168398),
+(77, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168398),
+(78, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168399),
+(79, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168399),
+(80, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168399),
+(81, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168399),
+(82, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168399),
+(83, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168400),
+(84, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732168400),
+(85, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732187260),
+(86, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732187264),
+(87, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732187266),
+(88, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732187269),
+(89, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732187272),
+(90, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732187274),
+(91, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732187277),
+(92, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732187307),
+(93, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732187308),
+(94, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732187621),
+(95, 'ae42bea3d9784f12835495c36896b71f', 49, 1, 0, 0, 1, 1605, 1605, 0, 1000, 0, 0, 1732187679),
+(96, 'ae42bea3d9784f12835495c36896b71f', 2, 1, 0, 0, 1, 79, 79, 0, 1000, 0, 0, 1732188065),
+(97, 'ae42bea3d9784f12835495c36896b71f', 1, 1, 0, 0, 1, 90, 90, 0, 1000, 0, 0, 1732188263),
+(98, 'ae42bea3d9784f12835495c36896b71f', 1, 1, 0, 0, 0, 100, 100, 0, 1000, 0, 0, 1732188418),
+(99, 'ae42bea3d9784f12835495c36896b71f', 2, 1, 0, 0, 1, 138, 138, 0, 1000, 0, 0, 1732190326),
+(100, 'ae42bea3d9784f12835495c36896b71f', 1, 1, 0, 0, 0, 61, 61, 2, 1000, 0, 0, 1732190732);
 
 -- --------------------------------------------------------
 

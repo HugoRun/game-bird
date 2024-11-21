@@ -17,4 +17,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class StorageBirdServiceImpl extends ServiceImpl<StorageBirdMapper, StorageBird> implements IStorageBirdService {
 
+    @Override
+    public int insertStorageBird(StorageBird storageBird) {
+        // 插入用户数据
+        boolean saved = this.save(storageBird);
+        if (saved) {
+            // 插入成功后，user 对象中的 id 会被自动填充为自增主键值
+            return storageBird.getId();
+        }
+        return 0; // 或者抛出异常
+    }
 }

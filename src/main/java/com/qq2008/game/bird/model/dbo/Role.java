@@ -32,6 +32,41 @@ public class Role implements Serializable {
     private String roleName;
 
     /**
+     * 等级
+     */
+    private Integer level;
+
+    /**
+     * 当前经验值
+     */
+    private Long exp;
+
+    /**
+     * 总经验值
+     */
+    private Long totalExp;
+
+    /**
+     * VIP等级
+     */
+    private Short vip;
+
+    /**
+     * VIP经验
+     */
+    private Integer vipExp;
+
+    /**
+     * 总VIP经验值
+     */
+    private Integer totalVipExp;
+
+    /**
+     * 性别,0保密/1男/2女
+     */
+    private Byte sex;
+
+    /**
      * 当前所在场景
      */
     private Short fieldId;
@@ -62,14 +97,9 @@ public class Role implements Serializable {
     private Long lovePoint;
 
     /**
-     * 最后一次登录时间戳
-     */
-    private Integer lastLoginTime;
 
-    /**
-     * 注册时间戳
      */
-    private Integer regTime;
+    private Integer titleId;
 
     /**
      * 头像地址
@@ -79,22 +109,22 @@ public class Role implements Serializable {
     /**
      * 等级
      */
-    private Integer level;
+    private Byte marriageType;
 
     /**
      * 当前经验值
      */
-    private Long exp;
+    private String dynamic;
 
     /**
      * 当前装备称号Id
      */
-    private Integer titleId;
+    private Integer regTime;
 
     /**
      * 婚姻类型,0无/1喜鹊之恋/2鸳鸯之恋/3比翼鸟之恋/4天使之恋
      */
-    private Byte marriageType;
+    private Integer lastLoginTime;
 
     public String getRoleId() {
         return roleId;
@@ -118,6 +148,62 @@ public class Role implements Serializable {
 
     public void setRoleName(String roleName) {
         this.roleName = roleName;
+    }
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
+    public Long getExp() {
+        return exp;
+    }
+
+    public void setExp(Long exp) {
+        this.exp = exp;
+    }
+
+    public Long getTotalExp() {
+        return totalExp;
+    }
+
+    public void setTotalExp(Long totalExp) {
+        this.totalExp = totalExp;
+    }
+
+    public Short getVip() {
+        return vip;
+    }
+
+    public void setVip(Short vip) {
+        this.vip = vip;
+    }
+
+    public Integer getVipExp() {
+        return vipExp;
+    }
+
+    public void setVipExp(Integer vipExp) {
+        this.vipExp = vipExp;
+    }
+
+    public Integer getTotalVipExp() {
+        return totalVipExp;
+    }
+
+    public void setTotalVipExp(Integer totalVipExp) {
+        this.totalVipExp = totalVipExp;
+    }
+
+    public Byte getSex() {
+        return sex;
+    }
+
+    public void setSex(Byte sex) {
+        this.sex = sex;
     }
 
     public Short getFieldId() {
@@ -168,20 +254,12 @@ public class Role implements Serializable {
         this.lovePoint = lovePoint;
     }
 
-    public Integer getLastLoginTime() {
-        return lastLoginTime;
+    public Integer getTitleId() {
+        return titleId;
     }
 
-    public void setLastLoginTime(Integer lastLoginTime) {
-        this.lastLoginTime = lastLoginTime;
-    }
-
-    public Integer getRegTime() {
-        return regTime;
-    }
-
-    public void setRegTime(Integer regTime) {
-        this.regTime = regTime;
+    public void setTitleId(Integer titleId) {
+        this.titleId = titleId;
     }
 
     public String getAvatarUrl() {
@@ -192,30 +270,6 @@ public class Role implements Serializable {
         this.avatarUrl = avatarUrl;
     }
 
-    public Integer getLevel() {
-        return level;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
-    public Long getExp() {
-        return exp;
-    }
-
-    public void setExp(Long exp) {
-        this.exp = exp;
-    }
-
-    public Integer getTitleId() {
-        return titleId;
-    }
-
-    public void setTitleId(Integer titleId) {
-        this.titleId = titleId;
-    }
-
     public Byte getMarriageType() {
         return marriageType;
     }
@@ -224,25 +278,55 @@ public class Role implements Serializable {
         this.marriageType = marriageType;
     }
 
+    public String getDynamic() {
+        return dynamic;
+    }
+
+    public void setDynamic(String dynamic) {
+        this.dynamic = dynamic;
+    }
+
+    public Integer getRegTime() {
+        return regTime;
+    }
+
+    public void setRegTime(Integer regTime) {
+        this.regTime = regTime;
+    }
+
+    public Integer getLastLoginTime() {
+        return lastLoginTime;
+    }
+
+    public void setLastLoginTime(Integer lastLoginTime) {
+        this.lastLoginTime = lastLoginTime;
+    }
+
     @Override
     public String toString() {
         return "Role{" +
             "roleId = " + roleId +
             ", userId = " + userId +
             ", roleName = " + roleName +
+            ", level = " + level +
+            ", exp = " + exp +
+            ", totalExp = " + totalExp +
+            ", vip = " + vip +
+            ", vipExp = " + vipExp +
+            ", totalVipExp = " + totalVipExp +
+            ", sex = " + sex +
             ", fieldId = " + fieldId +
             ", birdNum = " + birdNum +
             ", coin = " + coin +
             ", bankCoin = " + bankCoin +
             ", diamond = " + diamond +
             ", lovePoint = " + lovePoint +
-            ", lastLoginTime = " + lastLoginTime +
-            ", regTime = " + regTime +
-            ", avatarUrl = " + avatarUrl +
-            ", level = " + level +
-            ", exp = " + exp +
             ", titleId = " + titleId +
+            ", avatarUrl = " + avatarUrl +
             ", marriageType = " + marriageType +
+            ", dynamic = " + dynamic +
+            ", regTime = " + regTime +
+            ", lastLoginTime = " + lastLoginTime +
         "}";
     }
 }

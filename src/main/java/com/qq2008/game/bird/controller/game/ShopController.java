@@ -92,7 +92,7 @@ public class ShopController extends BaseController {
                 return "common/message";
             }
             // 扣除金钱
-            costCoin(role, (long) totalFeePrice);
+            costRoleCoin(role, (long) totalFeePrice);
         }
         // 钻石校验
         if (Objects.equals(baseBait.getFeeType(), ConstData.FEE_TYPE_DIAMOND)) {
@@ -103,7 +103,7 @@ public class ShopController extends BaseController {
 
             }
             // 扣除钻石
-            costDiamond(role, totalFeePrice);
+            costRoleDiamond(role, totalFeePrice);
         }
         // 爱心值校验
         if (Objects.equals(baseBait.getFeeType(), ConstData.FEE_TYPE_LOVE_POINT)) {
@@ -113,7 +113,7 @@ public class ShopController extends BaseController {
                 return "common/message";
             }
             // 扣除爱心值
-            costLovePoint(role, (long) totalFeePrice);
+            costRoleLovePoint(role, (long) totalFeePrice);
         }
         // 增加诱饵数量
         LambdaQueryWrapper<RolePack> queryWrapper = new LambdaQueryWrapper<>();
@@ -206,7 +206,7 @@ public class ShopController extends BaseController {
                 return "common/message";
             }
             // 扣除金钱
-            costCoin(role, (long) totalFeePrice);
+            costRoleCoin(role, (long) totalFeePrice);
         }
         // 钻石校验
         if (Objects.equals(baseTrap.getFeeType(), ConstData.FEE_TYPE_DIAMOND)) {
@@ -217,7 +217,7 @@ public class ShopController extends BaseController {
 
             }
             // 扣除钻石
-            costDiamond(role, totalFeePrice);
+            costRoleDiamond(role, totalFeePrice);
         }
         // 爱心值校验
         if (Objects.equals(baseTrap.getFeeType(), ConstData.FEE_TYPE_LOVE_POINT)) {
@@ -227,7 +227,7 @@ public class ShopController extends BaseController {
                 return "common/message";
             }
             // 扣除爱心值
-            costLovePoint(role, (long) totalFeePrice);
+            costRoleLovePoint(role, (long) totalFeePrice);
         }
         // 增加陷阱数量
         LambdaQueryWrapper<RolePack> queryWrapper = new LambdaQueryWrapper<>();
@@ -320,7 +320,7 @@ public class ShopController extends BaseController {
                 return "common/message";
             }
             // 扣除金钱
-            costCoin(role, (long) totalFeePrice);
+            costRoleCoin(role, (long) totalFeePrice);
         }
         // 钻石校验
         if (Objects.equals(baseCage.getFeeType(), ConstData.FEE_TYPE_DIAMOND)) {
@@ -331,7 +331,7 @@ public class ShopController extends BaseController {
 
             }
             // 扣除钻石
-            costDiamond(role, totalFeePrice);
+            costRoleDiamond(role, totalFeePrice);
         }
         // 爱心值校验
         if (Objects.equals(baseCage.getFeeType(), ConstData.FEE_TYPE_LOVE_POINT)) {
@@ -341,7 +341,7 @@ public class ShopController extends BaseController {
                 return "common/message";
             }
             // 扣除爱心值
-            costLovePoint(role, (long) totalFeePrice);
+            costRoleLovePoint(role, (long) totalFeePrice);
         }
         // 增加鸟笼数量
         LambdaQueryWrapper<RolePack> queryWrapper = new LambdaQueryWrapper<>();
@@ -434,7 +434,7 @@ public class ShopController extends BaseController {
                 return "common/message";
             }
             // 扣除金钱
-            costCoin(role, (long) totalFeePrice);
+            costRoleCoin(role, (long) totalFeePrice);
         }
         // 钻石校验
         if (Objects.equals(baseNest.getFeeType(), ConstData.FEE_TYPE_DIAMOND)) {
@@ -445,7 +445,7 @@ public class ShopController extends BaseController {
 
             }
             // 扣除钻石
-            costDiamond(role, totalFeePrice);
+            costRoleDiamond(role, totalFeePrice);
         }
         // 爱心值校验
         if (Objects.equals(baseNest.getFeeType(), ConstData.FEE_TYPE_LOVE_POINT)) {
@@ -455,7 +455,7 @@ public class ShopController extends BaseController {
                 return "common/message";
             }
             // 扣除爱心值
-            costLovePoint(role, (long) totalFeePrice);
+            costRoleLovePoint(role, (long) totalFeePrice);
         }
         // 增加巢数量
         LambdaQueryWrapper<RolePack> queryWrapper = new LambdaQueryWrapper<>();
@@ -548,7 +548,7 @@ public class ShopController extends BaseController {
                 return "common/message";
             }
             // 扣除金钱
-            costCoin(role, (long) totalFeePrice);
+            costRoleCoin(role, (long) totalFeePrice);
         }
         // 钻石校验
         if (Objects.equals(baseTrain.getFeeType(), ConstData.FEE_TYPE_DIAMOND)) {
@@ -559,7 +559,7 @@ public class ShopController extends BaseController {
 
             }
             // 扣除钻石
-            costDiamond(role, totalFeePrice);
+            costRoleDiamond(role, totalFeePrice);
         }
         // 爱心值校验
         if (Objects.equals(baseTrain.getFeeType(), ConstData.FEE_TYPE_LOVE_POINT)) {
@@ -569,7 +569,7 @@ public class ShopController extends BaseController {
                 return "common/message";
             }
             // 扣除爱心值
-            costLovePoint(role, (long) totalFeePrice);
+            costRoleLovePoint(role, (long) totalFeePrice);
         }
         // 增加训练场数量
         LambdaQueryWrapper<RolePack> queryWrapper = new LambdaQueryWrapper<>();
@@ -662,7 +662,7 @@ public class ShopController extends BaseController {
                 return "common/message";
             }
             // 扣除金钱
-            costCoin(role, (long) totalFeePrice);
+            costRoleCoin(role, (long) totalFeePrice);
         }
         // 钻石校验
         if (Objects.equals(baseProp.getFeeType(), ConstData.FEE_TYPE_DIAMOND)) {
@@ -673,7 +673,7 @@ public class ShopController extends BaseController {
 
             }
             // 扣除钻石
-            costDiamond(role, totalFeePrice);
+            costRoleDiamond(role, totalFeePrice);
         }
         // 爱心值校验
         if (Objects.equals(baseProp.getFeeType(), ConstData.FEE_TYPE_LOVE_POINT)) {
@@ -683,7 +683,7 @@ public class ShopController extends BaseController {
                 return "common/message";
             }
             // 扣除爱心值
-            costLovePoint(role, (long) totalFeePrice);
+            costRoleLovePoint(role, (long) totalFeePrice);
         }
         // 增加道具数量
         LambdaQueryWrapper<RolePack> queryWrapper = new LambdaQueryWrapper<>();

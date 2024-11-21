@@ -1,5 +1,7 @@
 package com.qq2008.game.bird.model.dbo;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 
@@ -19,6 +21,7 @@ public class StorageBird implements Serializable {
     /**
      * 小鸟唯一Id
      */
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
@@ -42,6 +45,11 @@ public class StorageBird implements Serializable {
     private Long exp;
 
     /**
+     * 总经验
+     */
+    private Long totalExp;
+
+    /**
      * 性别
      */
     private Byte sex;
@@ -56,6 +64,9 @@ public class StorageBird implements Serializable {
      */
     private Long weight;
 
+
+    Byte star;
+
     /**
      * 成长, 显示时/100
      */
@@ -64,7 +75,7 @@ public class StorageBird implements Serializable {
     /**
      * 克制
      */
-    private Short restrained;
+    private Short ko;
 
     /**
      * 是否锁定
@@ -116,6 +127,14 @@ public class StorageBird implements Serializable {
         this.exp = exp;
     }
 
+    public Long getTotalExp() {
+        return totalExp;
+    }
+
+    public void setTotalExp(Long totalExp) {
+        this.totalExp = totalExp;
+    }
+
     public Byte getSex() {
         return sex;
     }
@@ -148,12 +167,12 @@ public class StorageBird implements Serializable {
         this.grow = grow;
     }
 
-    public Short getRestrained() {
-        return restrained;
+    public Short getKo() {
+        return ko;
     }
 
-    public void setRestrained(Short restrained) {
-        this.restrained = restrained;
+    public void setKo(Short ko) {
+        this.ko = ko;
     }
 
     public Byte getIsLock() {
@@ -172,6 +191,14 @@ public class StorageBird implements Serializable {
         this.time = time;
     }
 
+    public Byte getStar() {
+        return star;
+    }
+
+    public void setStar(Byte star) {
+        this.star = star;
+    }
+
     @Override
     public String toString() {
         return "StorageBird{" +
@@ -180,11 +207,12 @@ public class StorageBird implements Serializable {
             ", birdId = " + birdId +
             ", level = " + level +
             ", exp = " + exp +
+            ", totalExp = " + totalExp +
             ", sex = " + sex +
             ", initWeight = " + initWeight +
             ", weight = " + weight +
             ", grow = " + grow +
-            ", restrained = " + restrained +
+            ", ko = " + ko +
             ", isLock = " + isLock +
             ", time = " + time +
         "}";

@@ -8,9 +8,12 @@ import com.qq2008.game.bird.service.*;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /***
  * 游戏配置管理器
@@ -41,6 +44,8 @@ public class GameConfigManager {
     public static ConcurrentHashMap<Integer, BaseTrain> mTrainCache;
     // 陷阱配置
     public static ConcurrentHashMap<Integer, BaseTrap> mTrapCache;
+    // 称号配置
+    public static ConcurrentHashMap<Integer, BaseTitle> mTitleCache;
 
     //
     @Resource
@@ -64,7 +69,7 @@ public class GameConfigManager {
     @Resource
     public IBaseTrapService baseTrapService;
     @Resource
-    public IAccountService accountService;
+    public IBaseTitleService baseTitleService;
 
     /***
      * 获取GameConfig单例对象
@@ -97,6 +102,7 @@ public class GameConfigManager {
         getInstance().loadBaseProp();
         getInstance().loadBaseTrain();
         getInstance().loadBaseTrap();
+        getInstance().loadBaseTitle();
     }
 
     /***
@@ -109,6 +115,13 @@ public class GameConfigManager {
         baseBaitList.forEach(baseBait -> mBaitCache.put(baseBait.getId(), baseBait));
         logger.info(JSONUtils.toJSON(mBaitCache));
         logger.info("诱饵配置加载完成。");
+    }
+
+    /***
+     * 获取诱饵配置列表
+     */
+    public List<BaseBait> getBaseBaitList() {
+        return mBaitCache.values().stream().toList();
     }
 
     /***
@@ -133,6 +146,13 @@ public class GameConfigManager {
     }
 
     /***
+     * 获取小鸟配置列表
+     */
+    public List<BaseBird> getBaseBirdList() {
+        return mBirdCache.values().stream().toList();
+    }
+
+    /***
      * 获取小鸟配置
      * @param id 小鸟配置Id
      * @return 小鸟配置
@@ -151,6 +171,13 @@ public class GameConfigManager {
         baseCageList.forEach(baseCage -> mCageCache.put(baseCage.getId(), baseCage));
         logger.info(JSONUtils.toJSON(mCageCache));
         logger.info("鸟笼配置加载完成。");
+    }
+
+    /***
+     * 获取鸟笼配置列表
+     */
+    public List<BaseCage> getBaseCageList() {
+        return mCageCache.values().stream().toList();
     }
 
     /***
@@ -175,6 +202,13 @@ public class GameConfigManager {
     }
 
     /***
+     * 获取场景配置列表
+     */
+    public List<BaseField> getBaseFieldList() {
+        return mFieldCache.values().stream().toList();
+    }
+
+    /***
      * 获取场景配置
      * @param id 场景配置Id
      * @return 场景配置
@@ -193,6 +227,13 @@ public class GameConfigManager {
         baseGeneList.forEach(baseGene -> mGeneCache.put(baseGene.getId(), baseGene));
         logger.info(JSONUtils.toJSON(mGeneCache));
         logger.info("基因配置加载完成。");
+    }
+
+    /***
+     * 获取基因配置列表
+     */
+    public List<BaseGene> getBaseGeneList() {
+        return mGeneCache.values().stream().toList();
     }
 
     /***
@@ -217,6 +258,13 @@ public class GameConfigManager {
     }
 
     /***
+     * 获取等级配置列表
+     */
+    public List<BaseLevel> getBaseLevelList() {
+        return mLevelCache.values().stream().toList();
+    }
+
+    /***
      * 获取等级配置
      * @param level 等级
      * @return 等级配置
@@ -235,6 +283,13 @@ public class GameConfigManager {
         baseNestList.forEach(baseNest -> mNestCache.put(baseNest.getId(), baseNest));
         logger.info(JSONUtils.toJSON(mNestCache));
         logger.info("鸟巢配置加载完成。");
+    }
+
+    /***
+     * 获取鸟巢配置列表
+     */
+    public List<BaseNest> getBaseNestList() {
+        return mNestCache.values().stream().toList();
     }
 
     /***
@@ -259,12 +314,47 @@ public class GameConfigManager {
     }
 
     /***
+     * 获取道具配置列表
+     */
+    public List<BaseProp> getBasePropList() {
+        return mPropCache.values().stream().toList();
+    }
+
+    /***
      * 获取道具配置
      * @param id 道具配置Id
      * @return 道具配置
      */
     public BaseProp getBaseProp(Integer id) {
         return mPropCache.get(id);
+    }
+
+    /***
+     * 加载称号配置
+     */
+    public void loadBaseTitle() {
+        logger.info("开始加载称号配置...");
+        mTitleCache = new ConcurrentHashMap<>();
+        List<BaseTitle> baseTitleList = baseTitleService.list();
+        baseTitleList.forEach(baseTitle -> mTitleCache.put(baseTitle.getId(), baseTitle));
+        logger.info(JSONUtils.toJSON(baseTitleList));
+        logger.info("称号配置加载完成。");
+    }
+
+    /***
+     * 获取称号配置列表
+     */
+    public List<BaseTitle> getBaseTitleList() {
+        return mTitleCache.values().stream().toList();
+    }
+
+    /***
+     * 获取陷阱配置
+     * @param id 陷阱配置Id
+     * @return 陷阱配置
+     */
+    public BaseTitle getBaseTitle(Integer id) {
+        return mTitleCache.get(id);
     }
 
     /***
@@ -277,6 +367,13 @@ public class GameConfigManager {
         baseTrainList.forEach(baseTrain -> mTrainCache.put(baseTrain.getId(), baseTrain));
         logger.info(JSONUtils.toJSON(mTrainCache));
         logger.info("训练场配置加载完成。");
+    }
+
+    /***
+     * 获取训练场配置列表
+     */
+    public List<BaseTrain> getBaseTrainList() {
+        return mTrainCache.values().stream().toList();
     }
 
     /***
@@ -298,6 +395,13 @@ public class GameConfigManager {
         baseTrapList.forEach(baseTrap -> mTrapCache.put(baseTrap.getId(), baseTrap));
         logger.info(JSONUtils.toJSON(mTrapCache));
         logger.info("陷阱配置加载完成。");
+    }
+
+    /***
+     * 获取陷阱配置列表
+     */
+    public List<BaseTrap> getBaseTrapList() {
+        return mTrapCache.values().stream().toList();
     }
 
     /***

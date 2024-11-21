@@ -13,4 +13,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IStorageBirdService extends IService<StorageBird> {
 
+    public int insertStorageBird(StorageBird storageBird);
+
 }

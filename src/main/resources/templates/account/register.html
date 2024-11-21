@@ -8,7 +8,7 @@
     <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
 </head>
 <body>
-<div class="main">
+<section th:if="${account == null }" class="main">
     <form action="" method="post">
         <h3>注册账号</h3>
         <div>
@@ -33,7 +33,7 @@
             </div>
         </div>
     </form>
-</div>
+</section>
 <script src="../../static/js/bootstrap.bundle.5.3.2.js" th:src="@{/assets/js/bootstrap.bundle.5.3.2.js}"></script>
 </body>
 </html>

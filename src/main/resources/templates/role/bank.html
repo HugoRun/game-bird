@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>银行</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+    <style>
+        ul li {
+            margin-bottom: 4px;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: flex-end;
+        }
+
+        ul li img {
+            border: 1px solid #aaa;
+            padding: 2px;
+            box-sizing: border-box;
+        }
+
+    </style>
+</head>
+<body>
+<div class="main">
+    <div class="pic"><img alt="." src="../../static/images/logo/bank.gif" th:src="@{/assets/images/logo/bank.gif}"/></div>
+    <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+    <div class="panel bg-yellow" th:if="${message == null}">
+        钱存起来才是最安全的,战斗失败也不会掉落哦<br/>
+        提升上限是按比率提升的，越早提升越合算哦
+    </div>
+    <div th:if="${message != null}" th:replace="~{fragment/message::message2}"></div>
+
+    <div class="l">现金:[[${session.sRole.coin}]]金币</div>
+    <div class="l">存款额度:0 <a href="#" th:href="@{/userBankUp}">提升上限</a></div>
+    <div class="l">账户余额:[[${session.sRole.bankCoin}]]金币</div>
+    <div class="icon-gray-border">
+        <div class="t">存款 (手续费1%，100金币起存)</div>
+        <form method="post" th:action="@{/bankIn.do}">
+            <div class="flex">
+                <input class="large-input mr5" maxlength="10" name="inNum" size="10" type="text" value="0"/>
+                <input class="mini-button" type="submit" value="马上存入"/>
+            </div>
+        </form>
+        <div class="t">取款 (无手续费)</div>
+        <form method="post" th:action="@{/bankOut.do}">
+            <div class="flex">
+                <input class="large-input mr5" maxlength="10" name="outNum" size="10" type="text" value="0"/>
+                <input class="mini-button" type="submit" value="马上取出"/>
+            </div>
+        </form>
+    </div>
+    <div class="panel"><a class="" href="../game.html" th:href="@{/game.do}">返回游戏</a></div>
+</div>
+</body>
+</html>

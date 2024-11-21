@@ -42,7 +42,22 @@ public class RoleTrap implements Serializable {
     /**
      * 捕捉小鸟配置Id
      */
-    private Integer baseBirdId;
+    private Integer catchBirdId;
+
+    /**
+     * 捕捉小鸟性别, 0中性/1雄性/2雌性
+     */
+    private Byte catchBirdSex;
+
+    /**
+     * 捕捉小鸟重量
+     */
+    private Long catchBirdWeight;
+
+    /**
+     * 捕捉小鸟星级
+     */
+    private Byte catchBirdStar;
 
     /**
      * 开始捕捉时间戳
@@ -96,12 +111,36 @@ public class RoleTrap implements Serializable {
         this.baitId = baitId;
     }
 
-    public Integer getBaseBirdId() {
-        return baseBirdId;
+    public Integer getCatchBirdId() {
+        return catchBirdId;
     }
 
-    public void setBaseBirdId(Integer baseBirdId) {
-        this.baseBirdId = baseBirdId;
+    public void setCatchBirdId(Integer catchBirdId) {
+        this.catchBirdId = catchBirdId;
+    }
+
+    public Byte getCatchBirdSex() {
+        return catchBirdSex;
+    }
+
+    public void setCatchBirdSex(Byte catchBirdSex) {
+        this.catchBirdSex = catchBirdSex;
+    }
+
+    public Long getCatchBirdWeight() {
+        return catchBirdWeight;
+    }
+
+    public void setCatchBirdWeight(Long catchBirdWeight) {
+        this.catchBirdWeight = catchBirdWeight;
+    }
+
+    public Byte getCatchBirdStar() {
+        return catchBirdStar;
+    }
+
+    public void setCatchBirdStar(Byte catchBirdStar) {
+        this.catchBirdStar = catchBirdStar;
     }
 
     public Integer getCatchTime() {
@@ -141,9 +180,12 @@ public class RoleTrap implements Serializable {
         return "RoleTrap{" +
             "id = " + id +
             ", roleId = " + roleId +
-            ", index = " + idx +
+            ", idx = " + idx +
             ", baitId = " + baitId +
-            ", baseBirdId = " + baseBirdId +
+            ", catchBirdId = " + catchBirdId +
+            ", catchBirdSex = " + catchBirdSex +
+            ", catchBirdWeight = " + catchBirdWeight +
+            ", catchBirdStar = " + catchBirdStar +
             ", catchTime = " + catchTime +
             ", catchEndTime = " + catchEndTime +
             ", useTrapId = " + useTrapId +

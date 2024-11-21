@@ -37,7 +37,7 @@
         <div th:if="${page.getTotal() > 0}">
             <ul class="">
                 <li th:each="item, stat : ${page.getRecords()}">
-                    <div>“<span th:text="${item.titleName}"></span>”<a href="#" th:text="${item.roleName}"></a>:<span th:text="${item.message}"></span> (<span th:text="${#dates.format(new java.util.Date(item.time * 1000L), 'MM-dd HH:mm')}"></span>)</div>
+                    <div>“<span th:text="${item.titleName}"></span>”<a href="#" th:text="${item.roleName}"></a>:<span th:text="${item.message}"></span> <span class="text-gray" th:text="${#dates.format(new java.util.Date(item.time * 1000L), 'MM-dd HH:mm')}"></span></div>
                 </li>
             </ul>
             <div th:replace="~{fragment/chat::pagination}"></div>

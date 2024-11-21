@@ -33,7 +33,7 @@
                         <p th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${baitVO.baseBait.name}+'×'+${baitVO.getNum()}">谷子(25级)</p>
                         <p>捕捉:<span th:text="${@gameUtils.getCatchBirdName(baitVO.baseBait.getBirdSet())}"></span></p>
                         <p>数量:<span th:text="${baitVO.num}"></span></p>
-                        <p class="btl"><a href="#" th:href="@{/pack/bait/use.do(baitId=${baitVO.baseId})}">使用</a>
+                        <p class="btl"><a href="#" th:href="@{/pack/trap/useBait.do(baitId=${baitVO.baseId})}">使用</a>
                     </div>
                 </li>
             </ul>

@@ -43,7 +43,7 @@ public class AccountController extends BaseController {
             return "account/login";
         }
         model.addAttribute("account", account);
-        return redirectTo("/loginRole.do");
+        return redirectTo("/role/login.do");
     }
 
     /***
@@ -84,7 +84,7 @@ public class AccountController extends BaseController {
         // 存储账户信息到session
         session.setAttribute("account", account);
         model.addAttribute("account", account);
-        return redirectTo("/loginRole.do");
+        return redirectTo("/role/login.do");
     }
 
     /***
@@ -104,7 +104,7 @@ public class AccountController extends BaseController {
         }
         Account account = (Account) session.getAttribute("account");
         if (null != account) {
-            return redirectTo("/loginRole.do");
+            return redirectTo("/role/login.do");
         }
         return "account/register";
     }
@@ -153,7 +153,7 @@ public class AccountController extends BaseController {
             return "account/register";
         }
 
-        int nowTime = CommonUtils.nowTimestamp();
+        int nowTime = CommonUtils.nowTime();
         // 创建账号
         account = new Account();
         account.setUserId(UUIDUtils.genUserId("bird"));
@@ -169,7 +169,7 @@ public class AccountController extends BaseController {
         // 存储账户信息到session
         session.setAttribute("account", account);
         model.addAttribute("account", account);
-        return redirectTo("/loginRole.do");
+        return redirectTo("/role/login.do");
     }
 
     /***

@@ -1,9 +1,10 @@
 package com.qq2008.game.bird.controller.common;
 
 import com.qq2008.game.bird.data.ConstData;
+import com.qq2008.game.bird.data.GameConfigManager;
+import com.qq2008.game.bird.model.dbo.BaseLevel;
 import com.qq2008.game.bird.model.dbo.Role;
 import com.qq2008.game.bird.model.dbo.RolePack;
-import com.qq2008.game.bird.service.*;
 import com.qq2008.game.bird.service.*;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
@@ -16,6 +17,7 @@ import java.util.Objects;
  */
 public class BaseController {
 
+    // service使用继承后的，便与代码生成器覆盖代码 todo
     @Resource
     public IBaseBaitService baseBaitService;
     @Resource
@@ -50,6 +52,8 @@ public class BaseController {
     public IRoleTrapService trapService;
     @Resource
     public ILogChatService chatService;
+    @Resource
+    public IStorageBirdService storageBirdService;
 
     /***
      * 转发到路由
@@ -99,11 +103,50 @@ public class BaseController {
     }
 
     /***
+     * 增加用户经验值
+     * @param role 角色信息
+     * @param addExp 增加经验值
+     */
+    public void addRoleExp(Role role, Long addExp) {
+        try {
+            // 增加金钱错误
+            if (role == null || addExp <= 0) {
+                throw new Exception();
+            }
+            // 增加经验值
+            role.setExp(role.getExp() + addExp);
+            role.setTotalExp(role.getTotalExp() + addExp);
+            int newLevel = calcRoleLevel(role.getLevel(), role.getTotalExp());
+            role.setLevel(newLevel);
+            // 写日志
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /***
+     * 计算角色等级
+     * @param oldLevel 旧的等级
+     * @param totalExp 总经验
+     * @return 新的觉得等级
+     */
+    int calcRoleLevel(int oldLevel, long totalExp){
+        int tempLevel = oldLevel;
+        for (int i = oldLevel; i < 200; i++) {
+            BaseLevel baseLevel = GameConfigManager.getInstance().getBaseLevel(i);
+            if(baseLevel != null && totalExp >= baseLevel.getTotalExp()){
+                tempLevel = i;
+            }
+        }
+        return tempLevel;
+    }
+
+    /***
      * 增加用户金钱
      * @param role 角色信息
      * @param addCoin 增加金钱
      */
-    public void addCoin(Role role, Long addCoin) {
+    public void addRoleCoin(Role role, Long addCoin) {
         try {
             // 增加金钱错误
             if (role == null || addCoin <= 0) {
@@ -122,7 +165,7 @@ public class BaseController {
      * @param role 角色信息
      * @param costCoin 消耗金钱
      */
-    public void costCoin(Role role, Long costCoin) {
+    public void costRoleCoin(Role role, Long costCoin) {
         try {
             // 金钱不足
             if (role == null || costCoin <= 0 || costCoin > role.getCoin()) {
@@ -142,7 +185,7 @@ public class BaseController {
      * @param role 角色信息
      * @param addDiamond 增加钻石
      */
-    public void addDiamond(Role role, int addDiamond) {
+    public void addRoleDiamond(Role role, int addDiamond) {
         try {
             // 增加钻石错误
             if (role == null || addDiamond <= 0) {
@@ -161,7 +204,7 @@ public class BaseController {
      * @param role 角色信息
      * @param costDiamond 消耗钻石
      */
-    public void costDiamond(Role role, int costDiamond) {
+    public void costRoleDiamond(Role role, int costDiamond) {
         try {
             // 钻石不足
             if (role == null || costDiamond <= 0 || costDiamond > role.getDiamond()) {
@@ -180,7 +223,7 @@ public class BaseController {
      * @param role 角色信息
      * @param addLovePoint 增加爱心值
      */
-    public void addLovePoint(Role role, int addLovePoint) {
+    public void addRoleLovePoint(Role role, int addLovePoint) {
         try {
             // 增加爱心值错误
             if (role == null || addLovePoint <= 0) {
@@ -199,7 +242,7 @@ public class BaseController {
      * @param role 角色信息
      * @param costLovePoint 消耗爱心值
      */
-    public void costLovePoint(Role role, Long costLovePoint) {
+    public void costRoleLovePoint(Role role, Long costLovePoint) {
         try {
             // 爱心值不足
             if (role == null || costLovePoint <=  0 || costLovePoint > role.getLovePoint()) {

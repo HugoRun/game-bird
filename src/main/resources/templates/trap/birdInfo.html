@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>小鸟情人</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+
+<div class="main">
+    <ul th:if="${baseBird != null}">
+        <li><img alt="" src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${baseBird.id}.gif|}"/> [[${baseBird.name}]]</li>
+        <li>[[${baseBird.descText}]]</li>
+        <li>类型:[[${baseBird.name}]]</li>
+        <li>最小重量:[[${baseBird.minWeight/100}]]斤</li>
+        <li>最大重量:[[${baseBird.maxWeight/100}]]斤</li>
+        <li>单价:[[${baseBird.price}]]金币</li>
+        <li>捕获时长:[[${baseBird.catchMin}]]分钟</li>
+        <li>捕获经验:[[${baseBird.catchExp}]]</li>
+        <li>升级所需经验:0</li>
+        <li>最小重量记录:无</li>
+        <li>最大重量记录:无</li>
+    </ul>
+    <ul th:if="${baseBird == null}">
+        <li>未知的小鸟</li>
+    </ul>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

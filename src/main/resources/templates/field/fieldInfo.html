@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>小鸟情人</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+
+<div class="main">
+    <ul th:if="${baseField != null }">
+        <li><img alt="" src="../../static/images/field/1.gif" th:src="@{|/assets/images/field/${baseField.id}.gif|}"/></li>
+        <li>[[${baseField.name}]]</li>
+        <li>[[${baseField.descText}]]</li>
+    </ul>
+    <ul th:if="${baseField == null }">
+        <li>未知的区域</li>
+    </ul>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

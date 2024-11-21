@@ -23,7 +23,7 @@ public class MockUtils {
      */
     public static Page<ChatMessageVO> mockChatMessageList(int size, Role role) {
         //
-        int nowTime = CommonUtils.nowTimestamp();
+        int nowTime = CommonUtils.nowTime();
         String[] messageList = RandomTextData.getRandChatMessageArray();
         ChatRoleVO chatRoleVO = GameUtils.makeChatRole(role);
         // 随机聊天信息列表
@@ -61,7 +61,7 @@ public class MockUtils {
      */
     public static Page<ChatMessageVO> mockTreeMessageList(int size, Role role) {
         //
-        int nowTime = CommonUtils.nowTimestamp();
+        int nowTime = CommonUtils.nowTime();
         String[] messageList = RandomTextData.getRandTreeMessageArray();
         ChatRoleVO chatRoleVO = GameUtils.makeChatRole(role);
         // 随机聊天信息列表

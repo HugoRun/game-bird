@@ -67,5 +67,6 @@ public class ConstData {
     public static int DEFAULT_TRAIN_ID = 1;
     // 默认陷阱Id
     public static int DEFAULT_TRAP_ID = 1;
-
+    // 聊天信息有效天数
+    public static int CHAT_TIME = 3;
 }

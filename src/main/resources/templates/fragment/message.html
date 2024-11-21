@@ -28,5 +28,14 @@
         <div class="text-danger" th:if="${message.messageType.typeId == 4}" th:utext="${message.message}"></div>
     </div>
 </div>
+<div th:fragment="message3">
+    <div class="" th:if="${message}">
+        <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+        <div class="" th:if="${message.messageType.typeId == 1}" th:utext="${message.message}"></div>
+        <div class="text-success" th:if="${message.messageType.typeId == 2}" th:utext="${message.message}"></div>
+        <div class="text-warning" th:if="${message.messageType.typeId == 3}" th:utext="${message.message}"></div>
+        <div class="text-danger" th:if="${message.messageType.typeId == 4}" th:utext="${message.message}"></div>
+    </div>
+</div>
 </body>
 </html>

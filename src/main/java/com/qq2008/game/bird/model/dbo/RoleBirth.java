@@ -193,15 +193,15 @@ public class RoleBirth implements Serializable {
         return "RoleBirth{" +
             "id = " + id +
             ", roleId = " + roleId +
-            ", index = " + idx +
+            ", idx = " + idx +
             ", birdId = " + birdId +
             ", birdBaseId = " + birdBaseId +
             ", matchRoleId = " + matchRoleId +
             ", matchRoleName = " + matchRoleName +
             ", matchBirdId = " + matchBirdId +
             ", matchBirdBaseId = " + matchBirdBaseId +
-            ", trainTime = " + birthTime +
-            ", trainEndTime = " + birthEndTime +
+            ", birthTime = " + birthTime +
+            ", birthEndTime = " + birthEndTime +
             ", useNestId = " + useNestId +
             ", useNestNum = " + useNestNum +
         "}";

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>修改性别</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+    <style>
+        ul li{
+            margin-bottom: 4px;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: flex-end;
+        }
+        ul li img{
+            border: 1px solid #aaa;
+            padding: 2px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <div class="mb-1 panel bg-green">修改玩家性别</div>
+    <form th:action="@{/role/change/sex.do}" method="post">
+        <div class="mb-1">
+            <select name="sex">
+                <option value="0">保密</option>
+                <option value="1">男</option>
+                <option value="2">女</option>
+            </select>
+        </div>
+        <div class="mb-1 text-end">
+            <input type="submit" value="确定修改">
+        </div>
+    </form>
+    <div class="panel "><a class="" href="./profile.html" th:href="@{/role/profile.do}">返回</a></div>
+    <div class="panel"><a class="" href="../game.html" th:href="@{/game.do}">返回首页</a></div>
+</div>
+</body>
+</html>

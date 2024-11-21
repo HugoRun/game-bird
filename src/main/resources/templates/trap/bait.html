@@ -21,13 +21,15 @@
             </div>
         </div>
         <div th:if="${baitList.size() > 0}">
-            <form action="/bait/use" method="post">
+            <form action="/trap/useBait.do" method="post">
                 <input type="hidden" name="trapId" th:value="${trapId}">
-                <select name="baitId">
-                    <option th:each="baitVO, stat : ${baitList}" th:value="${baitVO.id}">
-                        <th:block th:text="${baitVO.baseBait.name}+'×'+${baitVO.getNum()}">谷子(25级)</th:block>
-                    </option>
-                </select>
+                <label style="margin:  10px 0;">
+                    <select name="baitId">
+                        <option th:each="baitVO, stat : ${baitList}" th:value="${baitVO.id}">
+                            <th:block th:text="${baitVO.baseBait.name}+'×'+${baitVO.getNum()}">谷子(25级)</th:block>
+                        </option>
+                    </select>
+                </label>
                 <input type="submit" th:value="下饵">
             </form>
         </div>

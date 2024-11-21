@@ -7,6 +7,7 @@ import com.qq2008.common.entiy.vo.MessageLink;
 import com.qq2008.common.entiy.vo.MessageVO;
 import com.qq2008.common.util.CommonUtils;
 import com.qq2008.game.bird.controller.common.BaseController;
+import com.qq2008.game.bird.data.ConstData;
 import com.qq2008.game.bird.data.RandomTextData;
 import com.qq2008.game.bird.model.dbo.LogChat;
 import com.qq2008.game.bird.model.dbo.Role;
@@ -49,6 +50,7 @@ public class ChatController extends BaseController {
         model.addAttribute("chatType", chatType);
         // 查询数据
         LambdaQueryWrapper<LogChat> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.gt(LogChat::getTime, CommonUtils.nowDate() - ConstData.CHAT_TIME * 86400);
         queryWrapper.orderByDesc(LogChat::getTime);
         Page<LogChat> pageInfo = new Page<>();
         pageInfo.setCurrent(pageNo);
@@ -93,7 +95,7 @@ public class ChatController extends BaseController {
         chat.setRoleName(role.getRoleName());
         chat.setTitleName("小菜鸟");
         chat.setMessage(message);
-        chat.setTime(CommonUtils.nowTimestamp());
+        chat.setTime(CommonUtils.nowTime());
         chatService.save(chat);
         // 构造
         model.addFlashAttribute("message", MessageVO.error("发送聊天消息成功！"));
