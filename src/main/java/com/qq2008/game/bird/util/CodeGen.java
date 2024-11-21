@@ -16,7 +16,7 @@ public class CodeGen {
         // DB配置
         String JDBC_URL = "jdbc:mysql://localhost:3306/game_bird?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false";
         String DB_USER = "root";
-        String DB_PASSWORD = "";
+        String DB_PASSWORD = "root";
         // 生成路径配置
         String CODE_PATH_PROJECT = Paths.get(System.getProperty("user.dir")) + "/src/main/java";
         String CODE_PATH_TEST = Paths.get(System.getProperty("user.dir")) + "/code-gen";
