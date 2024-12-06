@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!-- 聊天频道 -->
+<div class="panel bg-blue navList" th:fragment="chatType(type)">
+    <ul th:if="${type == 1}">
+        <li>▣全部</li>
+        <li><a th:href="@{/chat/list.do(chatType=2)}" href="./chat.html">◻世界</a></li>
+        <li><a th:href="@{/chat/list.do(chatType=3)}" href="./chat.html">◻公会</a></li>
+    </ul>
+    <ul th:if="${type == 2}">
+        <li><a th:href="@{/chat/list.do(chatType=1)}" href="./chat.html">◻全部</a></li>
+        <li>▣世界</li>
+        <li><a th:href="@{/chat/list.do(chatType=3)}" href="./chat.html">◻公会</a></li>
+    </ul>
+    <ul th:if="${type == 3}">
+        <li><a th:href="@{/chat/list.do(chatType=1)}" href="./chat.html">◻全部</a></li>
+        <li><a th:href="@{/chat/list.do(chatType=2)}" href="./chat.html">◻世界</a></li>
+        <li>▣公会</li>
+    </ul>
+</div>
+<!-- 分页 -->
+<div th:fragment="pagination">
+    <div th:if="${page.pages > 1}">
+        <a th:href="@{${url}(chatType=${chatType}, pageNo=1)}" th:if="${page.current != 1}">首页</a>
+        <a th:href="@{${url}(chatType=${chatType}, pageNo=${page.current - 1})}" th:if="${page.current > 1}">上页</a>
+        <a th:href="@{${url}(chatType=${chatType}, pageNo=${page.current + 1})}" th:if="${page.current < page.pages}">下页</a>
+        <a th:href="@{${url}(chatType=${chatType}, pageNo=${page.pages})}" th:if="${page.current < page.pages}">最后一页</a>
+        <form action="" class="inline-block">
+            <input name="chatType" th:value="${chatType}" type="hidden">
+            第 <input class="mini-input" maxlength="3"name="pageNo" th:value="${page.getCurrent()}" type="text"/> 页 <input class="mini-button" type="submit" value="前往">
+        </form>
+        <br/>
+        <span class="panel" th:text="|(共${page.getTotal()}条数据, 当前第${page.current}/${page.pages}页)|"></span>
+    </div>
+</div>
+</body>
+</html>

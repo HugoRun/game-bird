@@ -1,0 +1,391 @@
+/* 通用CSS */
+*,
+p {
+    padding: 0;
+    margin: 0;
+    outline: none;
+}
+
+ul {
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+}
+
+html {
+    background-color: #ededed;
+}
+
+body {
+    font-size: 18px;
+    background-color: #fff;
+    max-width: 800px;
+    margin: 0 auto;
+    /*font-family: ui-sans-serif;*/
+    /*font-family: "微软雅黑", sans-serif, Serif;*/
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 0 1px 0 1px;
+    font-family: auto;
+    padding: 2px;
+}
+
+.main {
+    /*background-color: lightgray;*/
+    padding: 2px 10px;
+    box-sizing: border-box;
+    min-height: 100vh;
+}
+
+a {
+    color: #2b7bbf;
+    box-sizing: border-box;
+    /*border-radius: 3px;*/
+    /*border: 2px solid transparent;*/
+    /*letter-spacing: 2px;*/
+    text-decoration: none;
+}
+
+a:visited {
+    color: #2b7bbf;
+}
+
+a:hover {
+    background-color: #2b7bbf;
+    color: white;
+}
+
+input,
+input:hover,
+input:focus {
+    outline: none;
+}
+
+.inline-block {
+    display: inline-block;
+}
+
+/* 登录 */
+
+input[type=text],
+input[type=password] {
+    width: 100%;
+    padding: 4px 10px;
+    box-sizing: border-box;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #3b99fc;
+    border-radius: 2px;
+    font-family: Consolas, sans-serif, Serif;
+    /*box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);*/
+}
+
+input[type=text]:focus,
+input[type=password]:focus {
+    box-shadow: inset 0 1px 2px rgba(59, 153, 252, .3), inset 0 -1px 2px rgba(59, 153, 252, .1);
+    outline: none;
+    /*border-color: #6644bb;*/
+}
+
+input[type=submit],
+button {
+    padding: 0 10px;
+    box-sizing: border-box;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #0d6efd;
+    font-family: Consolas, sans-serif, Serif;
+    border-radius: 2px;
+    /*letter-spacing: 2px;*/
+}
+
+input[type=submit]:hover,
+button:hover {
+    box-shadow: inset 0 2px 3px rgba(0, 0, 0, .1);
+    border-color: #6644bb;
+    background-color: #eee;
+}
+
+input[type=submit]:active,
+button:active {
+    box-shadow: inset 1px 2px 5px rgba(0, 0, 0, .4);
+    border-color: #6644bb;
+    background-color: #ddd;
+}
+
+input[type=submit]:focus,
+button:focus {
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, .3);
+    border-color: #6644bb;
+    background-color: #ddd;
+}
+
+/* 列表类型1 */
+
+.list1 li {
+    display: flex;
+    box-sizing: border-box;
+    padding: 5px 0;
+}
+
+.list1 li .list1-icon {
+}
+
+.list1 li .list1-icon img {
+    width: 52px;
+    height: 52px;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.list1 li .list1-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.list1 li .list1-info p {
+    line-height: 26px;
+}
+
+/* 图标边框 */
+img.icon-gray-border {
+    border: 1px solid dimgray;
+    /*padding: 1px;*/
+    box-sizing: border-box;
+}
+
+/* 任务感叹号和问号 */
+
+.task-a:after {
+    content: "!";
+    color: #dc3545;
+    font-style: normal;
+    font-family: math;
+}
+
+.task-a:after {
+    content: "?";
+    color: #dc3545;
+    font-style: normal;
+    font-family: math;
+}
+
+/* xx */
+.btl {
+    /*border-top: 1px dashed #ccc;*/
+}
+
+/* VIP图标 */
+
+.vip-icon {
+    width: 24px;
+}
+
+/* 金蛋 */
+
+.egg {
+    display: inline-block;
+    width: 18px;
+    margin-right: 3px;
+}
+
+.egg-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+/* 面板 */
+
+.panel {
+    /*padding: 0 10px;*/
+    margin-bottom: 2px;
+}
+
+.panel.bg-green {
+    background-color: #cdffcc;
+    border: 1px solid #87D886;
+    margin: 1px;
+    padding: 1px;
+}
+
+.panel.bg-blue {
+    background-color: #c5e7ff;
+    border: 1px solid #A1CFEC;;
+    margin: 1px;
+    padding: 1px;
+}
+
+.panel.bg-yellow{
+    background-color: #fff7d0;
+    border: 1px solid #e3cc76;
+    margin: 1px;
+    padding: 1px;
+}
+
+/* 文本颜色 */
+
+.text-blue {
+    color: blue;
+}
+
+.text-light-green {
+    color: lightgreen;
+}
+
+.text-darkorange {
+    color: darkorange;
+}
+
+.text-graya {
+    color: rgba(128, 128, 128, 0.4);
+    user-select: none;
+}
+
+.text-gray {
+    color: rgba(128, 128, 128, 0.8);
+    user-select: none;
+}
+
+.text-green {
+    color: green;
+}
+
+/* NPC图标 */
+.npc-pic {
+    /*margin-bottom: 5px;*/
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    font-weight: bolder;
+    font-family: initial;
+    color: darkred;
+}
+
+.npc-pic img {
+    width: 48px;
+    border: 1px solid #6644bb;
+}
+
+.npc-talk {
+    color: darkred;
+}
+
+/* 宽度/高度  */
+
+.w100 {
+    cursor: pointer;
+    width: 100%;
+}
+
+.wh16 {
+    width: 16px;
+    height: 16px;
+}
+
+.wh24 {
+    width: 24px;
+    height: 24px;
+}
+
+.wh32 {
+    width: 32px;
+    height: 32px;
+}
+
+.wh48 {
+    width: 48px;
+    height: 48px;
+}
+
+.wh64 {
+    width: 64px;
+    height: 64px;
+}
+
+.wh100 {
+    width: 100px;
+    height: 100px;
+}
+
+/* 分页 */
+input.mini-input {
+    width: 60px;
+    padding: 0 5px;
+    display: inline-block;
+    height: 26px;
+}
+
+input.middle-input {
+    width: 120px;
+    padding: 0 5px;
+    display: inline-block;
+    height: 26px;
+}
+
+input.large-input {
+    width: 200px;
+    padding: 0 5px;
+    display: inline-block;
+    height: 26px;
+}
+
+input.mini-button,
+button.mini-button {
+    height: 26px;
+    font-size: 14px;
+    font-family: Consolas, sans-serif, Serif;
+}
+
+i.text-separator {
+    font-style: normal;
+}
+
+i.text-separator:after {
+    content: " . ";
+    color: rgba(0, 0, 0, .1);
+}
+
+.navList {
+
+}
+
+.navList ul {
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.navList ul li:not(:last-child) {
+    margin-right: 10px;
+}
+
+.avatar-wrapper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+}
+
+.b {
+    /*background-color: #84ac35;*/
+    /*border: 1px solid #678048;*/
+    /*color: #fff;*/
+    /*padding: 1px 5px;*/
+}
+
+.flex{
+    display: flex;
+}
+.mr5 {
+    margin-right: 5px;
+}
+

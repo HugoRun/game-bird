@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="feeTypeFilter">
+    <div th:if="${feeType == 0}">
+        筛选:▣全部&nbsp;<a href="?feeType=1" th:href="@{${url}(feeType=1)}">◻金币</a>&nbsp;<a href="?feeType=2" th:href="@{${url}(feeType=2)}">◻钻石</a>&nbsp;<a href="?feeType=3" th:href="@{${url}(feeType=3)}">◻爱心</a>
+    </div>
+    <div th:if="${feeType == 1}">
+        筛选:<a href="?feeType=0" th:href="@{${url}(feeType=0)}">◻全部</a>&nbsp;▣金币&nbsp;<a href="?feeType=2" th:href="@{${url}(feeType=2)}">◻钻石</a>&nbsp;<a href="?feeType=3" th:href="@{${url}(feeType=3)}">◻爱心</a>
+    </div>
+    <div th:if="${feeType == 2}">
+        筛选:<a href="?feeType=0" th:href="@{${url}(feeType=0)}">◻全部</a>&nbsp;<a href="?feeType=1" th:href="@{${url}(feeType=1)}">◻金币</a>&nbsp;▣钻石&nbsp;<a href="?feeType=3" th:href="@{${url}(feeType=3)}">◻爱心</a>
+    </div>
+    <div th:if="${feeType == 3}">
+        筛选:<a href="?feeType=0" th:href="@{${url}(feeType=0)}">◻全部</a>&nbsp;<a href="?feeType=1" th:href="@{${url}(feeType=1)}">◻金币</a>&nbsp;<a href="?feeType=2" th:href="@{${url}(feeType=2)}">◻钻石</a>&nbsp;▣爱心
+    </div>
+</div>
+</body>
+</html>

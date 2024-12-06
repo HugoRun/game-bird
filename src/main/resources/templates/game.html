@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>小鸟情人</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<div class="main">
+    <div class="panel bg-green">
+        <div>公告:<img src="../../static/images/icon/guide.gif" th:src="@{/assets/images/icon/guide.gif}"/><a href="./notice/detail.do" th:href="@{/notice/detail.do(id=0)}">真爱至上</a></div>
+        <div>主线:<i class="task-a"></i><a href="./task/list.html" th:href="@{/task/list.do}">挑战祥瑞之地</a></div>
+        <div>任务:<i class="task-a"></i><a href="#">愤怒的传奇(未完成)</a></div>
+        <div>福利:<a href="./weal/sign.html" th:href="@{/weal/sign.do}">签到</a>(未签到)</div>
+    </div>
+    <div>
+        <div class="panel bg-blue">"<span href="#" th:text="|小菜鸟|"></span>" <span href="#" th:text="|${session.sRole.roleName}|"></span> <a href="#" onclick="toggleShow('p1')">收起</a></div>
+        <div id="p1">
+            <div>等级:<span th:text="|${session.sRole.level}|"></span>级(20%) <img alt="" class="vip-icon" src="../../static/images/vip/vip_3.png" th:src="|/assets/images/vip/vip_${session.sRole.vip}.png|"/> <a th:href="@{/profile.do}">详情</a></div>
+            <div>爱心:<span th:text="|${session.sRole.lovePoint}|"></span> 金币:<span th:text="|${session.sRole.coin}|"></span> <a th:href="@{/bank.do}">存款</a></div>
+            <div>鲜花:<span th:text="|${session.sRole.diamond}|"></span> 钻石:<span th:text="|${session.sRole.diamond}|"></span></div>
+            <div th:if="${session.sRole.marriageType > 0}">爱人:<span><a href="#" th:text="|这段情、|">详情</a></span></div>
+            <div hidden="hidden">徒弟:<span><a href="#" th:text="|丂①花花世界的爱情|">详情</a></span> <span><a href="#" th:text="|丂①花花世界的爱情|">详情</a></span> <span><a href="#" th:text="|丂①花花世界的爱情|">详情</a></span></div>
+            <div class="egg-wrapper" hidden="hidden"><img alt="" class="egg" src="../../static/images/egg/1.gif" th:src="@{/assets/images/egg/1.gif}"/>1星金蛋:<a href="#">砸蛋开奖</a></div>
+            <div class="egg-wrapper" hidden="hidden"><img alt="" class="egg" src="../../static/images/egg/4.gif" th:src="@{/assets/images/egg/4.gif}"/>4星金蛋:10小时38分钟</div>
+        </div>
+    </div>
+    <div>
+        <div class="panel bg-blue">
+            【<a href="./myField.html" th:href="@{/field/info.do(fieldId=${session.sRole.fieldId})}" th:text="${@gameUtils.getFieldName(session.sRole.fieldId)}">彩虹树林</a>】 <a th:href="@{/trap/autoUseBait.do}">一键下饵</a>
+        </div>
+        <div>
+            <div>
+                <img class="icon-gray-border" src="../../static/images/field/1.gif" th:alt="${@gameUtils.getFieldName(session.sRole.fieldId)}" th:src="|/assets/images/field/${session.sRole.fieldId}.gif|">
+                <a th:href="@{/game.do}">刷新</a>
+            </div>
+            <div hidden="hidden">守卫:5小时后小鸟入侵</div>
+            <div hidden="hidden">出征:抢夺敌人财富 <a href="#">出征</a></div>
+            <div th:if="${session.sRole.marriageType > 0}">
+                <img src="../../static/images/icon/love.gif" th:alt="婚戒" th:src="@{/assets/images/icon/love.gif}">
+                <div th:if="${session.sRole.marriageType == 1}">喜鹊之恋:配对重量+1%,配对时间-1%</div>
+                <div th:if="${session.sRole.marriageType == 2}">鸳鸯之恋:配对重量+3%,时间-3%</div>
+                <div th:if="${session.sRole.marriageType == 3}">比翼鸟之恋:配对重量+8%,时间-8%</div>
+                <div th:if="${session.sRole.marriageType == 4}">天使之恋:配对重量+20%,时间-20%</div>
+            </div>
+        </div>
+    </div>
+    <div th:if="${trapList != null && trapList.size() > 0}">
+        <ul class="list1">
+            <li th:each="trap, stat : ${trapList}">
+                <div class="list1-icon" th:if="${trap.baitId == 0}">
+                    <img alt="" class="icon-gray-border" src="../../static/images/trap/1.gif" th:src="@{|/assets/images/trap/${trap.useTrap.id}.gif|}">
+                </div>
+                <div class="list1-info" th:if="${trap.baitId == 0}">
+                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/trap/change.do(trapId=${trap.id})}">更换陷阱</a></span></p>
+                    <p>空闲中</p>
+                    <p><a href="#" th:href="@{/trap/useBait.do(trapId=${trap.id})}">下饵</a></p>
+                </div>
+
+                <div class="list1-icon" th:if="${trap.baitId > 0}">
+                    <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${trap.catchBirdId}.gif|}">
+                </div>
+                <div class="list1-info" th:if="${trap.baitId > 0 && trap.catchEndTime > nowTime}">
+                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/trap/birdInfo.do(birdId=${trap.catchBird.id})}" th:text="${trap.catchBird.name}">麻雀</a> <th:block
+                            th:text="${@gameUtils.getStarName(trap.catchBirdStar)}"></th:block></span></p>
+                    <p><th:block th:text="${@gameUtils.getTimeDiff(trap.catchEndTime, nowTime)}"></th:block>后捕获</p>
+                    <p><a th:href="@{/trap/hasten.do(trapId=${trap.id})}">加速</a></p>
+                </div>
+                <div class="list1-info" th:if="${trap.baitId > 0 && trap.catchEndTime <= nowTime}">
+                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/trap/birdInfo.do(birdId=${trap.catchBird.id})}" th:text="${trap.catchBird.name}">麻雀</a> <th:block
+                            th:text="${@gameUtils.getStarName(trap.catchBirdStar)}"></th:block></span></p>
+                    <p>已捕获</p>
+                    <p><a href="#" th:href="@{/trap/over.do(trapId=${trap.id})}">去收网</a></p>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div th:if="${birthList != null && birthList.size() > 0}">
+        <div class="panel bg-blue">【爱的巢穴】</div>
+        <ul class="list1">
+            <li th:each="birth, stat : ${birthList}">
+                <div class="list1-icon" th:if="${birth.birdId == 0}">
+                    <img alt="" class="icon-gray-border" src="../../static/images/nest/1.gif" th:src="@{|/assets/images/nest/${birth.useNest.id}.gif|}">
+                </div>
+                <div class="list1-info" th:if="${birth.birdId == 0}">
+                    <p>
+                        [[${birth.useNest.name}]] <span th:if="${birth.useNestId > 0}" th:text="|(剩余${birth.useNestNum}次)|"></span>
+                    </p>
+                    <p><a href="#">开始配对</a> <a href="/cage/change">换巢穴</a></p>
+                </div>
+
+                <div class="list1-icon" th:if="${birth.birdId > 0}">
+                    <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${birth.birdBaseId}.gif|}">
+                </div>
+                <div class="list1-info" th:if="${birth.birdId > 0 && birth.birthEndTime >= nowTime}">
+                    <p>[[${birth.useNest.name}]] <span class="text-primary" th:text="${birth.baseBird.name}">丹顶鹤</span></p>
+                    <p><th:block th:text="${@gameUtils.getTimeDiff(birth.birthEndTime, nowTime)}"></th:block>后完成</p>
+                    <p><a href="#">强化</a> <a href="#">加速</a></p>
+                </div>
+                <div class="list1-info" th:if="${birth.birdId > 0 && birth.birthEndTime < nowTime}">
+                    <p>[[${birth.useNest.name}]] <span class="text-primary" th:text="${birth.baseBird.name}">丹顶鹤</span></p>
+                    <p><a href="#">收获</a></p>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div th:if="${trainList != null && trainList.size() > 0}">
+        <div class="panel bg-blue">【宠物训练场】</div>
+        <ul class="list1">
+            <li th:each="train, stat : ${trainList}">
+                <div class="list1-icon" th:if="${train.birdId == 0}">
+                    <img alt="" class="icon-gray-border" src="../../static/images/train/1.gif" th:src="@{|/assets/images/train/${train.useTrain.id}.gif|}">
+                </div>
+                <div class="list1-info" th:if="${train.birdId == 0}">
+                    <p>[[${train.useTrain.name}]] <th:block th:if="${train.useTrainExpireTime > 0}" th:text="|${@gameUtils.getTimeDiff(train.useTrainExpireTime, nowTime)}后过期|"></th:block> <a href="#">更换场地</a></p>
+                    <p>空闲中</p>
+                    <p><a href="#">开始训练</a></p>
+                </div>
+
+                <div class="list1-icon" th:if="${train.birdId > 0}">
+                    <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${train.birdId}.gif|}">
+                </div>
+                <div class="list1-info" th:if="${train.birdId > 0 && train.trainEndTime > nowTime}">
+                    <p>[[${train.useTrain.name}]] <th:block th:if="${train.useTrainExpireTime > 0}" th:text="|${@gameUtils.getTimeDiff(train.useTrainExpireTime, nowTime)}后过期|"></th:block></p>
+                    <p><span class="text-primary">1级流氓兔</span>已训练<span class="text-darkorange">3</span>分钟</p>
+                    <p><a href="#">加速</a> <a href="#">停止</a></p>
+                </div>
+                <div class="list1-info" th:if="${train.birdId > 0 && train.trainEndTime <= nowTime}">
+                    <p>[[${train.useTrain.name}]] <th:block th:if="${train.useTrainExpireTime > 0}" th:text="|${@gameUtils.getTimeDiff(train.useTrainExpireTime, nowTime)}后过期|"></th:block></p>
+                    <p><a href="#">重温旧梦</a>的<span class="text-primary">1级流氓兔</span>已训练<span class="text-darkorange">3</span>分钟</p>
+                    <p><a href="#">赶走</a></p>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <div class="panel bg-blue">【世界喊话】<a href="/chat/list.do">我要喊话</a></div>
+        <div th:if="${chatMessageList != null && chatMessageList.size() == 0}">暂未开放</div>
+        <ul th:if="${chatMessageList.size() > 0}">
+            <li th:each="message, stat : ${chatMessageList}">
+                <span th:text='|"${message.titleName}"|'></span> <a href="#" th:text="${message.roleName}">重温旧梦</a>:<span th:text="${message.message}"></span> <span class="text-gray" th:text="|${@gameUtils.getTimeDiff(message.time)}前|"></span>
+            </li>
+        </ul>
+    </div>
+    <div hidden="hidden">
+        <div class="panel bg-blue">【树林记录】<a href="#">全部动态</a></div>
+        <div th:if="${treeMessagePage.getTotal() == 0}">暂未开放</div>
+        <ul>
+            <li th:each="message, stat : ${treeMessagePage.getRecords()}">
+                <span th:utext="${message.message}"></span> <span th:text="|${@gameUtils.getTimeDiff(message.time)}前|"></span>
+            </li>
+        </ul>
+    </div>
+    <div hidden="hidden">
+        <div class="panel bg-blue">【世界动态】<a href="#">全部动态</a></div>
+        <div>暂未开放</div>
+        <ul>
+            <li>我收获了0.5斤的麻雀一只。09:10:25</li>
+            <li><a href="#">重温旧梦</a> 收获了0.5斤的麻雀一只。09:10:25</li>
+        </ul>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+    <script>
+        /***
+         * 切换显示隐藏元素(根据元素Id)
+         */
+        function toggleShow(eId) {
+            let e = document.getElementById(eId);
+            e.hidden = !e.hidden;
+        }
+    </script>
+</div>
+</body>
+</html>

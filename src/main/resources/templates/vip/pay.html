@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>小鸟情人</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<div class="main">
+    <div class="n"></div>
+    <div class="npc-pic"><img alt="球球" th:src="@{/assets/images/icon/npc.gif}" src="../../static/images/icon/npc.gif"/>球球:</div>
+    <div class="panel bg-blue">
+        将球球在世界发的兑换码输入在下面，点击兑换，即可获得随机奖励～<br>
+        一个兑换码只能使用一次，先到先得哦
+    </div>
+    <div>
+        兑换CDK：
+        <form>
+            <div class="flex">
+                <input maxlength="10" size="15" type="text" class="mr5 large-input"/>
+                <input class="mini-button" type="submit" value="兑换"/>
+            </div>
+        </form>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

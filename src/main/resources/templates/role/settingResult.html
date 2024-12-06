@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>小鸟情人</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<div class="main">
+    <div th:replace="~{fragment/message::message3}"></div>
+    <div class="panel "><a class="" href="./profile.html" th:href="@{/role/profile.do}">返回</a></div>
+    <div class="panel"><a class="" href="../game.html" th:href="@{/game.do}">返回首页</a></div>
+</div>
+</body>
+</html>

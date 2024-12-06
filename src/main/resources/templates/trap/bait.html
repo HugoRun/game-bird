@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>小鸟情人</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+
+<div class="main">
+    <div>
+        <div class="pic">
+            <img alt="" src="../../static/images/logo/pack.gif" th:src="@{/assets/images/logo/pack.gif}"/>
+        </div>
+        <div th:if="${baitList.size() == 0}">
+            <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+            <div class="npc-talk">
+                <div>您还没有任何诱饵哦,马上去<a href="../../shop/bait.html" th:href="@{/shop/bait/list.do}">商店</a>购买吧！</div>
+            </div>
+        </div>
+        <div th:if="${baitList.size() > 0}">
+            <form action="/trap/useBait.do" method="post">
+                <input type="hidden" name="trapId" th:value="${trapId}">
+                <label style="margin:  10px 0;">
+                    <select name="baitId">
+                        <option th:each="baitVO, stat : ${baitList}" th:value="${baitVO.id}">
+                            <th:block th:text="${baitVO.baseBait.name}+'×'+${baitVO.getNum()}">谷子(25级)</th:block>
+                        </option>
+                    </select>
+                </label>
+                <input type="submit" th:value="下饵">
+            </form>
+        </div>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!--<template1 v-if="cages.length === 0">-->
+<!--<div class="msg">-->
+<!--<div class="l">你没有"笼子"可用啦！</div>-->
+<!--&lt;!&ndash;          <div class="l">有了饵才能抓鸟哦~</div>&ndash;&gt;-->
+<!--<div class="l">快去-->
+<!--<router-link :to="{ name: 'shopCage' }">商店</router-link>-->
+<!--购买吧-->
+<!--</div>-->
+<!--</div>-->
+<!--</template1>-->
+<!--<template1 v-else>-->
+<!--<table>-->
+<!--<template1 v-for="cage in cages" :key="cage.id">-->
+<!--<tr class="l">-->
+<!--<td class="pic">-->
+<!--  <img v-if="cage.cage.id" :src="`/img/cage/${cage.cage.id}.gif`" :alt="cage.cage.name" >-->
+<!--</td>-->
+<!--<td>-->
+<!--  <a href="#" @click="goCageDetail(cage.cage.id)">{{ cage.cage.name }}</a>|{{cage.cage.needLevel}}级-->
+<!--  <br />-->
+<!--  功能:{{cage.cage.funcDesc}}<br />-->
+<!--  耐久度:{{cage.durability}}次-->
+
+<!--  <router-link :to="{ name: 'selectCage', params:{id: cage.id} }">使用</router-link>-->
+<!--  <a @click="dropCage(cage.id)">丢弃</a>-->
+<!--  <br />-->
+<!--</td>-->
+
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>小鸟情人</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+
+<div class="main">
+    <div>
+        <div class="pic">
+            <img alt="" src="../../static/images/logo/pack.gif" th:src="@{/assets/images/logo/pack.gif}"/>
+        </div>
+        <div>容量:<span th:text="${page.getTotal()}"></span>/3000</div>
+        <div th:replace="~{fragment/pack::packType(type='cage')}"></div>
+        <div th:replace="~{fragment/feeTypeFilter::feeTypeFilter}"></div>
+        <div th:if="${page.getTotal() == 0}">
+            <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+            <div class="npc-talk">
+                <div>您还没有任何鸟笼哦,马上去<a href="../../shop/cage.html" th:href="@{/shop/cage/list.do}">商店</a>购买吧！</div>
+            </div>
+        </div>
+        <div th:if="${page.getTotal() > 0}">
+            <ul class="list1">
+                <li th:each="cageVO, stat : ${page.getRecords()}">
+                    <div class="list1-icon">
+                        <img alt="" class="icon-gray-border" src="../../static/images/cage/1.gif" th:src="@{|/assets/images/cage/${cageVO.baseId}.gif|}">
+                    </div>
+                    <div class="list1-info">
+                        <p th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${cageVO.baseCage.name}+'×'+${cageVO.getNum()}">谷子(25级)</p>
+                        <p>功能:<span th:text="${cageVO.baseCage.func}"></span></p>
+                        <p>耐久度:<span th:text="${cageVO.baseCage.num}"></span> 数量:<span th:text="${cageVO.num}"></span></p>
+                        <p class="btl"><a href="#" th:href="@{/pack/cage/use.do(cageId=${cageVO.baseId})}">使用</a>
+                    </div>
+                </li>
+            </ul>
+            <div th:replace="~{fragment/pack::pagination}"></div>
+        </div>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

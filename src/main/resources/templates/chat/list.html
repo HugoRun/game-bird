@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>小鸟情人</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<div class="main">
+    <div>
+        <div class="pic">
+            <img alt="" src="../../static/images/logo/chat.gif" th:src="@{/assets/images/logo/chat.gif}"/>
+        </div>
+
+        <div th:replace="~{fragment/message::message2}"></div>
+        <div>
+            <div>输入喊话内容(30个字以内):</div>
+            <div>
+                <form th:action="@{/chat/chatWorld.do}" method="post">
+                    <div class="mb-1">
+                        <input maxlength="30" type="text" name="message" placeholder="请输入聊天内容"/>
+                    </div>
+                    <div class="mb-1 text-end">
+                        <input class="" type="submit" value="世界喊话">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div th:replace="~{fragment/chat::chatType(type=1)}"></div>
+        <div class="panel">喊话记录 <a href="javascript:window.location.reload()">刷新</a></div>
+        <div th:if="${page.getTotal() == 0}">
+            <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+            <div class="npc-talk">当前还没有人发言哦，快去发言吧。</div>
+        </div>
+        <div th:if="${page.getTotal() > 0}">
+            <ul class="">
+                <li th:each="item, stat : ${page.getRecords()}">
+                    <div>“<span th:text="${item.titleName}"></span>”<a href="#" th:text="${item.roleName}"></a>:<span th:text="${item.message}"></span> <span class="text-gray" th:text="${#dates.format(new java.util.Date(item.time * 1000L), 'MM-dd HH:mm')}"></span></div>
+                </li>
+            </ul>
+            <div th:replace="~{fragment/chat::pagination}"></div>
+        </div>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

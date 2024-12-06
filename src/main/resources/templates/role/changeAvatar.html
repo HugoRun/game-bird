@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>修改头像</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+    <style>
+        ul li{
+            margin-bottom: 4px;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: flex-end;
+        }
+        ul li img{
+            border: 1px solid #aaa;
+            padding: 2px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <ul>
+        <li><img alt="头像" src="/assets/images/head/1.png"><a href="#" th:href="@{/role/change/avatar2.do(img=1)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/2.png"><a href="#" th:href="@{/role/change/avatar2.do(img=2)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/3.png"><a href="#" th:href="@{/role/change/avatar2.do(img=3)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/4.png"><a href="#" th:href="@{/role/change/avatar2.do(img=4)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/5.png"><a href="#" th:href="@{/role/change/avatar2.do(img=5)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/6.png"><a href="#" th:href="@{/role/change/avatar2.do(img=6)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/7.png"><a href="#" th:href="@{/role/change/avatar2.do(img=7)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/8.png"><a href="#" th:href="@{/role/change/avatar2.do(img=8)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/9.png"><a href="#" th:href="@{/role/change/avatar2.do(img=9)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/10.png"><a href="#" th:href="@{/role/change/avatar2.do(img=10)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/11.png"><a href="#" th:href="@{/role/change/avatar2.do(img=11)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/12.png"><a href="#" th:href="@{/role/change/avatar2.do(img=12)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/13.png"><a href="#" th:href="@{/role/change/avatar2.do(img=13)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/14.png"><a href="#" th:href="@{/role/change/avatar2.do(img=14)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/15.png"><a href="#" th:href="@{/role/change/avatar2.do(img=15)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/16.png"><a href="#" th:href="@{/role/change/avatar2.do(img=16)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/17.png"><a href="#" th:href="@{/role/change/avatar2.do(img=17)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/18.png"><a href="#" th:href="@{/role/change/avatar2.do(img=18)}">设置头像</a></li>
+        <li><img alt="头像" src="/assets/images/head/19.png"><a href="#" th:href="@{/role/change/avatar2.do(img=19)}">设置头像</a></li>
+    </ul>
+    <div class="panel "><a class="" href="./profile.html" th:href="@{/role/profile.do}">返回</a></div>
+    <div class="panel"><a class="" href="../game.html" th:href="@{/game.do}">返回游戏</a></div>
+</div>
+</body>
+</html>

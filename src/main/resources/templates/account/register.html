@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>注册账号</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<section th:if="${account == null }" class="main">
+    <form action="" method="post">
+        <h3>注册账号</h3>
+        <div>
+            <div class="mb-1">
+                <div>账号:</div>
+                <div><input name="username" type="text"/></div>
+            </div>
+            <div class="mb-2">
+                <div>密码:</div>
+                <div><input name="password" type="text"/></div>
+            </div>
+            <div class="mb-2">
+                <div>密码:</div>
+                <div><input name="passwordRe" type="text"/></div>
+            </div>
+            <div class="text-danger text-end" th:if="${!#strings.isEmpty(errorMsg)}" th:text="${errorMsg}"></div>
+            <div class="mb-1 text-end">
+                <input class="btn btn-outline-primary" type="submit" value="注册">
+            </div>
+            <div class="text-end">
+                <a href="/login.do">登录账号</a>
+            </div>
+        </div>
+    </form>
+</section>
+<script src="../../static/js/bootstrap.bundle.5.3.2.js" th:src="@{/assets/js/bootstrap.bundle.5.3.2.js}"></script>
+</body>
+</html>

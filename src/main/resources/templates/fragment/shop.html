@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!-- 商店信息 -->
+<div th:fragment="shopInfo">
+    金币:[[${session.sRole.coin}]]&nbsp;<a href="./userBank.html" th:href="@{/userBank.do}">取款</a>
+    <br/>
+    爱心:[[${session.sRole.lovePoint}]]&nbsp;钻石:[[${session.sRole.diamond}]]&nbsp;<a href="../pay.html" th:href="@{/pay.do}">获得钻石</a>
+</div>
+<!-- 类型导航 -->
+<div class="panel bg-blue navList" th:fragment="shopType(type)">
+    <ul th:if="${type == 'bait'}">
+        <li>▣诱饵</li>
+        <li><a th:href="@{/shop/trap/list.do}" href="./trap.html">◻陷阱</a></li>
+        <li><a th:href="@{/shop/cage/list.do}" href="./cage.html">◻鸟笼</a></li>
+        <li><a th:href="@{/shop/nest/list.do}" href="./nest.html">◻巢穴</a></li>
+        <li><a th:href="@{/shop/train/list.do}" href="./train.html">◻训练场</a></li>
+        <li><a th:href="@{/shop/prop/list.do}" href="./prop.html">◻道具</a></li>
+    </ul>
+    <ul th:if="${type == 'cage'}">
+        <li><a th:href="@{/shop/bait/list.do}" href="./bait.html">◻诱饵</a></li>
+        <li><a th:href="@{/shop/trap/list.do}" href="./trap.html">◻陷阱</a></li>
+        <li>▣鸟笼</li>
+        <li><a th:href="@{/shop/nest/list.do}" href="./nest.html">◻巢穴</a></li>
+        <li><a th:href="@{/shop/train/list.do}" href="./train.html">◻训练场</a></li>
+        <li><a th:href="@{/shop/prop/list.do}" href="./prop.html">◻道具</a></li>
+    </ul>
+    <ul th:if="${type == 'nest'}">
+        <li><a th:href="@{/shop/bait/list.do}" href="./bait.html">◻诱饵</a></li>
+        <li><a th:href="@{/shop/trap/list.do}" href="./trap.html">◻陷阱</a></li>
+        <li><a th:href="@{/shop/cage/list.do}" href="./cage.html">◻鸟笼</a></li>
+        <li>▣巢</li>
+        <li><a th:href="@{/shop/train/list.do}" href="./train.html">◻训练场</a></li>
+        <li><a th:href="@{/shop/prop/list.do}" href="./prop.html">◻道具</a></li>
+    </ul>
+    <ul th:if="${type == 'prop'}">
+        <li><a th:href="@{/shop/bait/list.do}" href="./bait.html">◻诱饵</a></li>
+        <li><a th:href="@{/shop/trap/list.do}" href="./trap.html">◻陷阱</a></li>
+        <li><a th:href="@{/shop/cage/list.do}" href="./cage.html">◻鸟笼</a></li>
+        <li><a th:href="@{/shop/nest/list.do}" href="./nest.html">◻巢穴</a></li>
+        <li><a th:href="@{/shop/train/list.do}" href="./train.html">◻训练场</a></li>
+        <li>▣道具</li>
+    </ul>
+    <ul th:if="${type == 'train'}">
+        <li><a th:href="@{/shop/bait/list.do}" href="./bait.html">◻诱饵</a></li>
+        <li><a th:href="@{/shop/trap/list.do}" href="./trap.html">◻陷阱</a></li>
+        <li><a th:href="@{/shop/cage/list.do}" href="./cage.html">◻鸟笼</a></li>
+        <li><a th:href="@{/shop/nest/list.do}" href="./nest.html">◻巢穴</a></li>
+        <li>▣训练场</li>
+        <li><a th:href="@{/shop/prop/list.do}" href="./prop.html">◻道具</a></li>
+    </ul>
+    <ul th:if="${type == 'trap'}">
+        <li><a th:href="@{/shop/bait/list.do}" href="./bait.html">◻诱饵</a></li>
+        <li>▣陷阱</li>
+        <li><a th:href="@{/shop/cage/list.do}" href="./cage.html">◻鸟笼</a></li>
+        <li><a th:href="@{/shop/nest/list.do}" href="./nest.html">◻巢穴</a></li>
+        <li><a th:href="@{/shop/train/list.do}" href="./train.html">◻训练场</a></li>
+        <li><a th:href="@{/shop/prop/list.do}" href="./prop.html">◻道具</a></li>
+    </ul>
+</div>
+<!-- 分页 -->
+<div th:fragment="pagination">
+    <div th:if="${page.pages > 1}">
+        <a th:href="@{${url}(feeType=${feeType}, pageNo=1)}" th:if="${page.current != 1}">首页</a>
+        <a th:href="@{${url}(feeType=${feeType}, pageNo=${page.current - 1})}" th:if="${page.current > 1}">上页</a>
+        <a th:href="@{${url}(feeType=${feeType}, pageNo=${page.current + 1})}" th:if="${page.current < page.pages}">下页</a>
+        <a th:href="@{${url}(feeType=${feeType}, pageNo=${page.pages})}" th:if="${page.current < page.pages}">最后一页</a>
+        <form action="" class="inline-block">
+            <input name="feeType" th:value="${feeType}" type="hidden">
+            第 <input class="mini-input" maxlength="3"name="pageNo" th:value="${page.getCurrent()}" type="text"/> 页 <input class="mini-button" type="submit" value="前往">
+        </form>
+        <br/>
+        <span class="panel" th:text="|(共${page.getTotal()}条数据, 当前第${page.current}/${page.pages}页)|"></span>
+    </div>
+</div>
+</body>
+</html>

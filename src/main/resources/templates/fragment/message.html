@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="message">
+    <div class="" th:if="${message}">
+        <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+        <div class="" th:if="${message.messageType.typeId == 1}" th:utext="${message.message}"></div>
+        <div class="text-success" th:if="${message.messageType.typeId == 2}" th:utext="${message.message}"></div>
+        <div class="text-warning" th:if="${message.messageType.typeId == 3}" th:utext="${message.message}"></div>
+        <div class="text-danger" th:if="${message.messageType.typeId == 4}" th:utext="${message.message}"></div>
+        <div th:if="${message.linkList}">
+            <div th:each="link, stat : ${message.linkList}">
+                <a th:href="${link.href}" th:utext="${link.text}">前往</a>
+            </div>
+        </div>
+        <div><a href="#" onclick="self.location=document.referrer;" th:if="${message.isGoBack}">返回</a></div>
+    </div>
+</div>
+<div th:fragment="message2">
+    <div class="" th:if="${message}">
+        <div class="" th:if="${message.messageType.typeId == 1}" th:utext="${message.message}"></div>
+        <div class="text-success" th:if="${message.messageType.typeId == 2}" th:utext="${message.message}"></div>
+        <div class="text-warning" th:if="${message.messageType.typeId == 3}" th:utext="${message.message}"></div>
+        <div class="text-danger" th:if="${message.messageType.typeId == 4}" th:utext="${message.message}"></div>
+    </div>
+</div>
+<div th:fragment="message3">
+    <div class="" th:if="${message}">
+        <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+        <div class="" th:if="${message.messageType.typeId == 1}" th:utext="${message.message}"></div>
+        <div class="text-success" th:if="${message.messageType.typeId == 2}" th:utext="${message.message}"></div>
+        <div class="text-warning" th:if="${message.messageType.typeId == 3}" th:utext="${message.message}"></div>
+        <div class="text-danger" th:if="${message.messageType.typeId == 4}" th:utext="${message.message}"></div>
+    </div>
+</div>
+</body>
+</html>
