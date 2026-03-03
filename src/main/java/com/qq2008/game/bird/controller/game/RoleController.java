@@ -143,7 +143,7 @@ public class RoleController extends BaseController {
         // 没有角色跳转到创建角色界面
         if (null == role) {
             model.addAttribute("errorMsg", "未找到相关角色。");
-            return redirectTo("/create.do");
+            return redirectTo("create.do");
         }
         // 写登录日志(更新登录时间戳)
         int nowTime = CommonUtils.nowTime();
