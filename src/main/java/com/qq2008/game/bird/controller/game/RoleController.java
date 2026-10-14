@@ -23,6 +23,19 @@ import java.util.List;
 
 /***
  * 角色
+ *
+ * <p><b>路由命名（RT-3）</b>：本类 16 条映射去掉 {@code .do} 后缀，
+ * 并把「设置页」与「设置动作」收敛到同一路径、靠 HTTP method 区分：
+ * {@code GET /role/avatar} 列出 19 个头像，{@code POST /role/avatar} 落库；
+ * {@code GET /role/title} 列出称号，{@code POST /role/title} 落库。
+ *
+ * <p>原先的 {@code avatar2.do} / {@code title2.do} 是历史遗留的分裂 ——
+ * 同一功能的「进入页」与「提交」被拆成两条路径，只有后缀可区分。
+ * 它们同时是<b>GET 写操作</b>（会 {@code roleService.saveOrUpdate}），本次一并转为 POST。
+ * 合并后误用 {@code <a href>} 只会 GET 到设置页而不会改数据，比原先更安全。
+ *
+ * <p>{@code /quit} 刻意保留不限定 method 的 {@code @RequestMapping}，
+ * 改 method 语义不属于本轮的路由后缀范围。
  */
 @RequestMapping("/role")
 @Controller
@@ -39,7 +52,7 @@ public class RoleController extends BaseController {
      * @return view
      */
     @SkipRole
-    @GetMapping("/create.do")
+    @GetMapping("/create")
     public String postCreateRole(Model model) {
         model.addAttribute("randNickName", "");
         return "role/create";
@@ -52,7 +65,7 @@ public class RoleController extends BaseController {
      * @return view
      */
     @SkipRole
-    @PostMapping("/create.do")
+    @PostMapping("/create")
     public String postCreateRole(HttpSession session, String roleName, Model model) {
         // 参数校验
         if (null == roleName || roleName.isEmpty()) {
@@ -136,7 +149,7 @@ public class RoleController extends BaseController {
      * @return view
      */
     @SkipRole
-    @RequestMapping("/login.do")
+    @GetMapping("/login")
     public String postLoginRole(HttpSession session, Model model) {
         // 获取已登录账号
         Account account = (Account) session.getAttribute("account");
@@ -147,7 +160,7 @@ public class RoleController extends BaseController {
         // 没有角色跳转到创建角色界面
         if (null == role) {
             model.addAttribute("message", MessageVO.error("未找到相关角色。"));
-            return redirectTo("create.do");
+            return redirectTo("create");
         }
         // 写登录日志(更新登录时间戳)
         int nowTime = CommonUtils.nowTime();
@@ -164,7 +177,7 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/profile.do")
+    @GetMapping("/profile")
     public String pageProfile(HttpSession session, Model model) {
         return "role/profile";
     }
@@ -175,7 +188,7 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/change/avatar.do")
+    @GetMapping("/avatar")
     public String pageChangeAvatar(HttpSession session, Model model) {
         return "role/changeAvatar";
     }
@@ -186,7 +199,7 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/change/avatar2.do")
+    @PostMapping("/avatar")
     public String doChangeAvatar(HttpSession session, Model model, @RequestParam(defaultValue = "1") int img) {
         Role role = getSessionRole(session);
         // 头像配置错误
@@ -208,7 +221,7 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/change/title.do")
+    @GetMapping("/title")
     public String pageChangeTitle(HttpSession session, Model model) {
         List<BaseTitle> titleList = configGateway.getBaseTitleList();
         model.addAttribute("baseTitleList", titleList);
@@ -221,7 +234,7 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/change/title2.do")
+    @PostMapping("/title")
     public String doChangeTitle(HttpSession session, Model model, @RequestParam(defaultValue = "1") int titleId) {
         Role role = getSessionRole(session);
         // 称号配置错误
@@ -245,7 +258,7 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/change/dynamic.do")
+    @GetMapping("/dynamic")
     public String pageChangeDynamic(HttpSession session, Model model) {
         return "role/changeDynamic";
     }
@@ -256,7 +269,7 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @PostMapping("/change/dynamic.do")
+    @PostMapping("/dynamic")
     public String doChangeDynamic(HttpSession session, Model model, String dynamic) {
         Role role = getSessionRole(session);
         // 心情为空
@@ -279,7 +292,7 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/change/name.do")
+    @GetMapping("/name")
     public String pageChangeName(HttpSession session, Model model) {
         return "role/changeName";
     }
@@ -290,7 +303,7 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @PostMapping("/change/name.do")
+    @PostMapping("/name")
     public String doChangeName(HttpSession session, Model model, String roleName) {
         Role role = getSessionRole(session);
         // 名称不能为空
@@ -321,7 +334,7 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/change/sex.do")
+    @GetMapping("/sex")
     public String pageChangeSex(HttpSession session, Model model) {
         return "role/changeSex";
     }
@@ -332,7 +345,7 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @PostMapping("/change/sex.do")
+    @PostMapping("/sex")
     public String doChangeSex(HttpSession session, Model model, @RequestParam(defaultValue = "0") Byte sex) {
         Role role = getSessionRole(session);
         // 性别错误
@@ -353,7 +366,7 @@ public class RoleController extends BaseController {
      * @param session session
      * @return view
      */
-    @RequestMapping(value = {"/quit.do"})
+    @RequestMapping(value = {"/quit"})
     public String quit(HttpSession session) {
         // 注销当前登录角色数据
         session.removeAttribute("sRole"); // 红线：session key 必须叫 sRole，原代码写成 role，等于没删干净
