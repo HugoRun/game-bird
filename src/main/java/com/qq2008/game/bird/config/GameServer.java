@@ -1,4 +1,4 @@
-package com.qq2008.game.bird.data;
+package com.qq2008.game.bird.config;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;

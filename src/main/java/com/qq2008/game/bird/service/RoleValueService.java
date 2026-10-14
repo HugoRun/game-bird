@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import com.qq2008.common.entity.BizException;
 import com.qq2008.common.entity.ResultCode;
 
-import com.qq2008.game.bird.data.GameConfigManager;
+import com.qq2008.game.bird.config.GameConfigManager;
 import com.qq2008.game.bird.model.dbo.BaseLevel;
 import com.qq2008.game.bird.model.dbo.Role;
 import com.qq2008.game.bird.model.dbo.RolePack;

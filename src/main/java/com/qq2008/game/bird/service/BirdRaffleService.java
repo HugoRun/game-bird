@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.qq2008.game.bird.data.GameConfigGateway;
+import com.qq2008.game.bird.config.GameConfigGateway;
 import com.qq2008.game.bird.model.dbo.BaseBird;
 
 /**

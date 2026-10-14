@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.ReflectionUtils;
 
-import com.qq2008.game.bird.data.GameConfigGateway;
+import com.qq2008.game.bird.config.GameConfigGateway;
 import com.qq2008.game.bird.model.dbo.BaseBait;
 import com.qq2008.game.bird.model.dbo.BaseCage;
 import com.qq2008.game.bird.model.dbo.RolePack;

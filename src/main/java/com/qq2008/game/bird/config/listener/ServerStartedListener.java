@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.qq2008.game.bird.data.GameConfigManager;
-import com.qq2008.game.bird.data.GameServer;
+import com.qq2008.game.bird.config.GameConfigManager;
+import com.qq2008.game.bird.config.GameServer;
 import com.qq2008.game.bird.model.vo.GameStatusVO;
 
 /**

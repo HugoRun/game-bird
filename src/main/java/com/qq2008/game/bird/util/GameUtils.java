@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import com.qq2008.common.util.ArrayUtils;
 import com.qq2008.common.util.CommonUtils;
 
+import com.qq2008.game.bird.config.GameConfigGateway;
 import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.data.GameConfigGateway;
 import com.qq2008.game.bird.data.RandomTextData;
 import com.qq2008.game.bird.model.dbo.BaseBird;
 import com.qq2008.game.bird.model.dbo.BaseField;

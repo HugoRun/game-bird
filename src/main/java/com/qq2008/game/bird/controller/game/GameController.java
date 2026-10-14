@@ -18,9 +18,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.qq2008.common.annotation.SkipRole;
 import com.qq2008.common.util.CommonUtils;
 
+import com.qq2008.game.bird.config.GameConfigGateway;
 import com.qq2008.game.bird.controller.common.BaseController;
 import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.data.GameConfigGateway;
 import com.qq2008.game.bird.model.dbo.BaseField;
 import com.qq2008.game.bird.model.dbo.LogChat;
 import com.qq2008.game.bird.model.dbo.Role;
