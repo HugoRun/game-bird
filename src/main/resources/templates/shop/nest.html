@@ -4,15 +4,9 @@
 <body>
 <div class="main">
     <div>
-        <div class="pic">
-            <img alt="" src="../../static/images/logo/shop.gif" th:src="@{/assets/images/logo/shop.gif}"/>
-        </div>
-        <div th:replace="~{fragment/shop::shopInfo}"></div>
-        <div th:replace="~{fragment/shop::shopType(type='nest')}"></div>
-        <div th:replace="~{fragment/feeTypeFilter::feeTypeFilter}"></div>
+        <div th:replace="~{fragment/shop::shopHeader(type='nest')}"></div>
         <div th:if="${page.getTotal() == 0}">
-            <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
-            <div class="npc-talk">商店现在还没有开门哦。</div>
+            <div th:replace="~{fragment/shop::shopEmpty}"></div>
         </div>
         <div th:if="${page.getTotal() > 0}">
             <ul class="list1">

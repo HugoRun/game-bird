@@ -18,11 +18,22 @@ public class GameProperties {
     /** 是否允许注册新账号。 */
     private boolean allowRegister = true;
 
+    /** 包裹总容量（U12 新增：原先是 6 个模板里各写死一个 3000）。 */
+    private int packTotalCapacity = 3000;
+
     public boolean isAllowRegister() {
         return allowRegister;
     }
 
     public void setAllowRegister(boolean allowRegister) {
         this.allowRegister = allowRegister;
+    }
+
+    public int getPackTotalCapacity() {
+        return packTotalCapacity;
+    }
+
+    public void setPackTotalCapacity(int packTotalCapacity) {
+        this.packTotalCapacity = packTotalCapacity;
     }
 }

@@ -3,6 +3,7 @@ package com.qq2008.game.bird.controller.game;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.qq2008.game.bird.assembler.RolePackAssembler;
+import com.qq2008.game.bird.config.GameProperties;
 import com.qq2008.game.bird.controller.common.BaseController;
 import com.qq2008.game.bird.data.ConstData;
 import com.qq2008.game.bird.model.dbo.RolePack;
@@ -25,9 +26,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class PackController extends BaseController {
 
-    /** 包裹页面视图装配器，由构造器注入。 */
+    /** 包裹页面视图装配器，由注入取得。 */
     @jakarta.annotation.Resource
     public RolePackAssembler packAssembler;
+
+    /** 游戏配置（提供包裹总容量）。 */
+    @jakarta.annotation.Resource
+    public GameProperties gameProperties;
 
     /***
      * 诱饵背包界面
@@ -126,6 +131,9 @@ public class PackController extends BaseController {
         // 数据转换（增加配置属性）
         Page<RolePackVO> viewPage = packAssembler.assemble(pageInfo, kind);
         model.addAttribute("page", viewPage);
+        // U12：原先 6 个包裹模板各写死一个 3000，现统一由 game.pack-total-capacity 下发。
+        // 只下发不校验 —— 当前版本本就没有限制包裹上限的逻辑，此处不得凭空加入校验。
+        model.addAttribute("packCapacity", gameProperties.getPackTotalCapacity());
         return view;
     }
 
