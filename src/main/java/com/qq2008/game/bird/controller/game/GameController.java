@@ -7,7 +7,7 @@ import com.qq2008.common.entiy.vo.MessageVO;
 import com.qq2008.common.util.CommonUtils;
 import com.qq2008.game.bird.controller.common.BaseController;
 import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.data.GameConfigManager;
+import com.qq2008.game.bird.data.GameConfigGateway;
 import com.qq2008.game.bird.model.dbo.*;
 import com.qq2008.game.bird.model.vo.*;
 import com.qq2008.game.bird.util.MockUtils;
@@ -25,7 +25,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /****
@@ -37,8 +38,12 @@ import java.util.logging.Logger;
 
 @Controller
 public class GameController extends BaseController {
+
+    /** 游戏配置读取入口，由构造器注入。 */
+    @jakarta.annotation.Resource
+    public GameConfigGateway configGateway;
     // 日志句柄
-    Logger logger = Logger.getLogger(GameController.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
     /***
      * 游戏主界面
@@ -74,9 +79,9 @@ public class GameController extends BaseController {
         for (RoleTrap trap : trapList1) {
             RoleTrapVO trapVO = new RoleTrapVO();
             BeanUtils.copyProperties(trap, trapVO);
-            trapVO.setUseTrap(GameConfigManager.getInstance().getBaseTrap(trap.getUseTrapId() == 0 ? ConstData.DEFAULT_TRAP_ID : trap.getUseTrapId()));
+            trapVO.setUseTrap(configGateway.getBaseTrap(trap.getUseTrapId() == 0 ? ConstData.DEFAULT_TRAP_ID : trap.getUseTrapId()));
             if (trap.getCatchBirdId() > 0) {
-                trapVO.setCatchBird(GameConfigManager.getInstance().getBaseBird(trap.getCatchBirdId()));
+                trapVO.setCatchBird(configGateway.getBaseBird(trap.getCatchBirdId()));
             }
             trapList.add(trapVO);
         }
@@ -91,7 +96,7 @@ public class GameController extends BaseController {
         for (RoleBirth trap : birthList1) {
             RoleBirthVO trapVO = new RoleBirthVO();
             BeanUtils.copyProperties(trap, trapVO);
-            trapVO.setUseNest(GameConfigManager.getInstance().getBaseNest(trap.getUseNestId() == 0 ? ConstData.DEFAULT_NEST_ID : trap.getUseNestId()));
+            trapVO.setUseNest(configGateway.getBaseNest(trap.getUseNestId() == 0 ? ConstData.DEFAULT_NEST_ID : trap.getUseNestId()));
             birthList.add(trapVO);
         }
         model.addAttribute("birthList", birthList);
@@ -105,9 +110,9 @@ public class GameController extends BaseController {
         for (RoleTrain trap : trainList1) {
             RoleTrainVO trainVO = new RoleTrainVO();
             BeanUtils.copyProperties(trap, trainVO);
-            trainVO.setUseTrain(GameConfigManager.getInstance().getBaseTrain(trap.getUseTrainId() == 0 ? ConstData.DEFAULT_TRAIN_ID : trap.getUseTrainId()));
+            trainVO.setUseTrain(configGateway.getBaseTrain(trap.getUseTrainId() == 0 ? ConstData.DEFAULT_TRAIN_ID : trap.getUseTrainId()));
             if (trap.getBirdBaseId() > 0) {
-                trainVO.setBaseBird(GameConfigManager.getInstance().getBaseBird(trap.getBirdBaseId()));
+                trainVO.setBaseBird(configGateway.getBaseBird(trap.getBirdBaseId()));
             }
             trainList.add(trainVO);
         }
@@ -202,11 +207,13 @@ public class GameController extends BaseController {
      */
     @GetMapping("/field/info.do")
     public String pageFile(HttpSession session, Model model, @RequestParam(defaultValue = "0") int fieldId) {
-        BaseField baseField = GameConfigManager.getInstance().getBaseField(fieldId);
+        BaseField baseField = configGateway.getBaseField(fieldId);
         model.addAttribute("baseField", baseField);
         return "field/fieldInfo";
     }
 
+    // ========== 待实现功能备忘（非死代码，勿删） ==========
+    // 下列条目是作者列出的功能规划清单，没有对应实现，属于产品待办而非废弃代码。
     // 一键下饵
     // 收获 playFinish
     // 选择场地界面 PackSelectTrap
@@ -260,18 +267,6 @@ public class GameController extends BaseController {
     @SkipRole
     @GetMapping("/pay.do")
     public String pagePay(HttpSession session, Model model) {
-        //        int nowTime = CommonUtils.nowTimestamp();
-        //        Role role = getSessionRole(session);
-        //        String[] chatList = RandomTextData.getRandChatMessageArray();
-        //        for (String s1 : chatList) {
-        //            LogChat chat = new LogChat();
-        //            chat.setId(0L);
-        //            chat.setRoleId(role.getRoleId());
-        //            chat.setMessage(s1);
-        //            chat.setTime((int) (nowTime - Math.random() * 100000));
-        //            chatService.save(chat);
-        //        }
-
         return "vip/pay";
     }
 

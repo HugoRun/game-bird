@@ -2,10 +2,9 @@ package com.qq2008.game.bird.controller.game;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.qq2008.common.util.JSONUtils;
 import com.qq2008.game.bird.controller.common.BaseController;
 import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.data.GameConfigManager;
+import com.qq2008.game.bird.data.GameConfigGateway;
 import com.qq2008.game.bird.model.dbo.Role;
 import com.qq2008.game.bird.model.dbo.RolePack;
 import com.qq2008.game.bird.model.vo.RolePackVO;
@@ -26,6 +25,10 @@ import java.util.List;
 @RequestMapping("/pack")
 @Controller
 public class PackController extends BaseController {
+
+    /** 游戏配置读取入口，由构造器注入。 */
+    @jakarta.annotation.Resource
+    public GameConfigGateway configGateway;
 
     /***
      * 诱饵背包界面
@@ -57,7 +60,7 @@ public class PackController extends BaseController {
         for (RolePack item : pageInfo.getRecords()) {
             RolePackVO roleBaitVO = new RolePackVO();
             BeanUtils.copyProperties(item, roleBaitVO);
-            roleBaitVO.setBaseBait(GameConfigManager.getInstance().getBaseBait(roleBaitVO.getBaseId()));
+            roleBaitVO.setBaseBait(configGateway.getBaseBait(roleBaitVO.getBaseId()));
             baitRecordList.add(roleBaitVO);
         }
         pageInfo2.setRecords(baitRecordList);
@@ -95,7 +98,7 @@ public class PackController extends BaseController {
         for (RolePack item : pageInfo.getRecords()) {
             RolePackVO roleCageVO = new RolePackVO();
             BeanUtils.copyProperties(item, roleCageVO);
-            roleCageVO.setBaseCage(GameConfigManager.getInstance().getBaseCage(roleCageVO.getBaseId()));
+            roleCageVO.setBaseCage(configGateway.getBaseCage(roleCageVO.getBaseId()));
             cageRecordList.add(roleCageVO);
         }
         pageInfo2.setRecords(cageRecordList);
@@ -133,7 +136,7 @@ public class PackController extends BaseController {
         for (RolePack item : pageInfo.getRecords()) {
             RolePackVO roleNestVO = new RolePackVO();
             BeanUtils.copyProperties(item, roleNestVO);
-            roleNestVO.setBaseNest(GameConfigManager.getInstance().getBaseNest(roleNestVO.getBaseId()));
+            roleNestVO.setBaseNest(configGateway.getBaseNest(roleNestVO.getBaseId()));
             nestRecordList.add(roleNestVO);
         }
         pageInfo2.setRecords(nestRecordList);
@@ -171,7 +174,7 @@ public class PackController extends BaseController {
         for (RolePack item : pageInfo.getRecords()) {
             RolePackVO rolePropVO = new RolePackVO();
             BeanUtils.copyProperties(item, rolePropVO);
-            rolePropVO.setBaseProp(GameConfigManager.getInstance().getBaseProp(rolePropVO.getBaseId()));
+            rolePropVO.setBaseProp(configGateway.getBaseProp(rolePropVO.getBaseId()));
             propRecordList.add(rolePropVO);
         }
         pageInfo2.setRecords(propRecordList);
@@ -209,11 +212,10 @@ public class PackController extends BaseController {
         for (RolePack item : pageInfo.getRecords()) {
             RolePackVO roleTrainVO = new RolePackVO();
             BeanUtils.copyProperties(item, roleTrainVO);
-            roleTrainVO.setBaseTrain(GameConfigManager.getInstance().getBaseTrain(roleTrainVO.getBaseId()));
+            roleTrainVO.setBaseTrain(configGateway.getBaseTrain(roleTrainVO.getBaseId()));
             trainRecordList.add(roleTrainVO);
         }
         pageInfo2.setRecords(trainRecordList);
-        System.out.println(JSONUtils.toJSON(trainRecordList));
         model.addAttribute("page", pageInfo2);
         return "pack/train";
     }
@@ -248,7 +250,7 @@ public class PackController extends BaseController {
         for (RolePack item : pageInfo.getRecords()) {
             RolePackVO roleTrapVO = new RolePackVO();
             BeanUtils.copyProperties(item, roleTrapVO);
-            roleTrapVO.setBaseTrap(GameConfigManager.getInstance().getBaseTrap(roleTrapVO.getBaseId()));
+            roleTrapVO.setBaseTrap(configGateway.getBaseTrap(roleTrapVO.getBaseId()));
             trapRecordList.add(roleTrapVO);
         }
         pageInfo2.setRecords(trapRecordList);

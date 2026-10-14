@@ -1,7 +1,7 @@
 package com.qq2008.game.bird.util;
 
 import com.qq2008.common.util.CommonUtils;
-import com.qq2008.game.bird.data.GameConfigManager;
+import com.qq2008.game.bird.data.GameConfigGateway;
 import com.qq2008.game.bird.data.RandomTextData;
 import com.qq2008.game.bird.model.dbo.BaseBird;
 import com.qq2008.game.bird.model.dbo.BaseField;
@@ -10,6 +10,7 @@ import com.qq2008.game.bird.model.dbo.Role;
 import com.qq2008.game.bird.model.vo.ChatMessageVO;
 import com.qq2008.game.bird.model.vo.ChatRoleVO;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -20,6 +21,16 @@ import java.util.List;
  */
 @Component
 public class GameUtils {
+
+    /**
+     * 配置读取入口。
+     *
+     * <p>模板通过 {@code @gameUtils.xxx(...)} 调用本类。原先三个依赖配置的方法是static 的，
+     * 内部靠 {@code GameConfigManager.getInstance()} 反查容器；现改为实例方法 + 注入，
+     * SpEL 对实例方法同样能解析，模板无需改动。
+     */
+    @Autowired
+    private GameConfigGateway configGateway;
 
     /***
      * 获取一句随机的格言
@@ -85,8 +96,8 @@ public class GameUtils {
      * @param fileId 区域Id
      * @return 区域名称
      */
-    public static String getFieldName(int fileId) {
-        BaseField baseField = GameConfigManager.getInstance().getBaseField(fileId);
+    public String getFieldName(int fileId) {
+        BaseField baseField = configGateway.getBaseField(fileId);
         return baseField == null ? "" : baseField.getName();
     }
 
@@ -95,11 +106,11 @@ public class GameUtils {
      * @param birdIdSet 小鸟Id, ...
      * @return 名称集合
      */
-    public static String getCatchBirdName(String birdIdSet) {
+    public String getCatchBirdName(String birdIdSet) {
         List<String> nameList = new ArrayList<>();
         String[] birdIdList = birdIdSet.split(",");
         for (String birdId : birdIdList) {
-            BaseBird baseBird = GameConfigManager.getInstance().getBaseBird(Integer.valueOf(birdId));
+            BaseBird baseBird = configGateway.getBaseBird(Integer.valueOf(birdId));
             if (baseBird != null) {
                 nameList.add(baseBird.getName());
             }
@@ -155,8 +166,8 @@ public class GameUtils {
      * @param titleId 称号Id
      * @return 称号名称
      */
-    public static String getTitleName(int titleId) {
-        BaseTitle title = GameConfigManager.getInstance().getBaseTitle(titleId);
+    public String getTitleName(int titleId) {
+        BaseTitle title = configGateway.getBaseTitle(titleId);
         if (title == null)
             return "";
         return title.getName();

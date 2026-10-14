@@ -7,7 +7,7 @@ import com.qq2008.common.entiy.vo.MessageVO;
 import com.qq2008.common.util.CommonUtils;
 import com.qq2008.game.bird.controller.common.BaseController;
 import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.data.GameConfigManager;
+import com.qq2008.game.bird.data.GameConfigGateway;
 import com.qq2008.game.bird.model.dbo.*;
 import com.qq2008.game.bird.util.UUIDUtils;
 import com.qq2008.game.bird.model.dbo.*;
@@ -27,6 +27,10 @@ import java.util.List;
 @RequestMapping("/role")
 @Controller
 public class RoleController extends BaseController {
+
+    /** 游戏配置读取入口，由构造器注入。 */
+    @jakarta.annotation.Resource
+    public GameConfigGateway configGateway;
 
 
     /***
@@ -210,7 +214,7 @@ public class RoleController extends BaseController {
     @SkipRole
     @GetMapping("/change/title.do")
     public String pageChangeTitle(HttpSession session, Model model) {
-        List<BaseTitle> titleList = GameConfigManager.getInstance().getBaseTitleList();
+        List<BaseTitle> titleList = configGateway.getBaseTitleList();
         model.addAttribute("baseTitleList", titleList);
         return "role/changeTitle";
     }
@@ -226,7 +230,7 @@ public class RoleController extends BaseController {
     public String doChangeTitle(HttpSession session, Model model, @RequestParam(defaultValue = "1") int titleId) {
         Role role = getSessionRole(session);
         // 称号配置错误
-        BaseTitle baseTitle = GameConfigManager.getInstance().getBaseTitle(titleId);
+        BaseTitle baseTitle = configGateway.getBaseTitle(titleId);
         if (baseTitle == null) {
             model.addAttribute("message", MessageVO.error("称号配置错误。"));
             return "role/settingResult";
