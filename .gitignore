@@ -23,6 +23,9 @@ logs/
 tmp/
 temp/
 
+# ---- 数据库备份（deploy.sh backup 产物，含全量业务数据）----
+backup_*.sql
+
 # ---- 操作系统 ----
 .DS_Store
 Thumbs.db
