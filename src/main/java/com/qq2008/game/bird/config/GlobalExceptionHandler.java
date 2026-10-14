@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 /**
  * 全局异常处理。
@@ -63,6 +64,24 @@ public class GlobalExceptionHandler {
         logger.warn("业务异常 code={} message={} uri={}",
                 e.getCode().getCode(), e.getMessage(), request.getRequestURI());
         return respond(request, e.getCode(), e.getMessage(), HttpStatus.OK);
+    }
+
+    /**
+     * 404：请求路径没有对应处理器。
+     *
+     * <p><b>为什么必须显式声明</b>：下面 {@code handleException(Exception)} 会把
+     * {@code NoHandlerFoundException} 一并吞掉，导致任何不存在的路径都返回
+     * 500「系统繁忙」—— 运维与前端都无法区分「地址写错」和「服务坏了」。
+     * Spring 的选择器按「最具体优先」匹配，本方法因此会先于兜底方法命中。
+     *
+     * @param e       未命中处理器的异常
+     * @param request 当前请求
+     * @return JSON或 HTML
+     */
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public Object handleNoHandlerFound(NoHandlerFoundException e, HttpServletRequest request) {
+        logger.warn("请求的路径不存在 uri={}", request.getRequestURI());
+        return respond(request, ResultCode.SYSTEM_ERROR, "页面不存在。", HttpStatus.NOT_FOUND);
     }
 
     /**

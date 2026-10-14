@@ -2,33 +2,32 @@ package com.qq2008.game.bird.controller.game;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.qq2008.game.bird.assembler.RolePackAssembler;
 import com.qq2008.game.bird.controller.common.BaseController;
 import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.data.GameConfigGateway;
-import com.qq2008.game.bird.model.dbo.Role;
 import com.qq2008.game.bird.model.dbo.RolePack;
 import com.qq2008.game.bird.model.vo.RolePackVO;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /***
  * 包裹相关路由
+ *
+ * <p>6 个列表方法已由 {@link RolePackAssembler#assemble} 统一装配视图对象，
+ * 本类只剩「查哪一页、渲染哪个模板」两件事，因此每个方法只有 4 行有效逻辑。
+ * 物品种类与配置字段的映射关系集中在 {@link RolePackAssembler.PackItemKind}。
  */
 @RequestMapping("/pack")
 @Controller
 public class PackController extends BaseController {
 
-    /** 游戏配置读取入口，由构造器注入。 */
+    /** 包裹页面视图装配器，由构造器注入。 */
     @jakarta.annotation.Resource
-    public GameConfigGateway configGateway;
+    public RolePackAssembler packAssembler;
 
     /***
      * 诱饵背包界面
@@ -39,33 +38,7 @@ public class PackController extends BaseController {
      */
     @GetMapping(value = "/bait/list.do")
     public String pageShopBait(HttpSession session, Model model, @RequestParam(defaultValue = "1") int pageNo) {
-        // 参数兼容
-        if (pageNo < 1) {
-            pageNo = 1;
-        }
-        // 数据库查询数据
-        Role role = getSessionRole(session);
-        LambdaQueryWrapper<RolePack> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(RolePack::getRoleId, role.getRoleId());
-        queryWrapper.eq(RolePack::getTypeId, ConstData.PACK_TYPE_BAIT);
-        queryWrapper.orderByAsc(RolePack::getBaseId);
-        Page<RolePack> pageInfo = new Page<>();
-        pageInfo.setCurrent(pageNo);
-        pageInfo.setSize(5);
-        packService.page(pageInfo, queryWrapper);
-        // 数据转换(增加配置属性)
-        Page<RolePackVO> pageInfo2 = new Page<>();
-        BeanUtils.copyProperties(pageInfo, pageInfo2);
-        List<RolePackVO> baitRecordList = new ArrayList<>();
-        for (RolePack item : pageInfo.getRecords()) {
-            RolePackVO roleBaitVO = new RolePackVO();
-            BeanUtils.copyProperties(item, roleBaitVO);
-            roleBaitVO.setBaseBait(configGateway.getBaseBait(roleBaitVO.getBaseId()));
-            baitRecordList.add(roleBaitVO);
-        }
-        pageInfo2.setRecords(baitRecordList);
-        model.addAttribute("page", pageInfo2);
-        return "pack/bait";
+        return listPack(RolePackAssembler.PackItemKind.BAIT, session, model, pageNo, "pack/bait");
     }
 
     /***
@@ -77,33 +50,7 @@ public class PackController extends BaseController {
      */
     @GetMapping(value = "/cage/list.do")
     public String pageShopCage(HttpSession session, Model model, @RequestParam(defaultValue = "1") int pageNo) {
-        // 参数兼容
-        if (pageNo < 1) {
-            pageNo = 1;
-        }
-        // 数据库查询数据
-        Role role = getSessionRole(session);
-        LambdaQueryWrapper<RolePack> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(RolePack::getRoleId, role.getRoleId());
-        queryWrapper.eq(RolePack::getTypeId, ConstData.PACK_TYPE_CAGE);
-        queryWrapper.orderByAsc(RolePack::getBaseId);
-        Page<RolePack> pageInfo = new Page<>();
-        pageInfo.setCurrent(pageNo);
-        pageInfo.setSize(5);
-        packService.page(pageInfo, queryWrapper);
-        // 数据转换(增加配置属性)
-        Page<RolePackVO> pageInfo2 = new Page<>();
-        BeanUtils.copyProperties(pageInfo, pageInfo2);
-        List<RolePackVO> cageRecordList = new ArrayList<>();
-        for (RolePack item : pageInfo.getRecords()) {
-            RolePackVO roleCageVO = new RolePackVO();
-            BeanUtils.copyProperties(item, roleCageVO);
-            roleCageVO.setBaseCage(configGateway.getBaseCage(roleCageVO.getBaseId()));
-            cageRecordList.add(roleCageVO);
-        }
-        pageInfo2.setRecords(cageRecordList);
-        model.addAttribute("page", pageInfo2);
-        return "pack/cage";
+        return listPack(RolePackAssembler.PackItemKind.CAGE, session, model, pageNo, "pack/cage");
     }
 
     /***
@@ -115,33 +62,7 @@ public class PackController extends BaseController {
      */
     @GetMapping(value = "/nest/list.do")
     public String pageShopNest(HttpSession session, Model model, @RequestParam(defaultValue = "1") int pageNo) {
-        // 参数兼容
-        if (pageNo < 1) {
-            pageNo = 1;
-        }
-        // 数据库查询数据
-        Role role = getSessionRole(session);
-        LambdaQueryWrapper<RolePack> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(RolePack::getRoleId, role.getRoleId());
-        queryWrapper.eq(RolePack::getTypeId, ConstData.PACK_TYPE_NEST);
-        queryWrapper.orderByAsc(RolePack::getBaseId);
-        Page<RolePack> pageInfo = new Page<>();
-        pageInfo.setCurrent(pageNo);
-        pageInfo.setSize(5);
-        packService.page(pageInfo, queryWrapper);
-        // 数据转换(增加配置属性)
-        Page<RolePackVO> pageInfo2 = new Page<>();
-        BeanUtils.copyProperties(pageInfo, pageInfo2);
-        List<RolePackVO> nestRecordList = new ArrayList<>();
-        for (RolePack item : pageInfo.getRecords()) {
-            RolePackVO roleNestVO = new RolePackVO();
-            BeanUtils.copyProperties(item, roleNestVO);
-            roleNestVO.setBaseNest(configGateway.getBaseNest(roleNestVO.getBaseId()));
-            nestRecordList.add(roleNestVO);
-        }
-        pageInfo2.setRecords(nestRecordList);
-        model.addAttribute("page", pageInfo2);
-        return "pack/nest";
+        return listPack(RolePackAssembler.PackItemKind.NEST, session, model, pageNo, "pack/nest");
     }
 
     /***
@@ -153,33 +74,7 @@ public class PackController extends BaseController {
      */
     @GetMapping(value = "/prop/list.do")
     public String pageShopProp(HttpSession session, Model model, @RequestParam(defaultValue = "1") int pageNo) {
-        // 参数兼容
-        if (pageNo < 1) {
-            pageNo = 1;
-        }
-        // 数据库查询数据
-        Role role = getSessionRole(session);
-        LambdaQueryWrapper<RolePack> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(RolePack::getRoleId, role.getRoleId());
-        queryWrapper.eq(RolePack::getTypeId, ConstData.PACK_TYPE_PROP);
-        queryWrapper.orderByAsc(RolePack::getBaseId);
-        Page<RolePack> pageInfo = new Page<>();
-        pageInfo.setCurrent(pageNo);
-        pageInfo.setSize(5);
-        packService.page(pageInfo, queryWrapper);
-        // 数据转换(增加配置属性)
-        Page<RolePackVO> pageInfo2 = new Page<>();
-        BeanUtils.copyProperties(pageInfo, pageInfo2);
-        List<RolePackVO> propRecordList = new ArrayList<>();
-        for (RolePack item : pageInfo.getRecords()) {
-            RolePackVO rolePropVO = new RolePackVO();
-            BeanUtils.copyProperties(item, rolePropVO);
-            rolePropVO.setBaseProp(configGateway.getBaseProp(rolePropVO.getBaseId()));
-            propRecordList.add(rolePropVO);
-        }
-        pageInfo2.setRecords(propRecordList);
-        model.addAttribute("page", pageInfo2);
-        return "pack/prop";
+        return listPack(RolePackAssembler.PackItemKind.PROP, session, model, pageNo, "pack/prop");
     }
 
     /***
@@ -191,33 +86,7 @@ public class PackController extends BaseController {
      */
     @GetMapping(value = "/train/list.do")
     public String pageShopTrain(HttpSession session, Model model, @RequestParam(defaultValue = "1") int pageNo) {
-        // 参数兼容
-        if (pageNo < 1) {
-            pageNo = 1;
-        }
-        // 数据库查询数据
-        Role role = getSessionRole(session);
-        LambdaQueryWrapper<RolePack> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(RolePack::getRoleId, role.getRoleId());
-        queryWrapper.eq(RolePack::getTypeId, ConstData.PACK_TYPE_TRAIN);
-        queryWrapper.orderByAsc(RolePack::getBaseId);
-        Page<RolePack> pageInfo = new Page<>();
-        pageInfo.setCurrent(pageNo);
-        pageInfo.setSize(5);
-        packService.page(pageInfo, queryWrapper);
-        // 数据转换(增加配置属性)
-        Page<RolePackVO> pageInfo2 = new Page<>();
-        BeanUtils.copyProperties(pageInfo, pageInfo2);
-        List<RolePackVO> trainRecordList = new ArrayList<>();
-        for (RolePack item : pageInfo.getRecords()) {
-            RolePackVO roleTrainVO = new RolePackVO();
-            BeanUtils.copyProperties(item, roleTrainVO);
-            roleTrainVO.setBaseTrain(configGateway.getBaseTrain(roleTrainVO.getBaseId()));
-            trainRecordList.add(roleTrainVO);
-        }
-        pageInfo2.setRecords(trainRecordList);
-        model.addAttribute("page", pageInfo2);
-        return "pack/train";
+        return listPack(RolePackAssembler.PackItemKind.TRAIN, session, model, pageNo, "pack/train");
     }
 
     /***
@@ -229,33 +98,35 @@ public class PackController extends BaseController {
      */
     @GetMapping(value = "/trap/list.do")
     public String pageShopTrap(HttpSession session, Model model, @RequestParam(defaultValue = "1") int pageNo) {
+        return listPack(RolePackAssembler.PackItemKind.TRAP, session, model, pageNo, "pack/trap");
+    }
+
+    /**
+     * 包裹列表的公共实现：查一页记录，装配视图对象，写入模型。
+     *
+     * @param kind    物品种类
+     * @param session 会话
+     * @param model   模型
+     * @param pageNo  页码，小于 1 时按 1 处理
+     * @param view    模板名
+     * @return 视图名
+     */
+    private String listPack(RolePackAssembler.PackItemKind kind, HttpSession session, Model model, int pageNo, String view) {
         // 参数兼容
-        if (pageNo < 1) {
-            pageNo = 1;
-        }
+        int current = pageNo < 1 ? 1 : pageNo;
         // 数据库查询数据
-        Role role = getSessionRole(session);
         LambdaQueryWrapper<RolePack> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(RolePack::getRoleId, role.getRoleId());
-        queryWrapper.eq(RolePack::getTypeId, ConstData.PACK_TYPE_TRAP);
+        queryWrapper.eq(RolePack::getRoleId, getSessionRole(session).getRoleId());
+        queryWrapper.eq(RolePack::getTypeId, kind.packTypeId());
         queryWrapper.orderByAsc(RolePack::getBaseId);
         Page<RolePack> pageInfo = new Page<>();
-        pageInfo.setCurrent(pageNo);
-        pageInfo.setSize(5);
+        pageInfo.setCurrent(current);
+        pageInfo.setSize(ConstData.PACK_PAGE_SIZE);
         packService.page(pageInfo, queryWrapper);
-        // 数据转换(增加配置属性)
-        Page<RolePackVO> pageInfo2 = new Page<>();
-        BeanUtils.copyProperties(pageInfo, pageInfo2);
-        List<RolePackVO> trapRecordList = new ArrayList<>();
-        for (RolePack item : pageInfo.getRecords()) {
-            RolePackVO roleTrapVO = new RolePackVO();
-            BeanUtils.copyProperties(item, roleTrapVO);
-            roleTrapVO.setBaseTrap(configGateway.getBaseTrap(roleTrapVO.getBaseId()));
-            trapRecordList.add(roleTrapVO);
-        }
-        pageInfo2.setRecords(trapRecordList);
-        model.addAttribute("page", pageInfo2);
-        return "pack/trap";
+        // 数据转换（增加配置属性）
+        Page<RolePackVO> viewPage = packAssembler.assemble(pageInfo, kind);
+        model.addAttribute("page", viewPage);
+        return view;
     }
 
     // 使用道具
