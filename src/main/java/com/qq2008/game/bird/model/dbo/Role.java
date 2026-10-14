@@ -1,6 +1,7 @@
 package com.qq2008.game.bird.model.dbo;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 
 /**
@@ -11,6 +12,10 @@ import java.io.Serializable;
  * @author HugoRun
  * @since 2024-11-17
  */
+// role 是 MySQL 保留字。MP 生成 SQL 时会自动为表名加反引号，
+// 因此这里写 "role" 即可，不要自行加反引号（会破坏 MP 的表名解析）。
+// 该映射已实测：roleService.getById(...) 可正常查出角色。
+@TableName("role")
 public class Role implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -1,6 +1,7 @@
 package com.qq2008.game.bird.model.dbo;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 
 /**
@@ -11,6 +12,7 @@ import java.io.Serializable;
  * @author HugoRun
  * @since 2024-11-17
  */
+@TableName("account")
 public class Account implements Serializable {
 
     private static final long serialVersionUID = 1L;
