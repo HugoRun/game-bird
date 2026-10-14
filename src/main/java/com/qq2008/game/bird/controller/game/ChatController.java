@@ -47,7 +47,7 @@ public class ChatController extends BaseController {
         queryWrapper.orderByDesc(LogChat::getTime);
         Page<LogChat> pageInfo = new Page<>();
         pageInfo.setCurrent(pageNo);
-        pageInfo.setSize(10);
+        pageInfo.setSize(ConstData.CHAT_PAGE_SIZE);
         chatService.page(pageInfo, queryWrapper);
         model.addAttribute("page", pageInfo);
         return "chat/list";
@@ -86,7 +86,7 @@ public class ChatController extends BaseController {
         chat.setId(0L);
         chat.setRoleId(role.getRoleId());
         chat.setRoleName(role.getRoleName());
-        chat.setTitleName("小菜鸟");
+        chat.setTitleName(ConstData.DEFAULT_NICK_NAME);
         chat.setMessage(message);
         chat.setTime(CommonUtils.nowTime());
         chatService.save(chat);

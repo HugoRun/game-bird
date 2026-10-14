@@ -19,6 +19,7 @@ import com.qq2008.common.util.CommonUtils;
 
 import com.qq2008.game.bird.config.GameProperties;
 import com.qq2008.game.bird.controller.common.BaseController;
+import com.qq2008.game.bird.data.ConstData;
 import com.qq2008.game.bird.model.dbo.Account;
 import com.qq2008.game.bird.service.AccountService;
 import com.qq2008.game.bird.util.UUIDUtils;
@@ -109,7 +110,7 @@ public class AccountController extends BaseController {
         // 已禁止注册账号
         if (!gameProperties.isAllowRegister()) {
             model.addAttribute("message", MessageVO.error("服务器已禁止注册。"));
-            return "common/message";
+            return ConstData.VIEW_MESSAGE;
         }
         Account account = (Account) session.getAttribute("account");
         if (null != account) {
@@ -134,7 +135,7 @@ public class AccountController extends BaseController {
         // 已禁止注册账号
         if (!gameProperties.isAllowRegister()) {
             model.addAttribute("message", MessageVO.error("服务器已禁止注册。"));
-            return "common/message";
+            return ConstData.VIEW_MESSAGE;
         }
         // 用户名长度和敏感词检测 todo
         // 账号和密码长度和字符检测 todo

@@ -83,8 +83,11 @@ public final class ConstData {
     public static final int SHOP_PAGE_SIZE = 5;
     // 包裹列表每页条数
     public static final int PACK_PAGE_SIZE = 5;
-    // 聊天列表每页条数
-    public static final int CHAT_PAGE_SIZE = 20;
+    // 聊天列表每页条数。
+    // ★ 原值为 20 且零引用，而 ChatController 实际写死 10——常量与行为矛盾。
+    // 此处让常量反映现实（改为 10），而非让现实迁就常量（把 10 改成 20），
+    // 因为后者会改变聊天列表每页条数，属行为变更。
+    public static final int CHAT_PAGE_SIZE = 10;
 
 
     ////////////////// 游戏参数 //////////////////
@@ -100,4 +103,29 @@ public final class ConstData {
     public static final int DEFAULT_TRAP_ID = 1;
     // 聊天信息有效天数
     public static final int CHAT_TIME = 3;
+    // 默认昵称：未设置昵称的角色在聊天中显示的名字
+    public static final String DEFAULT_NICK_NAME = "小菜鸟";
+
+
+    ////////////////// 视图名 //////////////////
+    // 视图名集中管理：改 templates 目录结构时只需改这一处，
+    // 不必在十几个 Controller 的 return 语句里逐个找字面量。
+    // 命名统一 VIEW_ 前缀，与路由/参数常量区分。
+    // 消息提示页：游戏内各种操作结果的统一展示页
+    public static final String VIEW_MESSAGE = "common/message";
+    // 聊天大厅
+    public static final String VIEW_CHAT_LIST = "chat/list";
+    // 游戏主页
+    public static final String VIEW_GAME = "game";
+    // 角色创建页
+    public static final String VIEW_ROLE_CREATE = "role/create";
+    // 角色状态页
+    public static final String VIEW_ROLE_PROFILE = "role/profile";
+
+
+    ////////////////// Session //////////////////
+    // 已登录角色在 session 中的 key。
+    // ★ 红线：不可改名。RoleAuthHandlerInterceptor 据此判断登录态，
+    // BaseController/ RoleController 据此读写，改名等于全站登录失效。
+    public static final String SESSION_ROLE_KEY = "sRole";
 }

@@ -108,7 +108,7 @@ public class BaseController {
      * @return 已登录角色
      */
     public Role getSessionRole(HttpSession session) {
-        return (Role) session.getAttribute("sRole");
+        return (Role) session.getAttribute(ConstData.SESSION_ROLE_KEY);
     }
 
     /**
@@ -117,18 +117,7 @@ public class BaseController {
      * @param role 已登录角色
      */
     public void saveSessionRole(HttpSession session, Role role) {
-        session.setAttribute("sRole", role);
-    }
-
-    /**
-     * 检测支付类型是否合法
-     * @param feeType 支付类型, 0金钱/1钻石/2爱心值
-     * @return <b>是否非法</b>：返回 {@code true} 表示 feeType 不属上述三者之一，
-     *         即「是错的」。方法名 {@code isFeeTypeError} 与返回值语义一致，
-     *         调用方按 {@code if (isFeeTypeError(t))} 读即为「若不合法则拒绝」。
-     */
-    public boolean isFeeTypeError(Byte feeType) {
-        return !Objects.equals(feeType, ConstData.FEE_TYPE_COIN) && !Objects.equals(feeType, ConstData.FEE_TYPE_DIAMOND) && !Objects.equals(feeType, ConstData.FEE_TYPE_LOVE_POINT);
+        session.setAttribute(ConstData.SESSION_ROLE_KEY, role);
     }
 
     /**

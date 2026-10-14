@@ -284,7 +284,7 @@ public class ShopController extends BaseController {
         Role role = getSessionRole(session);
         PurchaseResult result = shopPurchaseService.purchase(role, kind, id, payNum);
         model.addAttribute("message", result.message());
-        return "common/message";
+        return ConstData.VIEW_MESSAGE;
     }
 
     /**

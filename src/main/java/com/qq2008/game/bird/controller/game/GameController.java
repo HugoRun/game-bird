@@ -297,6 +297,6 @@ public class GameController extends BaseController {
      */
     @GetMapping(value = {ConstData.MESSAGE_PATH})
     public String message(HttpSession session, Model model) {
-        return "common/message";
+        return ConstData.VIEW_MESSAGE;
     }
 }

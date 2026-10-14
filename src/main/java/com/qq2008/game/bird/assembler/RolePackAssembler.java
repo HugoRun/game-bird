@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
+import com.qq2008.game.bird.data.ConstData;
 import com.qq2008.game.bird.data.GameConfigGateway;
 import com.qq2008.game.bird.model.dbo.RolePack;
 import com.qq2008.game.bird.model.vo.RolePackVO;
@@ -81,27 +82,27 @@ public class RolePackAssembler {
     public enum PackItemKind {
 
         /** 诱饵。 */
-        BAIT(com.qq2008.game.bird.data.ConstData.PACK_TYPE_BAIT,
+        BAIT(ConstData.PACK_TYPE_BAIT,
                 (view, gateway) -> view.setBaseBait(gateway.getBaseBait(view.getBaseId()))),
 
         /** 陷阱。 */
-        TRAP(com.qq2008.game.bird.data.ConstData.PACK_TYPE_TRAP,
+        TRAP(ConstData.PACK_TYPE_TRAP,
                 (view, gateway) -> view.setBaseTrap(gateway.getBaseTrap(view.getBaseId()))),
 
         /** 鸟笼。 */
-        CAGE(com.qq2008.game.bird.data.ConstData.PACK_TYPE_CAGE,
+        CAGE(ConstData.PACK_TYPE_CAGE,
                 (view, gateway) -> view.setBaseCage(gateway.getBaseCage(view.getBaseId()))),
 
         /** 巢。 */
-        NEST(com.qq2008.game.bird.data.ConstData.PACK_TYPE_NEST,
+        NEST(ConstData.PACK_TYPE_NEST,
                 (view, gateway) -> view.setBaseNest(gateway.getBaseNest(view.getBaseId()))),
 
         /** 训练场。 */
-        TRAIN(com.qq2008.game.bird.data.ConstData.PACK_TYPE_TRAIN,
+        TRAIN(ConstData.PACK_TYPE_TRAIN,
                 (view, gateway) -> view.setBaseTrain(gateway.getBaseTrain(view.getBaseId()))),
 
         /** 道具。 */
-        PROP(com.qq2008.game.bird.data.ConstData.PACK_TYPE_PROP,
+        PROP(ConstData.PACK_TYPE_PROP,
                 (view, gateway) -> view.setBaseProp(gateway.getBaseProp(view.getBaseId())));
 
         /** role_pack.type_id，用于列表查询条件。 */

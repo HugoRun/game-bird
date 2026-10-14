@@ -62,15 +62,15 @@ public class TrapController extends BaseController {
         RoleTrap roleTrap = trapService.getById(trapId);
         if (roleTrap == null || !roleTrap.getRoleId().equals(role.getRoleId())){
             model.addAttribute("message", MessageVO.error("陷阱错误，请重新选择一个陷阱捕鸟。"));
-            return "common/message";
+            return ConstData.VIEW_MESSAGE;
         }
         if (roleTrap.getBaitId() > 0 ){
             model.addAttribute("message", MessageVO.error("当前陷阱正在捕鸟中。"));
-            return "common/message";
+            return ConstData.VIEW_MESSAGE;
         }
         if (roleTrap.getUseTrapId() > 0 && roleTrap.getUseTrapNum() == 0){
             model.addAttribute("message", MessageVO.error("陷阱已过期，请切换陷阱。"));
-            return "common/message";
+            return ConstData.VIEW_MESSAGE;
         }
         model.addAttribute("trapId", trapId);
         // 查询已拥有的诱饵数据
@@ -106,34 +106,34 @@ public class TrapController extends BaseController {
         RoleTrap roleTrap = trapService.getById(trapId);
         if (roleTrap == null || !roleTrap.getRoleId().equals(role.getRoleId())){
             model.addAttribute("message", MessageVO.error("陷阱错误，请重新选择一个陷阱捕鸟。"));
-            return "common/message";
+            return ConstData.VIEW_MESSAGE;
         }
         if (roleTrap.getBaitId() > 0 ){
             model.addAttribute("message", MessageVO.error("当前陷阱正在捕鸟中。"));
-            return "common/message";
+            return ConstData.VIEW_MESSAGE;
         }
         if (roleTrap.getUseTrapId() > 0 && roleTrap.getUseTrapNum() == 0){
             model.addAttribute("message", MessageVO.error("陷阱已过期，请切换陷阱。"));
-            return "common/message";
+            return ConstData.VIEW_MESSAGE;
         }
         //
         RolePack packBait = packService.getById(baitId);
         // 诱饵数量不足
         if (packBait == null || !packBait.getRoleId().equals(role.getRoleId()) || packBait.getNum() == 0){
             model.addAttribute("message", MessageVO.error("诱饵数量不足"));
-            return "common/message";
+            return ConstData.VIEW_MESSAGE;
         }
         BaseBait baseBait = configGateway.getBaseBait(packBait.getBaseId());
         if (baseBait == null || baseBait.getBirdSet() == null || baseBait.getBirdSet().trim().isEmpty()){
             model.addAttribute("message", MessageVO.error("诱饵配置错误"));
-            return "common/message";
+            return ConstData.VIEW_MESSAGE;
         }
         int nowTime = CommonUtils.nowTime();
         // 随机小鸟
         BaseBird baseBird = birdRaffleService.randBird(baseBait.getBirdSet().split(","));
         if (baseBird == null){
             model.addAttribute("message", MessageVO.error("诱饵或者小鸟配置错误"));
-            return "common/message";
+            return ConstData.VIEW_MESSAGE;
         }
         // 随机性别
         Byte sex = (byte) (CommonUtils.randNum(1, 100) <= 50 ? 0 : 1);
@@ -185,7 +185,7 @@ public class TrapController extends BaseController {
 
 
         model.addAttribute("message", MessageVO.success(""));
-        return "common/message";
+        return ConstData.VIEW_MESSAGE;
     }
 
     /**
@@ -210,12 +210,12 @@ public class TrapController extends BaseController {
         RoleTrap roleTrap = trapService.getById(trapId);
         if (roleTrap == null || !roleTrap.getRoleId().equals(role.getRoleId())){
             model.addAttribute("message", MessageVO.error("没有该陷阱"));
-            return "common/message";
+            return ConstData.VIEW_MESSAGE;
         }
         // 陷阱处于空闲中
         if (roleTrap.getBaitId() == 0){
             model.addAttribute("message", MessageVO.error("当前陷阱正处于空闲中。"));
-            return "common/message";
+            return ConstData.VIEW_MESSAGE;
         }
         StorageBird bird = new StorageBird();
         bird.setId(0);

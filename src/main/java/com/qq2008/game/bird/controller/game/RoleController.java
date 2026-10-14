@@ -146,7 +146,7 @@ public class RoleController extends BaseController {
         messageVO.addLink(link);
         messageVO.setGoBack(false);
         model.addAttribute("message", messageVO);
-        return "common/message";
+        return ConstData.VIEW_MESSAGE;
     }
 
     /**
@@ -376,7 +376,7 @@ public class RoleController extends BaseController {
     @RequestMapping(value = {"/quit"})
     public String quit(HttpSession session) {
         // 注销当前登录角色数据
-        session.removeAttribute("sRole"); // 红线：session key 必须叫 sRole，原代码写成 role，等于没删干净
+        session.removeAttribute(ConstData.SESSION_ROLE_KEY); // 红线：session key 必须叫 sRole，原代码写成 role，等于没删干净
         // 注销当前登录账号数据
         session.removeAttribute("account");
         return redirectTo("/login");

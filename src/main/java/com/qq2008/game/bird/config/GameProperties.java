@@ -2,6 +2,7 @@ package com.qq2008.game.bird.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import com.qq2008.game.bird.data.ConstData;
 
 /**
  * 游戏开关类配置项（对应 application.properties 的 {@code game.*} 前缀）。

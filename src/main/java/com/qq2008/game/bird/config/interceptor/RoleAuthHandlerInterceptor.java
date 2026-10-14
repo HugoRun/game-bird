@@ -10,6 +10,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.qq2008.common.annotation.SkipRole;
+import com.qq2008.game.bird.data.ConstData;
 
 /**
  * 角色登录认证拦截器
@@ -27,7 +28,7 @@ public class RoleAuthHandlerInterceptor implements HandlerInterceptor {
             String methodPath = handlerMethod.getMethod().getDeclaringClass() + "." + handlerMethod.getMethod().getName();
             // 检测session中是否存储角色信息, 如果未存储则跳转到角色列表
             HttpSession session = request.getSession();
-            if (null == session.getAttribute("sRole")) {
+            if (null == session.getAttribute(ConstData.SESSION_ROLE_KEY)) {
                 logger.info(methodPath + " 未拥有 @SkipRole 注解，进行角色校验！");
                 response.sendRedirect(request.getContextPath() + "/role/login");
                 return false;

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.qq2008.common.util.CommonUtils;
 
+import com.qq2008.game.bird.data.ConstData;
 import com.qq2008.game.bird.data.GameConfigGateway;
 import com.qq2008.game.bird.data.RandomTextData;
 import com.qq2008.game.bird.model.dbo.BaseBird;
@@ -185,7 +186,7 @@ public class GameUtils {
         chatRoleVO.setRoleName(role.getRoleName());
         chatRoleVO.setLevel(role.getLevel());
         chatRoleVO.setVip(0);
-        chatRoleVO.setTitleName("小菜鸟");
+        chatRoleVO.setTitleName(ConstData.DEFAULT_NICK_NAME);
         return chatRoleVO;
     }
 }
