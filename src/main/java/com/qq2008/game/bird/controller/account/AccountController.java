@@ -180,63 +180,6 @@ public class AccountController extends BaseController {
     }
 
     /***
-     * 修改密码界面
-     * @return view
-     */
-    @SkipRole
-    @GetMapping(value = "/changePassword.do")
-    public String changePassword() {
-        return "account/changePassword";
-    }
-
-    /***
-     * 修改密码操作
-     * @param session当前会话
-     * @param model   model
-     * @param oldPassword 旧密码
-     * @param password1 新密码
-     * @param password2 新密码重复
-     * @return view
-     */
-    @SkipRole
-    @PostMapping(value = "/changePassword.do")
-    public String doChangePassword(HttpSession session, Model model, @RequestParam String oldPassword,
-                                   @RequestParam String password1, @RequestParam String password2) {
-        Account account = (Account) session.getAttribute("account");
-        if (null == account) {
-            model.addAttribute("message", MessageVO.error("请先登录。"));
-            return redirectTo("/login.do");
-        }
-        // 旧密码校验
-        if (isBlank(oldPassword) || !passwordMatches(oldPassword, account.getPassword())) {
-            model.addAttribute("message", MessageVO.error("修改失败,旧密码错误。"));
-            return "account/changePassword";
-        }
-        // 新密码一致性校验
-        if (isBlank(password1)) {
-            model.addAttribute("message", MessageVO.error("修改失败,新密码不能为空。"));
-            return "account/changePassword";
-        }
-        if (!password1.equals(password2)) {
-            model.addAttribute("message", MessageVO.error("修改失败,新密码和重复密码不匹配。"));
-            return "account/changePassword";
-        }
-        // 新密码不得与旧密码相同
-        if (passwordMatches(password1, account.getPassword())) {
-            model.addAttribute("message", MessageVO.error("修改失败,新密码不能与旧密码相同。"));
-            return "account/changePassword";
-        }
-        Account update = new Account();
-        update.setUserId(account.getUserId());
-        update.setPassword(password1);
-        accountService.updateById(update);
-        // 同步刷新会话中的密码，避免旧密码继续留在内存里
-        account.setPassword(password1);
-        model.addAttribute("message", MessageVO.success("密码修改成功。"));
-        return "account/changePassword";
-    }
-
-    /**
      * 常量时间比较两个口令。
      *
      * <p>原先用 {@code password.equals(stored)}，其短路比较会在首个不等字节处立即返回，
@@ -257,15 +200,5 @@ public class AccountController extends BaseController {
         return MessageDigest.isEqual(
                 input.getBytes(StandardCharsets.UTF_8),
                 stored.getBytes(StandardCharsets.UTF_8));
-    }
-
-    /**
-     * 判断字符串是否为 null、空串或纯空白。
-     *
-     * @param value 待判断的字符串
-     * @return true 表示为空白
-     */
-    private static boolean isBlank(String value) {
-        return null == value || value.trim().isEmpty();
     }
 }
