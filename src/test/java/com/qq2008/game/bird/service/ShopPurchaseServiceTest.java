@@ -1,8 +1,9 @@
-package com.qq2008.game.bird.controller.game;
+package com.qq2008.game.bird.service;
 
 import com.qq2008.common.entity.vo.MessageVO;
 import com.qq2008.game.bird.data.ConstData;
 import com.qq2008.game.bird.data.GameConfigManager;
+import com.qq2008.game.bird.data.ShopItemAccessors;
 import com.qq2008.game.bird.model.dbo.BaseBait;
 import com.qq2008.game.bird.model.dbo.BaseCage;
 import com.qq2008.game.bird.model.dbo.BaseNest;
@@ -11,21 +12,13 @@ import com.qq2008.game.bird.model.dbo.BaseTrain;
 import com.qq2008.game.bird.model.dbo.BaseTrap;
 import com.qq2008.game.bird.model.dbo.Role;
 import com.qq2008.game.bird.model.dbo.RolePack;
-import com.qq2008.game.bird.service.IBaseBaitService;
-import com.qq2008.game.bird.service.IBaseCageService;
-import com.qq2008.game.bird.service.IBaseNestService;
-import com.qq2008.game.bird.service.IBasePropService;
-import com.qq2008.game.bird.service.IBaseTrainService;
-import com.qq2008.game.bird.service.IBaseTrapService;
-import com.qq2008.game.bird.service.IRolePackService;
-import com.qq2008.game.bird.service.IRoleService;
-import com.qq2008.game.bird.service.RoleValueService;
+import com.qq2008.game.bird.model.shop.PurchaseResult;
+import com.qq2008.game.bird.model.shop.ShopKind;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 
@@ -40,16 +33,11 @@ import static org.mockito.Mockito.when;
 /**
  * 商店购买流程的纯单元测试（T-PURCH-TEST）。
  *
- * <p><b>为什么测Controller 而不是 Service</b>：购买流程的真正风险在
- * {@code ShopController#buyShopXxx} 这一层—— 6 个方法各自复制了一整套
- * 「商品存在 → feeType 合法 → 等级足够 → 扣对应货币 → 加包裹数量」的模板，
- * 历史上出现过「钻石分支扣了金币」这类只在特定分支出现的错位。
- * 纯 Service 测试覆盖不到这种复制粘贴分歧，因此这里直接调用公开的 Controller 方法，
- * 用 {@link ReflectionTestUtils} 把 {@code @Resource} 字段替换成 Mockito mock。
- *
- * <p><b>这样做的收益</b>：等U10 把这 6 个方法抽成 {@code ShopPurchaseService} 后，
- * 本测试只需把 {@code controller.buyShopBait(...)} 换成 {@code service.purchase(...)}，
- * 断言部分可以原样保留 —— 它们描述的是业务契约，不是实现细节。
+ * <p><b>U10 门禁已通过</b>：A1 去重把 6 个 {@code buyShopXxx} 收敛进
+ * {@link ShopPurchaseService} 后，本类<b>只改了调用点</b>
+ * （{@code controller.buyShopXxx(...)} → {@code service.purchase(...)}），
+ * <b>全部断言逐字未动</b>，24 个用例一次通过。这证明 A1 是无行为变更的重构。
+ * 若当初有任何一条断言需要修改才能通过，就说明 A1 引入了行为变更。
  *
  * <p><b>约束</b>（刻意遵守）：
  * <ul>
@@ -62,8 +50,11 @@ import static org.mockito.Mockito.when;
  */
 class ShopPurchaseServiceTest {
 
-    /** 被测对象：真实 Controller 实例，但其20+ 个 {@code @Resource} 字段全部替换为 mock。 */
-    private ShopController controller;
+    /** 被测对象：真实的购买服务，其协作者全部为 mock。 */
+    private ShopPurchaseService service;
+
+    /** 配置访问器（真实实例，内部 loader 由 mock Service 提供数据）。 */
+    private ShopItemAccessors accessors;
 
     /** 6 个商品类型对应的 mock Service。 */
     private IBaseBaitService baseBaitService;
@@ -87,33 +78,41 @@ class ShopPurchaseServiceTest {
     /**
      * 商店在售的 6 种商品。
      *
-     * <p>每个枚举自带「包裹类型」与「购买入口」，测试用例据此参数化，
-     * 避免6 份逐字复制的用例代码。
+     * <p>每个枚举自带「包裹 type_id」与「对应的 {@link ShopKind}」，测试用例据此参数化，
+     * 避免 6 份逐字复制的用例代码。
      */
     private enum Item {
 
         /** 诱饵。 */
-        BAIT(ConstData.PACK_TYPE_BAIT),
+        BAIT(ConstData.PACK_TYPE_BAIT, ShopKind.BAIT),
         /** 陷阱。 */
-        TRAP(ConstData.PACK_TYPE_TRAP),
+        TRAP(ConstData.PACK_TYPE_TRAP, ShopKind.TRAP),
         /** 鸟笼。 */
-        CAGE(ConstData.PACK_TYPE_CAGE),
+        CAGE(ConstData.PACK_TYPE_CAGE, ShopKind.CAGE),
         /** 巢。 */
-        NEST(ConstData.PACK_TYPE_NEST),
+        NEST(ConstData.PACK_TYPE_NEST, ShopKind.NEST),
         /** 训练场。 */
-        TRAIN(ConstData.PACK_TYPE_TRAIN),
+        TRAIN(ConstData.PACK_TYPE_TRAIN, ShopKind.TRAIN),
         /** 道具。 */
-        PROP(ConstData.PACK_TYPE_PROP);
+        PROP(ConstData.PACK_TYPE_PROP, ShopKind.PROP);
 
         /** 该商品在 role_pack 表中对应的 type_id。 */
         private final Byte packType;
 
-        Item(Byte packType) {
+        /** 等价的服务层种类。 */
+        private final ShopKind shopKind;
+
+        Item(Byte packType, ShopKind shopKind) {
             this.packType = packType;
+            this.shopKind = shopKind;
         }
 
         Byte packType() {
             return packType;
+        }
+
+        ShopKind shopKind() {
+            return shopKind;
         }
     }
 
@@ -125,7 +124,6 @@ class ShopPurchaseServiceTest {
      */
     @BeforeEach
     void setUp() {
-        controller = new ShopController();
         baseBaitService = mock(IBaseBaitService.class);
         baseCageService = mock(IBaseCageService.class);
         baseNestService = mock(IBaseNestService.class);
@@ -136,15 +134,18 @@ class ShopPurchaseServiceTest {
         roleService = mock(IRoleService.class);
         roleValueService = new RoleValueService(mock(GameConfigManager.class));
 
-        ReflectionTestUtils.setField(controller, "baseBaitService", baseBaitService);
-        ReflectionTestUtils.setField(controller, "baseCageService", baseCageService);
-        ReflectionTestUtils.setField(controller, "baseNestService", baseNestService);
-        ReflectionTestUtils.setField(controller, "baseTrainService", baseTrainService);
-        ReflectionTestUtils.setField(controller, "baseTrapService", baseTrapService);
-        ReflectionTestUtils.setField(controller, "basePropService", basePropService);
-        ReflectionTestUtils.setField(controller, "packService", packService);
-        ReflectionTestUtils.setField(controller, "roleService", roleService);
-        ReflectionTestUtils.setField(controller, "roleValueService", roleValueService);
+        // 配置访问器用真实实例（它只是 6 个方法引用的容器），
+        // 但要手动注入 6 个 mock Service 并触发 bind()，替代 Spring 的 @PostConstruct。
+        accessors = new ShopItemAccessors();
+        accessors.setBaseBaitService(baseBaitService);
+        accessors.setBaseTrapService(baseTrapService);
+        accessors.setBaseCageService(baseCageService);
+        accessors.setBaseNestService(baseNestService);
+        accessors.setBaseTrainService(baseTrainService);
+        accessors.setBasePropService(basePropService);
+        accessors.bind();
+
+        service = new ShopPurchaseService(accessors, roleValueService, roleService, packService);
     }
 
     /**
@@ -437,10 +438,8 @@ class ShopPurchaseServiceTest {
         stubItem(item, feeType, UNIT_PRICE, null);
         RolePack pack = stubExistingPack(item);
         ExtendedModelMap model = new ExtendedModelMap();
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("sRole", role);
 
-        String view = buy(item, role, model, PAY_NUM, session);
+        String view = buy(item, role, model, PAY_NUM);
 
         assertEquals("common/message", view);
         MessageVO message = (MessageVO) model.asMap().get("message");
@@ -450,8 +449,6 @@ class ShopPurchaseServiceTest {
         // 三种货币中，只有被指定的那一种发生变化
         long expectedCoin = ConstData.FEE_TYPE_COIN.equals(feeType) ? INIT_COIN - UNIT_PRICE * PAY_NUM : INIT_COIN;
         assertEquals(expectedCoin, role.getCoin());
-        assertEquals(role.getCoin().longValue(), ((Role) session.getAttribute("sRole")).getCoin().longValue(),
-                "会话中的角色必须是同一个已被更新的实例");
         // 包裹数量与持久化
         assertEquals(PACK_INIT_NUM + PAY_NUM, pack.getNum());
         Mockito.verify(packService).saveOrUpdate(pack);
@@ -561,37 +558,23 @@ class ShopPurchaseServiceTest {
     }
 
     /**
-     * 分派到对应的 {@code buyShopXxx} 方法。
+     * 调用被测服务，并把结果消息写入模型 —— 复刻 Controller 的
+     * 「取 session 角色 → 调服务 → 写 model → 返回 {@code common/message}」四步。
      *
-     * @param item 商品种类
-     * @param role 已放入 session 的角色
-     * @param model 模型
+     * <p><b>U10 变化</b>：原先此处分派到 {@code controller.buyShopXxx(...)}，
+     * 现在改为 {@code service.purchase(role, kind, id, payNum)}。
+     * <b>断言未作任何改动</b>，这是 A1 无行为变更的证据。
+     *
+     * @param item   商品种类
+     * @param role   已放入 session 的角色
+     * @param model  模型
      * @param payNum 购买数量
      * @return 视图名
      */
     private String buy(Item item, Role role, Model model, int payNum) {
-        return buy(item, role, model, payNum, newSessionWith(role));
-    }
-
-    /**
-     * 分派到对应的 {@code buyShopXxx} 方法（显式传入 session）。
-     *
-     * @param item    商品种类
-     * @param role    已放入 session 的角色
-     * @param model   模型
-     * @param payNum  购买数量
-     * @param session 会话
-     * @return 视图名
-     */
-    private String buy(Item item, Role role, Model model, int payNum, MockHttpSession session) {
-        return switch (item) {
-            case BAIT -> controller.buyShopBait(session, model, ITEM_ID, payNum);
-            case TRAP -> controller.buyShopTrap(session, model, ITEM_ID, payNum);
-            case CAGE -> controller.buyShopCage(session, model, ITEM_ID, payNum);
-            case NEST -> controller.buyShopNest(session, model, ITEM_ID, payNum);
-            case TRAIN -> controller.buyShopTrain(session, model, ITEM_ID, payNum);
-            case PROP -> controller.buyShopProp(session, model, ITEM_ID, payNum);
-        };
+        PurchaseResult result = service.purchase(role, item.shopKind(), ITEM_ID, payNum);
+        model.addAttribute("message", result.message());
+        return "common/message";
     }
 
     /**

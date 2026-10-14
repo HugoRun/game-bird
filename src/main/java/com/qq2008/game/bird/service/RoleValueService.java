@@ -6,6 +6,7 @@ import com.qq2008.game.bird.data.GameConfigManager;
 import com.qq2008.game.bird.model.dbo.BaseLevel;
 import com.qq2008.game.bird.model.dbo.Role;
 import com.qq2008.game.bird.model.dbo.RolePack;
+import com.qq2008.game.bird.model.shop.FeeKind;
 import org.springframework.stereotype.Service;
 
 /**
@@ -143,6 +144,33 @@ public class RoleValueService {
                     "您的爱心值不足(" + role.getLovePoint() + "/" + costLovePoint + ")。");
         }
         role.setLovePoint(role.getLovePoint() - costLovePoint);
+    }
+
+    /**
+     * 按货币种类扣除对应余额。
+     *
+     * <p><b>为什么委托给 {@link FeeKind}</b>：购买流程原先在 {@code ShopController} 里
+     * 用 3 个彼此独立的 {@code if} 扣 3 种货币（实测 {@code ShopController} 原文），
+     * 校验通过后都不 return 直接往下走，一旦 {@code feeType} 出现第 4 种取值，
+     * 三个分支都不进 → 道具白送且不扣费。改为按枚举穷举分派后，
+     * 该隐患从结构上消失（见 {@link FeeKind} 类注释）。
+     *
+     * <p><b>先校验后扣除</b>：余额不足时抛异常且<b>不改角色</b>，
+     * 因此不会发生「扣了一半」的状态。
+     *
+     * @param feeKind 货币种类
+     * @param role    角色
+     * @param fee     扣除金额，必须大于 0
+     * @throws BizException 参数非法或余额不足
+     */
+    public void cost(FeeKind feeKind, Role role, long fee) {
+        if (feeKind == null || role == null || fee <= 0) {
+            throw new BizException(ResultCode.PARAM_INVALID, "扣除的金额必须大于 0。");
+        }
+        if (feeKind.balance(role) < fee) {
+            throw new BizException(ResultCode.CURRENCY_NOT_ENOUGH, feeKind.notEnoughText(role, fee));
+        }
+        feeKind.deduct(role, fee);
     }
 
     /**
