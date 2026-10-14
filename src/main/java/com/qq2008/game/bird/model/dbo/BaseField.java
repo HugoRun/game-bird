@@ -1,6 +1,9 @@
 package com.qq2008.game.bird.model.dbo;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 /**
@@ -12,6 +15,8 @@ import java.io.Serializable;
  * @since 2024-11-17
  */
 @TableName("base_field")
+@Getter
+@Setter
 public class BaseField implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -30,37 +35,4 @@ public class BaseField implements Serializable {
      * 描述
      */
     private String descText;
-
-    public Short getId() {
-        return id;
-    }
-
-    public void setId(Short id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescText() {
-        return descText;
-    }
-
-    public void setDescText(String descText) {
-        this.descText = descText;
-    }
-
-    @Override
-    public String toString() {
-        return "BaseField{" +
-            "id = " + id +
-            ", name = " + name +
-            ", descText = " + descText +
-        "}";
-    }
 }

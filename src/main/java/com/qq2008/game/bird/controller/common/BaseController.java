@@ -1,8 +1,6 @@
 package com.qq2008.game.bird.controller.common;
 
 import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.data.GameConfigManager;
-import com.qq2008.game.bird.model.dbo.BaseLevel;
 import com.qq2008.game.bird.model.dbo.Role;
 import com.qq2008.game.bird.model.dbo.RolePack;
 import com.qq2008.game.bird.service.*;
@@ -18,6 +16,9 @@ import java.util.Objects;
 public class BaseController {
 
     // service使用继承后的，便与代码生成器覆盖代码 todo
+    //
+    // 注意：下面 19 个字段刻意保持 public。20+ 个子类 Controller 直接以继承方式访问它们，
+    // 改成 private 会导致子类编译失败，且逐个改为 protected 属于本轮范围外的机械改动。
     @Resource
     public IBaseBaitService baseBaitService;
     @Resource
@@ -54,6 +55,13 @@ public class BaseController {
     public ILogChatService chatService;
     @Resource
     public IStorageBirdService storageBirdService;
+
+    /**
+     * 角色数值服务。9 个数值方法已下沉至此，本类只保留一行委托，
+     * 以免 20+ 个子类 Controller 的调用点全部需要改动。
+     */
+    @Resource
+    public RoleValueService roleValueService;
 
     /***
      * 转发到路由
@@ -108,37 +116,7 @@ public class BaseController {
      * @param addExp 增加经验值
      */
     public void addRoleExp(Role role, Long addExp) {
-        try {
-            // 增加金钱错误
-            if (role == null || addExp <= 0) {
-                throw new Exception();
-            }
-            // 增加经验值
-            role.setExp(role.getExp() + addExp);
-            role.setTotalExp(role.getTotalExp() + addExp);
-            int newLevel = calcRoleLevel(role.getLevel(), role.getTotalExp());
-            role.setLevel(newLevel);
-            // 写日志
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /***
-     * 计算角色等级
-     * @param oldLevel 旧的等级
-     * @param totalExp 总经验
-     * @return 新的觉得等级
-     */
-    int calcRoleLevel(int oldLevel, long totalExp){
-        int tempLevel = oldLevel;
-        for (int i = oldLevel; i < 200; i++) {
-            BaseLevel baseLevel = GameConfigManager.getInstance().getBaseLevel(i);
-            if(baseLevel != null && totalExp >= baseLevel.getTotalExp()){
-                tempLevel = i;
-            }
-        }
-        return tempLevel;
+        roleValueService.addRoleExp(role, addExp);
     }
 
     /***
@@ -147,17 +125,7 @@ public class BaseController {
      * @param addCoin 增加金钱
      */
     public void addRoleCoin(Role role, Long addCoin) {
-        try {
-            // 增加金钱错误
-            if (role == null || addCoin <= 0) {
-                throw new Exception();
-            }
-            // 增加金钱
-            role.setCoin(role.getCoin() + addCoin);
-            // 写日志
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        roleValueService.addRoleCoin(role, addCoin);
     }
 
     /***
@@ -166,18 +134,7 @@ public class BaseController {
      * @param costCoin 消耗金钱
      */
     public void costRoleCoin(Role role, Long costCoin) {
-        try {
-            // 金钱不足
-            if (role == null || costCoin <= 0 || costCoin > role.getCoin()) {
-                throw new Exception();
-            }
-            // 扣除金钱
-            role.setCoin(role.getCoin() - costCoin);
-            // 写日志
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        roleValueService.costRoleCoin(role, costCoin);
     }
 
     /***
@@ -186,17 +143,7 @@ public class BaseController {
      * @param addDiamond 增加钻石
      */
     public void addRoleDiamond(Role role, int addDiamond) {
-        try {
-            // 增加钻石错误
-            if (role == null || addDiamond <= 0) {
-                throw new Exception();
-            }
-            // 增加钻石
-            role.setDiamond(role.getDiamond() + addDiamond);
-            // 写日志
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        roleValueService.addRoleDiamond(role, addDiamond);
     }
 
     /***
@@ -205,17 +152,7 @@ public class BaseController {
      * @param costDiamond 消耗钻石
      */
     public void costRoleDiamond(Role role, int costDiamond) {
-        try {
-            // 钻石不足
-            if (role == null || costDiamond <= 0 || costDiamond > role.getDiamond()) {
-                throw new Exception();
-            }
-            // 扣除钻石
-            role.setDiamond(role.getDiamond() - costDiamond);
-            // 写日志
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        roleValueService.costRoleDiamond(role, costDiamond);
     }
 
     /***
@@ -224,17 +161,7 @@ public class BaseController {
      * @param addLovePoint 增加爱心值
      */
     public void addRoleLovePoint(Role role, int addLovePoint) {
-        try {
-            // 增加爱心值错误
-            if (role == null || addLovePoint <= 0) {
-                throw new Exception();
-            }
-            // 增加爱心值
-            role.setLovePoint(role.getLovePoint() + addLovePoint);
-            // 写日志
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        roleValueService.addRoleLovePoint(role, addLovePoint);
     }
 
     /***
@@ -243,17 +170,7 @@ public class BaseController {
      * @param costLovePoint 消耗爱心值
      */
     public void costRoleLovePoint(Role role, Long costLovePoint) {
-        try {
-            // 爱心值不足
-            if (role == null || costLovePoint <=  0 || costLovePoint > role.getLovePoint()) {
-                throw new Exception();
-            }
-            // 扣除爱心值
-            role.setLovePoint(role.getLovePoint() - costLovePoint);
-            // 写日志
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        roleValueService.costRoleLovePoint(role, costLovePoint);
     }
 
     /***
@@ -261,17 +178,8 @@ public class BaseController {
      * @param pack 物品信息
      * @param addNum 增加数量
      */
-    public void addPackNum(RolePack pack, int addNum){
-        try {
-            // 参数错误
-            if (pack == null || addNum <= 0) {
-                throw new Exception();
-            }
-            pack.setNum(pack.getNum() + addNum);
-            // 写日志
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public void addPackNum(RolePack pack, int addNum) {
+        roleValueService.addPackNum(pack, addNum);
     }
 
     /***
@@ -279,17 +187,8 @@ public class BaseController {
      * @param pack 物品信息
      * @param costPackNum 扣除物品数量
      */
-    public void costPackNum(RolePack pack, int costPackNum){
-        try {
-            // 参数错误
-            if (pack == null || costPackNum <= 0 || pack.getNum() < costPackNum) {
-                throw new Exception();
-            }
-            pack.setNum(pack.getNum() - costPackNum);
-            // 写日志
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public void costPackNum(RolePack pack, int costPackNum) {
+        roleValueService.costPackNum(pack, costPackNum);
     }
 
 }

@@ -2,6 +2,9 @@ package com.qq2008.game.bird.model.dbo;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 /**
@@ -16,6 +19,8 @@ import java.io.Serializable;
 // 因此这里写 "role" 即可，不要自行加反引号（会破坏 MP 的表名解析）。
 // 该映射已实测：roleService.getById(...) 可正常查出角色。
 @TableName("role")
+@Getter
+@Setter
 public class Role implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -130,208 +135,4 @@ public class Role implements Serializable {
      * 婚姻类型,0无/1喜鹊之恋/2鸳鸯之恋/3比翼鸟之恋/4天使之恋
      */
     private Integer lastLoginTime;
-
-    public String getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(String roleId) {
-        this.roleId = roleId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getRoleName() {
-        return roleName;
-    }
-
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
-    }
-
-    public Integer getLevel() {
-        return level;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
-    public Long getExp() {
-        return exp;
-    }
-
-    public void setExp(Long exp) {
-        this.exp = exp;
-    }
-
-    public Long getTotalExp() {
-        return totalExp;
-    }
-
-    public void setTotalExp(Long totalExp) {
-        this.totalExp = totalExp;
-    }
-
-    public Short getVip() {
-        return vip;
-    }
-
-    public void setVip(Short vip) {
-        this.vip = vip;
-    }
-
-    public Integer getVipExp() {
-        return vipExp;
-    }
-
-    public void setVipExp(Integer vipExp) {
-        this.vipExp = vipExp;
-    }
-
-    public Integer getTotalVipExp() {
-        return totalVipExp;
-    }
-
-    public void setTotalVipExp(Integer totalVipExp) {
-        this.totalVipExp = totalVipExp;
-    }
-
-    public Byte getSex() {
-        return sex;
-    }
-
-    public void setSex(Byte sex) {
-        this.sex = sex;
-    }
-
-    public Short getFieldId() {
-        return fieldId;
-    }
-
-    public void setFieldId(Short fieldId) {
-        this.fieldId = fieldId;
-    }
-
-    public Short getBirdNum() {
-        return birdNum;
-    }
-
-    public void setBirdNum(Short birdNum) {
-        this.birdNum = birdNum;
-    }
-
-    public Long getCoin() {
-        return coin;
-    }
-
-    public void setCoin(Long coin) {
-        this.coin = coin;
-    }
-
-    public Long getBankCoin() {
-        return bankCoin;
-    }
-
-    public void setBankCoin(Long bankCoin) {
-        this.bankCoin = bankCoin;
-    }
-
-    public Integer getDiamond() {
-        return diamond;
-    }
-
-    public void setDiamond(Integer diamond) {
-        this.diamond = diamond;
-    }
-
-    public Long getLovePoint() {
-        return lovePoint;
-    }
-
-    public void setLovePoint(Long lovePoint) {
-        this.lovePoint = lovePoint;
-    }
-
-    public Integer getTitleId() {
-        return titleId;
-    }
-
-    public void setTitleId(Integer titleId) {
-        this.titleId = titleId;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    public Byte getMarriageType() {
-        return marriageType;
-    }
-
-    public void setMarriageType(Byte marriageType) {
-        this.marriageType = marriageType;
-    }
-
-    public String getDynamic() {
-        return dynamic;
-    }
-
-    public void setDynamic(String dynamic) {
-        this.dynamic = dynamic;
-    }
-
-    public Integer getRegTime() {
-        return regTime;
-    }
-
-    public void setRegTime(Integer regTime) {
-        this.regTime = regTime;
-    }
-
-    public Integer getLastLoginTime() {
-        return lastLoginTime;
-    }
-
-    public void setLastLoginTime(Integer lastLoginTime) {
-        this.lastLoginTime = lastLoginTime;
-    }
-
-    @Override
-    public String toString() {
-        return "Role{" +
-            "roleId = " + roleId +
-            ", userId = " + userId +
-            ", roleName = " + roleName +
-            ", level = " + level +
-            ", exp = " + exp +
-            ", totalExp = " + totalExp +
-            ", vip = " + vip +
-            ", vipExp = " + vipExp +
-            ", totalVipExp = " + totalVipExp +
-            ", sex = " + sex +
-            ", fieldId = " + fieldId +
-            ", birdNum = " + birdNum +
-            ", coin = " + coin +
-            ", bankCoin = " + bankCoin +
-            ", diamond = " + diamond +
-            ", lovePoint = " + lovePoint +
-            ", titleId = " + titleId +
-            ", avatarUrl = " + avatarUrl +
-            ", marriageType = " + marriageType +
-            ", dynamic = " + dynamic +
-            ", regTime = " + regTime +
-            ", lastLoginTime = " + lastLoginTime +
-        "}";
-    }
 }

@@ -2,6 +2,9 @@ package com.qq2008.game.bird.model.dbo;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 /**
@@ -13,6 +16,8 @@ import java.io.Serializable;
  * @since 2024-11-17
  */
 @TableName("base_level")
+@Getter
+@Setter
 public class BaseLevel implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -32,37 +37,4 @@ public class BaseLevel implements Serializable {
      * 升到本级累计需要经验
      */
     private Long totalExp;
-
-    public Short getLevel() {
-        return level;
-    }
-
-    public void setLevel(Short level) {
-        this.level = level;
-    }
-
-    public Integer getCostExp() {
-        return costExp;
-    }
-
-    public void setCostExp(Integer costExp) {
-        this.costExp = costExp;
-    }
-
-    public Long getTotalExp() {
-        return totalExp;
-    }
-
-    public void setTotalExp(Long totalExp) {
-        this.totalExp = totalExp;
-    }
-
-    @Override
-    public String toString() {
-        return "BaseLevel{" +
-            "level = " + level +
-            ", costExp = " + costExp +
-            ", totalExp = " + totalExp +
-        "}";
-    }
 }

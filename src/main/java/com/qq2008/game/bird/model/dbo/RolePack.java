@@ -3,6 +3,9 @@ package com.qq2008.game.bird.model.dbo;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 /**
@@ -14,6 +17,8 @@ import java.io.Serializable;
  * @since 2024-11-17
  */
 @TableName("role_pack")
+@Getter
+@Setter
 public class RolePack implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -43,55 +48,4 @@ public class RolePack implements Serializable {
      * 道具数量
      */
     private Integer num;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(String roleId) {
-        this.roleId = roleId;
-    }
-
-    public Byte getTypeId() {
-        return typeId;
-    }
-
-    public void setTypeId(Byte typeId) {
-        this.typeId = typeId;
-    }
-
-    public Integer getBaseId() {
-        return baseId;
-    }
-
-    public void setBaseId(Integer baseId) {
-        this.baseId = baseId;
-    }
-
-    public Integer getNum() {
-        return num;
-    }
-
-    public void setNum(Integer num) {
-        this.num = num;
-    }
-
-    @Override
-    public String toString() {
-        return "RolePack{" +
-            "id = " + id +
-            ", roleId = " + roleId +
-            ", typeId = " + typeId +
-            ", baseId = " + baseId +
-            ", num = " + num +
-        "}";
-    }
 }

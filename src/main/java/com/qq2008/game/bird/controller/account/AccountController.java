@@ -6,7 +6,7 @@ import com.qq2008.common.annotation.SkipRole;
 import com.qq2008.common.entiy.vo.MessageVO;
 import com.qq2008.common.util.CommonUtils;
 import com.qq2008.game.bird.controller.common.BaseController;
-import com.qq2008.game.bird.data.ConstData;
+import com.qq2008.game.bird.config.GameProperties;
 import com.qq2008.game.bird.model.dbo.Account;
 import com.qq2008.game.bird.service.IAccountService;
 import com.qq2008.game.bird.util.UUIDUtils;
@@ -27,6 +27,10 @@ public class AccountController extends BaseController {
 
     @Resource
     IAccountService accountService;
+
+    /** 游戏开关配置（是否允许注册）。原先是ConstData 里的 public static 字段，任何代码都能改。 */
+    @Resource
+    GameProperties gameProperties;
 
     /***
      * 登录界面
@@ -98,7 +102,7 @@ public class AccountController extends BaseController {
     @GetMapping(value = "/register.do")
     public String pageRegister(HttpSession session, Model model) {
         // 已禁止注册账号
-        if (!ConstData.IS_ALLOW_REGISTER) {
+        if (!gameProperties.isAllowRegister()) {
             model.addAttribute("message", MessageVO.error("服务器已禁止注册。"));
             return "common/message";
         }
@@ -123,7 +127,7 @@ public class AccountController extends BaseController {
     @PostMapping(value = "/register.do")
     public String doRegister(HttpSession session, Model model, @RequestParam String username, @RequestParam String password, @RequestParam String passwordRe) {
         // 已禁止注册账号
-        if (!ConstData.IS_ALLOW_REGISTER) {
+        if (!gameProperties.isAllowRegister()) {
             model.addAttribute("message", MessageVO.error("服务器已禁止注册。"));
             return "common/message";
         }
