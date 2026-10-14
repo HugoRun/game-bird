@@ -1,6 +1,6 @@
 package com.qq2008.game.bird.model.vo;
 
-/***
+/**
  * 消息VO
  */
 public class ChatMessageVO {

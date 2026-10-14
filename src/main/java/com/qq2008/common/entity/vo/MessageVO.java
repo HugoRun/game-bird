@@ -1,11 +1,11 @@
 package com.qq2008.common.entity.vo;
 
-import com.qq2008.common.entity.ResultCode;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/***
+import com.qq2008.common.entity.ResultCode;
+
+/**
  * 消息
  */
 public class MessageVO {

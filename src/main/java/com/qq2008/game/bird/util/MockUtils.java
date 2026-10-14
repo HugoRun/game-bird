@@ -1,21 +1,23 @@
 package com.qq2008.game.bird.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 import com.qq2008.common.util.CommonUtils;
+
 import com.qq2008.game.bird.data.RandomTextData;
 import com.qq2008.game.bird.model.dbo.Role;
 import com.qq2008.game.bird.model.vo.ChatMessageVO;
 import com.qq2008.game.bird.model.vo.ChatRoleVO;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/***
+/**
  * 模拟数据工具集
  * 用于获取一些模拟数据
  */
 public class MockUtils {
-    /***
+    /**
      * 模拟聊天信息列表
      * @param size 消息数量
      * @param role 玩家信息
@@ -53,7 +55,7 @@ public class MockUtils {
 
     }
 
-    /***
+    /**
      * 模拟树林记录列表
      * @param size 消息数量
      * @param role 玩家信息

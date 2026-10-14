@@ -1,8 +1,13 @@
 package com.qq2008.common.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/***
+/**
  * 允许未登录角色者访问
  */
 @Documented // 会被 javadoc 之类的工具处理

@@ -2,18 +2,7 @@ package com.qq2008.game.bird.controller.game;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.qq2008.common.entity.ResultCode;
-import com.qq2008.common.entity.vo.MessageLink;
-import com.qq2008.common.entity.vo.MessageVO;
-import com.qq2008.common.util.CommonUtils;
-import com.qq2008.game.bird.controller.common.BaseController;
-import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.data.RandomTextData;
-import com.qq2008.game.bird.model.dbo.LogChat;
-import com.qq2008.game.bird.model.dbo.Role;
-import com.qq2008.game.bird.util.ArrayUtils;
 import jakarta.servlet.http.HttpSession;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,20 +11,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.qq2008.common.entity.vo.MessageVO;
+import com.qq2008.common.util.CommonUtils;
 
-/***
+import com.qq2008.game.bird.controller.common.BaseController;
+import com.qq2008.game.bird.data.ConstData;
+import com.qq2008.game.bird.model.dbo.LogChat;
+import com.qq2008.game.bird.model.dbo.Role;
+
+/**
  * 聊天相关路由
  */
 @Controller
 @RequestMapping("/chat")
 public class ChatController extends BaseController {
     // 日志句柄
-    private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
 
-    /***
+    /**
      * 聊天主界面
      * @param session session
      * @param model model
@@ -61,7 +53,7 @@ public class ChatController extends BaseController {
         return "chat/list";
     }
 
-    /***
+    /**
      * 发送世界聊天消息
      * @param session session
      * @param model model
@@ -75,7 +67,7 @@ public class ChatController extends BaseController {
         // 铭感词检测 todo
         // 聊天CD todo
         // 检测和扣除聊天道具 todo
-//        if(){
+//        if (){
 //            model.addFlashAttribute("message", MessageVO.error("发言过频，请稍后再进行发言。"));
 //            return "common/message";
 //        }
@@ -102,8 +94,6 @@ public class ChatController extends BaseController {
         model.addFlashAttribute("message", MessageVO.success("发送聊天消息成功！"));
         return redirectTo("/chat/list");
     }
-
-
 
     // 孵化场 birthBirth
     // 孵化场 birthWait

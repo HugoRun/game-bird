@@ -1,5 +1,13 @@
 package com.qq2008.game.bird.data;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+
+import jakarta.annotation.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
 import com.qq2008.game.bird.model.dbo.BaseBait;
 import com.qq2008.game.bird.model.dbo.BaseBird;
 import com.qq2008.game.bird.model.dbo.BaseCage;
@@ -22,15 +30,8 @@ import com.qq2008.game.bird.service.BasePropService;
 import com.qq2008.game.bird.service.BaseTitleService;
 import com.qq2008.game.bird.service.BaseTrainService;
 import com.qq2008.game.bird.service.BaseTrapService;
-import jakarta.annotation.Resource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
-/***
+/**
  * 游戏配置管理器
  * todo 使用ehcache存储
  */
@@ -85,7 +86,7 @@ public class GameConfigManager {
     @Resource
     public BaseTitleService baseTitleService;
 
-    /***
+    /**
      * 计算人物等级
      * @param exp 经验
      * @return 等级
@@ -94,7 +95,7 @@ public class GameConfigManager {
         return (short) (exp / 100);
     }
 
-    /***
+    /**
      * 加载全部游戏配置。
      *
      * <p>改造前是static 方法，内部靠 {@code getInstance()} 反查 Spring 容器，
@@ -115,7 +116,7 @@ public class GameConfigManager {
         loadBaseTitle();
     }
 
-    /***
+    /**
      * 加载诱饵配置
      */
     public void loadBaseBait() {
@@ -126,14 +127,14 @@ public class GameConfigManager {
         logger.info("诱饵配置加载完成，共{}条。", mBaitCache.size());
     }
 
-    /***
+    /**
      * 获取诱饵配置列表
      */
     public List<BaseBait> getBaseBaitList() {
         return mBaitCache.values().stream().toList();
     }
 
-    /***
+    /**
      * 获取诱饵配置
      * @param id 诱饵配置Id
      * @return 诱饵配置
@@ -142,7 +143,7 @@ public class GameConfigManager {
         return mBaitCache.get(id);
     }
 
-    /***
+    /**
      * 加载小鸟配置
      */
     public void loadBaseBird() {
@@ -153,14 +154,14 @@ public class GameConfigManager {
         logger.info("小鸟配置加载完成，共{}条。", mBirdCache.size());
     }
 
-    /***
+    /**
      * 获取小鸟配置列表
      */
     public List<BaseBird> getBaseBirdList() {
         return mBirdCache.values().stream().toList();
     }
 
-    /***
+    /**
      * 获取小鸟配置
      * @param id 小鸟配置Id
      * @return 小鸟配置
@@ -169,7 +170,7 @@ public class GameConfigManager {
         return mBirdCache.get(id);
     }
 
-    /***
+    /**
      * 加载鸟笼配置
      */
     public void loadBaseCage() {
@@ -180,14 +181,14 @@ public class GameConfigManager {
         logger.info("鸟笼配置加载完成，共{}条。", mCageCache.size());
     }
 
-    /***
+    /**
      * 获取鸟笼配置列表
      */
     public List<BaseCage> getBaseCageList() {
         return mCageCache.values().stream().toList();
     }
 
-    /***
+    /**
      * 获取鸟笼配置
      * @param id 鸟笼配置Id
      * @return 鸟笼配置
@@ -196,7 +197,7 @@ public class GameConfigManager {
         return mCageCache.get(id);
     }
 
-    /***
+    /**
      * 加载场景配置
      */
     public void loadBaseField() {
@@ -207,14 +208,14 @@ public class GameConfigManager {
         logger.info("场景配置加载完成，共{}条。", mFieldCache.size());
     }
 
-    /***
+    /**
      * 获取场景配置列表
      */
     public List<BaseField> getBaseFieldList() {
         return mFieldCache.values().stream().toList();
     }
 
-    /***
+    /**
      * 获取场景配置
      * @param id 场景配置Id
      * @return 场景配置
@@ -223,7 +224,7 @@ public class GameConfigManager {
         return mFieldCache.get(id);
     }
 
-    /***
+    /**
      * 加载基因配置
      */
     public void loadBaseGene() {
@@ -234,14 +235,14 @@ public class GameConfigManager {
         logger.info("基因配置加载完成，共{}条。", mGeneCache.size());
     }
 
-    /***
+    /**
      * 获取基因配置列表
      */
     public List<BaseGene> getBaseGeneList() {
         return mGeneCache.values().stream().toList();
     }
 
-    /***
+    /**
      * 获取基因配置
      * @param id 基因配置Id
      * @return 基因配置
@@ -250,7 +251,7 @@ public class GameConfigManager {
         return mGeneCache.get(id);
     }
 
-    /***
+    /**
      * 加载等级配置
      */
     public void loadBaseLevel() {
@@ -261,14 +262,14 @@ public class GameConfigManager {
         logger.info("等级配置加载完成，共{}条。", mLevelCache.size());
     }
 
-    /***
+    /**
      * 获取等级配置列表
      */
     public List<BaseLevel> getBaseLevelList() {
         return mLevelCache.values().stream().toList();
     }
 
-    /***
+    /**
      * 获取等级配置
      * @param level 等级
      * @return 等级配置
@@ -277,7 +278,7 @@ public class GameConfigManager {
         return mLevelCache.get(level);
     }
 
-    /***
+    /**
      * 加载鸟巢配置
      */
     public void loadBaseNest() {
@@ -288,14 +289,14 @@ public class GameConfigManager {
         logger.info("鸟巢配置加载完成，共{}条。", mNestCache.size());
     }
 
-    /***
+    /**
      * 获取鸟巢配置列表
      */
     public List<BaseNest> getBaseNestList() {
         return mNestCache.values().stream().toList();
     }
 
-    /***
+    /**
      * 获取鸟巢配置
      * @param id 鸟巢配置Id
      * @return 鸟巢配置
@@ -304,7 +305,7 @@ public class GameConfigManager {
         return mNestCache.get(id);
     }
 
-    /***
+    /**
      * 加载道具配置
      */
     public void loadBaseProp() {
@@ -315,14 +316,14 @@ public class GameConfigManager {
         logger.info("道具配置加载完成，共{}条。", mPropCache.size());
     }
 
-    /***
+    /**
      * 获取道具配置列表
      */
     public List<BaseProp> getBasePropList() {
         return mPropCache.values().stream().toList();
     }
 
-    /***
+    /**
      * 获取道具配置
      * @param id 道具配置Id
      * @return 道具配置
@@ -331,7 +332,7 @@ public class GameConfigManager {
         return mPropCache.get(id);
     }
 
-    /***
+    /**
      * 加载称号配置
      */
     public void loadBaseTitle() {
@@ -342,14 +343,14 @@ public class GameConfigManager {
         logger.info("称号配置加载完成，共{}条。", mTitleCache.size());
     }
 
-    /***
+    /**
      * 获取称号配置列表
      */
     public List<BaseTitle> getBaseTitleList() {
         return mTitleCache.values().stream().toList();
     }
 
-    /***
+    /**
      * 获取陷阱配置
      * @param id 陷阱配置Id
      * @return 陷阱配置
@@ -358,7 +359,7 @@ public class GameConfigManager {
         return mTitleCache.get(id);
     }
 
-    /***
+    /**
      * 加载训练场配置
      */
     public void loadBaseTrain() {
@@ -369,14 +370,14 @@ public class GameConfigManager {
         logger.info("训练场配置加载完成，共{}条。", mTrainCache.size());
     }
 
-    /***
+    /**
      * 获取训练场配置列表
      */
     public List<BaseTrain> getBaseTrainList() {
         return mTrainCache.values().stream().toList();
     }
 
-    /***
+    /**
      * 获取训练场配置
      * @param id 训练场配置Id
      * @return 训练场配置
@@ -385,7 +386,7 @@ public class GameConfigManager {
         return mTrainCache.get(id);
     }
 
-    /***
+    /**
      * 加载陷阱配置
      */
     public void loadBaseTrap() {
@@ -396,14 +397,14 @@ public class GameConfigManager {
         logger.info("陷阱配置加载完成，共{}条。", mTrapCache.size());
     }
 
-    /***
+    /**
      * 获取陷阱配置列表
      */
     public List<BaseTrap> getBaseTrapList() {
         return mTrapCache.values().stream().toList();
     }
 
-    /***
+    /**
      * 获取陷阱配置
      * @param id 陷阱配置Id
      * @return 陷阱配置

@@ -1,10 +1,11 @@
 package com.qq2008.game.bird.controller.game;
 
-import com.qq2008.game.bird.controller.common.BaseController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/***
+import com.qq2008.game.bird.controller.common.BaseController;
+
+/**
  * 教堂相关路由
  */
 @Controller

@@ -1,12 +1,12 @@
 package com.qq2008.game.bird.model.dbo;
 
+import java.io.Serializable;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.Serializable;
 
 /**
  * <p>
@@ -70,7 +70,7 @@ public class StorageBird implements Serializable {
     private Long weight;
 
 
-    Byte star;
+    private Byte star;
 
     /**
      * 成长, 显示时/100

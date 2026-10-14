@@ -1,10 +1,11 @@
 package com.qq2008.game.bird.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
+
 import com.qq2008.game.bird.mapper.BaseTitleMapper;
 import com.qq2008.game.bird.model.dbo.BaseTitle;
 import com.qq2008.game.bird.service.BaseTitleService;
-import org.springframework.stereotype.Service;
 
 /**
  * <p>

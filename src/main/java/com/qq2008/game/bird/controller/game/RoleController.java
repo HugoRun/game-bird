@@ -1,16 +1,9 @@
 package com.qq2008.game.bird.controller.game;
 
+import java.util.List;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.qq2008.common.annotation.SkipRole;
-import com.qq2008.common.entity.vo.MessageLink;
-import com.qq2008.common.entity.vo.MessageVO;
-import com.qq2008.common.util.CommonUtils;
-import com.qq2008.game.bird.controller.common.BaseController;
-import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.data.GameConfigGateway;
-import com.qq2008.game.bird.model.dbo.*;
-import com.qq2008.game.bird.util.UUIDUtils;
-import com.qq2008.game.bird.model.dbo.*;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,9 +12,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
+import com.qq2008.common.annotation.SkipRole;
+import com.qq2008.common.entity.vo.MessageLink;
+import com.qq2008.common.entity.vo.MessageVO;
+import com.qq2008.common.util.CommonUtils;
 
-/***
+import com.qq2008.game.bird.controller.common.BaseController;
+import com.qq2008.game.bird.data.ConstData;
+import com.qq2008.game.bird.data.GameConfigGateway;
+import com.qq2008.game.bird.model.dbo.Account;
+import com.qq2008.game.bird.model.dbo.BaseTitle;
+import com.qq2008.game.bird.model.dbo.Role;
+import com.qq2008.game.bird.model.dbo.RoleBirth;
+import com.qq2008.game.bird.model.dbo.RoleTrain;
+import com.qq2008.game.bird.model.dbo.RoleTrap;
+import com.qq2008.game.bird.util.UUIDUtils;
+
+/**
  * 角色
  *
  * <p><b>路由命名（RT-3）</b>：本类 16 条映射去掉了历史遗留的路由后缀，
@@ -42,11 +49,11 @@ import java.util.List;
 public class RoleController extends BaseController {
 
     /** 游戏配置读取入口，由构造器注入。 */
-    @jakarta.annotation.Resource
+    @Resource
     public GameConfigGateway configGateway;
 
 
-    /***
+    /**
      * 创建角色界面
      * @param model model
      * @return view
@@ -58,7 +65,7 @@ public class RoleController extends BaseController {
         return "role/create";
     }
 
-    /***
+    /**
      * 创建角色
      * @param session session
      * @param model model
@@ -142,7 +149,7 @@ public class RoleController extends BaseController {
         return "common/message";
     }
 
-    /***
+    /**
      * 登陆角色
      * @param session session
      * @param model model
@@ -171,7 +178,7 @@ public class RoleController extends BaseController {
         return redirectTo("/game");
     }
 
-    /***
+    /**
      * 角色信息界面
      * @param session session
      * @param model model
@@ -182,7 +189,7 @@ public class RoleController extends BaseController {
         return "role/profile";
     }
 
-    /***
+    /**
      * 设置头像界面
      * @param session session
      * @param model model
@@ -193,7 +200,7 @@ public class RoleController extends BaseController {
         return "role/changeAvatar";
     }
 
-    /***
+    /**
      * 设置头像
      * @param session session
      * @param model model
@@ -215,7 +222,7 @@ public class RoleController extends BaseController {
         return "role/settingResult";
     }
 
-    /***
+    /**
      * 设置称号界面
      * @param session session
      * @param model model
@@ -228,7 +235,7 @@ public class RoleController extends BaseController {
         return "role/changeTitle";
     }
 
-    /***
+    /**
      * 设置称号
      * @param session session
      * @param model model
@@ -252,7 +259,7 @@ public class RoleController extends BaseController {
         return "role/settingResult";
     }
 
-    /***
+    /**
      * 设置心情界面
      * @param session session
      * @param model model
@@ -263,7 +270,7 @@ public class RoleController extends BaseController {
         return "role/changeDynamic";
     }
 
-    /***
+    /**
      * 设置心情
      * @param session session
      * @param model model
@@ -286,7 +293,7 @@ public class RoleController extends BaseController {
         return "role/settingResult";
     }
 
-    /***
+    /**
      * 设置名称界面
      * @param session session
      * @param model model
@@ -297,7 +304,7 @@ public class RoleController extends BaseController {
         return "role/changeName";
     }
 
-    /***
+    /**
      * 设置名称
      * @param session session
      * @param model model
@@ -315,7 +322,7 @@ public class RoleController extends BaseController {
 
         LambdaQueryWrapper<Role> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Role::getRoleName, roleName);
-        if(roleService.getOne(queryWrapper) != null){
+        if (roleService.getOne(queryWrapper) != null){
             model.addAttribute("message", MessageVO.error("该名称已被使用。"));
             return "role/settingResult";
         }
@@ -328,7 +335,7 @@ public class RoleController extends BaseController {
         return "role/settingResult";
     }
 
-    /***
+    /**
      * 设置性别界面
      * @param session session
      * @param model model
@@ -339,7 +346,7 @@ public class RoleController extends BaseController {
         return "role/changeSex";
     }
 
-    /***
+    /**
      * 设置性别
      * @param session session
      * @param model model
@@ -361,7 +368,7 @@ public class RoleController extends BaseController {
         return "role/settingResult";
     }
 
-    /***
+    /**
      * 退出
      * @param session session
      * @return view

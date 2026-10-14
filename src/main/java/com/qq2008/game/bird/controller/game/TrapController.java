@@ -1,17 +1,10 @@
 package com.qq2008.game.bird.controller.game;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.qq2008.common.entity.vo.MessageVO;
-import com.qq2008.common.util.CommonUtils;
-import com.qq2008.game.bird.controller.common.BaseController;
-import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.data.GameConfigGateway;
-import com.qq2008.game.bird.service.BirdRaffleService;
-import com.qq2008.game.bird.model.dbo.*;
-import com.qq2008.game.bird.model.vo.RolePackVO;
-import com.qq2008.game.bird.model.vo.TrapResultVO;
-import com.qq2008.game.bird.util.BirdTextUtils;
-import com.qq2008.game.bird.util.GameUtils;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
@@ -21,10 +14,26 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.qq2008.common.entity.vo.MessageVO;
+import com.qq2008.common.util.CommonUtils;
 
-/***
+import com.qq2008.game.bird.controller.common.BaseController;
+import com.qq2008.game.bird.data.ConstData;
+import com.qq2008.game.bird.data.GameConfigGateway;
+import com.qq2008.game.bird.model.dbo.BaseBait;
+import com.qq2008.game.bird.model.dbo.BaseBird;
+import com.qq2008.game.bird.model.dbo.BaseLevel;
+import com.qq2008.game.bird.model.dbo.Role;
+import com.qq2008.game.bird.model.dbo.RolePack;
+import com.qq2008.game.bird.model.dbo.RoleTrap;
+import com.qq2008.game.bird.model.dbo.StorageBird;
+import com.qq2008.game.bird.model.vo.RolePackVO;
+import com.qq2008.game.bird.model.vo.TrapResultVO;
+import com.qq2008.game.bird.service.BirdRaffleService;
+import com.qq2008.game.bird.util.BirdTextUtils;
+import com.qq2008.game.bird.util.GameUtils;
+
+/**
  * 陷阱相关路由
  */
 @Controller
@@ -32,14 +41,14 @@ import java.util.List;
 public class TrapController extends BaseController {
 
     /** 游戏配置读取入口，由字段注入。 */
-    @jakarta.annotation.Resource
+    @Resource
     public GameConfigGateway configGateway;
 
     /** 按权重随机抽鸟。抽离自本类，使算法可脱离 Spring 容器做单元测试。 */
-    @jakarta.annotation.Resource
+    @Resource
     public BirdRaffleService birdRaffleService;
 
-    /***
+    /**
      * 下饵界面
      * @param session session
      * @param model model
@@ -51,15 +60,15 @@ public class TrapController extends BaseController {
         Role role = getSessionRole(session);
         // 检测陷阱信息
         RoleTrap roleTrap = trapService.getById(trapId);
-        if(roleTrap == null || !roleTrap.getRoleId().equals(role.getRoleId())){
+        if (roleTrap == null || !roleTrap.getRoleId().equals(role.getRoleId())){
             model.addAttribute("message", MessageVO.error("陷阱错误，请重新选择一个陷阱捕鸟。"));
             return "common/message";
         }
-        if(roleTrap.getBaitId() > 0 ){
+        if (roleTrap.getBaitId() > 0 ){
             model.addAttribute("message", MessageVO.error("当前陷阱正在捕鸟中。"));
             return "common/message";
         }
-        if(roleTrap.getUseTrapId() > 0 && roleTrap.getUseTrapNum() == 0){
+        if (roleTrap.getUseTrapId() > 0 && roleTrap.getUseTrapNum() == 0){
             model.addAttribute("message", MessageVO.error("陷阱已过期，请切换陷阱。"));
             return "common/message";
         }
@@ -82,7 +91,7 @@ public class TrapController extends BaseController {
         return "trap/bait";
     }
 
-    /***
+    /**
      * 下饵
      * @param session session
      * @param model model
@@ -95,34 +104,34 @@ public class TrapController extends BaseController {
         Role role = getSessionRole(session);
         // 未选择陷阱
         RoleTrap roleTrap = trapService.getById(trapId);
-        if(roleTrap == null || !roleTrap.getRoleId().equals(role.getRoleId())){
+        if (roleTrap == null || !roleTrap.getRoleId().equals(role.getRoleId())){
             model.addAttribute("message", MessageVO.error("陷阱错误，请重新选择一个陷阱捕鸟。"));
             return "common/message";
         }
-        if(roleTrap.getBaitId() > 0 ){
+        if (roleTrap.getBaitId() > 0 ){
             model.addAttribute("message", MessageVO.error("当前陷阱正在捕鸟中。"));
             return "common/message";
         }
-        if(roleTrap.getUseTrapId() > 0 && roleTrap.getUseTrapNum() == 0){
+        if (roleTrap.getUseTrapId() > 0 && roleTrap.getUseTrapNum() == 0){
             model.addAttribute("message", MessageVO.error("陷阱已过期，请切换陷阱。"));
             return "common/message";
         }
         //
         RolePack packBait = packService.getById(baitId);
         // 诱饵数量不足
-        if(packBait == null || !packBait.getRoleId().equals(role.getRoleId()) || packBait.getNum() == 0){
+        if (packBait == null || !packBait.getRoleId().equals(role.getRoleId()) || packBait.getNum() == 0){
             model.addAttribute("message", MessageVO.error("诱饵数量不足"));
             return "common/message";
         }
         BaseBait baseBait = configGateway.getBaseBait(packBait.getBaseId());
-        if(baseBait == null || baseBait.getBirdSet() == null || baseBait.getBirdSet().trim().isEmpty()){
+        if (baseBait == null || baseBait.getBirdSet() == null || baseBait.getBirdSet().trim().isEmpty()){
             model.addAttribute("message", MessageVO.error("诱饵配置错误"));
             return "common/message";
         }
         int nowTime = CommonUtils.nowTime();
         // 随机小鸟
         BaseBird baseBird = birdRaffleService.randBird(baseBait.getBirdSet().split(","));
-        if(baseBird == null){
+        if (baseBird == null){
             model.addAttribute("message", MessageVO.error("诱饵或者小鸟配置错误"));
             return "common/message";
         }
@@ -149,7 +158,7 @@ public class TrapController extends BaseController {
         return redirectTo("/game");
     }
 
-    /***
+    /**
      * 一键下饵界面
      * @param session session
      * @param model model
@@ -163,7 +172,7 @@ public class TrapController extends BaseController {
         return redirectTo("/game");
     }
 
-    /***
+    /**
      * 一键下饵
      * @param session session
      * @param model model
@@ -179,7 +188,7 @@ public class TrapController extends BaseController {
         return "common/message";
     }
 
-    /***
+    /**
      * 收网
      *
      * <p>★ 已知设计债（本轮不改）：本方法会写库（消耗陷阱、结算捕获），
@@ -199,12 +208,12 @@ public class TrapController extends BaseController {
         // 仓库鸟上限 todo
         // 陷阱未找到或者陷阱不是该角色的
         RoleTrap roleTrap = trapService.getById(trapId);
-        if(roleTrap == null || !roleTrap.getRoleId().equals(role.getRoleId())){
+        if (roleTrap == null || !roleTrap.getRoleId().equals(role.getRoleId())){
             model.addAttribute("message", MessageVO.error("没有该陷阱"));
             return "common/message";
         }
         // 陷阱处于空闲中
-        if(roleTrap.getBaitId() == 0){
+        if (roleTrap.getBaitId() == 0){
             model.addAttribute("message", MessageVO.error("当前陷阱正处于空闲中。"));
             return "common/message";
         }
@@ -244,7 +253,7 @@ public class TrapController extends BaseController {
         // 计算升到下一级所需要的经验值
         long needExp = 0;
         BaseLevel baseLevel = configGateway.getBaseLevel(role.getLevel() + 1);
-        if(baseLevel != null){
+        if (baseLevel != null){
             needExp = baseLevel.getTotalExp() - role.getTotalExp();
         }
         // 构造结果数据
@@ -267,7 +276,7 @@ public class TrapController extends BaseController {
         return "trap/over";
     }
 
-    /***
+    /**
      * 小鸟详情
      * @param session session
      * @param model model

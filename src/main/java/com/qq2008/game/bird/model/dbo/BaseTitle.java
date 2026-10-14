@@ -1,10 +1,10 @@
 package com.qq2008.game.bird.model.dbo;
 
+import java.io.Serializable;
+
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.Serializable;
 
 /**
  * <p>

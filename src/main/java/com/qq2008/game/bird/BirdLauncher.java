@@ -1,8 +1,8 @@
 package com.qq2008.game.bird;
 
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.SpringApplication;
 
 @SpringBootApplication(scanBasePackages = {"com.qq2008.game.bird", "com.qq2008.common"})
 @MapperScan("com.qq2008.game.bird.mapper")

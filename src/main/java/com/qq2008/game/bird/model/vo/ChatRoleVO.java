@@ -1,6 +1,6 @@
 package com.qq2008.game.bird.model.vo;
 
-/***
+/**
  * 聊天玩家信息
  */
 public class ChatRoleVO {

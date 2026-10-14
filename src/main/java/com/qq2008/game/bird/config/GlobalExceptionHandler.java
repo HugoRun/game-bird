@@ -1,21 +1,22 @@
 package com.qq2008.game.bird.config;
 
-import com.qq2008.common.entity.BizException;
-import com.qq2008.common.entity.Result;
-import com.qq2008.common.entity.ResultCode;
-import com.qq2008.common.entity.vo.MessageVO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import com.qq2008.common.entity.BizException;
+import com.qq2008.common.entity.Result;
+import com.qq2008.common.entity.ResultCode;
+import com.qq2008.common.entity.vo.MessageVO;
 
 /**
  * 全局异常处理。

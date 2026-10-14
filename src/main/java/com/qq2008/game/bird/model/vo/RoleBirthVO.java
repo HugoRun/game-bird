@@ -4,7 +4,7 @@ import com.qq2008.game.bird.model.dbo.BaseNest;
 import com.qq2008.game.bird.model.dbo.BaseTrap;
 import com.qq2008.game.bird.model.dbo.RoleBirth;
 
-/***
+/**
  * 巢穴VO
  */
 public class RoleBirthVO extends RoleBirth {

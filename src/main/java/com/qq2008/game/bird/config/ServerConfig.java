@@ -1,17 +1,16 @@
 package com.qq2008.game.bird.config;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.view.ThymeleafViewResolver;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 服务器配置
@@ -19,7 +18,7 @@ import java.util.Map;
 @Configuration
 public class ServerConfig {
 
-    /***
+    /**
      * 构造跨域配置
      *
      * <p>【RT-6 安全项】改造前硬编码 addAllowedOrigin("*") / addAllowedHeader("*") /
@@ -49,7 +48,7 @@ public class ServerConfig {
         return corsConfiguration;
     }
 
-    /***
+    /**
      * 跨域配置
      *
      * @param props CORS 白名单配置
@@ -62,7 +61,7 @@ public class ServerConfig {
         return new CorsFilter(source);
     }
 
-    /***
+    /**
      * Thymeleaf全局变量
      * @param resolver resolver
      */

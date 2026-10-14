@@ -2,12 +2,12 @@ package com.qq2008.game.bird.data;
 
 import com.qq2008.game.bird.util.ArrayUtils;
 
-/***
+/**
  * 一些用于随机的文本数据
  */
 public class RandomTextData {
 
-    /***
+    /**
      * 获取可随机格言文本列表
      * @return 可随机格言文本列表
      */
@@ -39,7 +39,7 @@ public class RandomTextData {
         };
     }
 
-    /***
+    /**
      * 获取可随机聊天文本列表
      * @return 可随机聊天文本列表
      */
@@ -637,7 +637,7 @@ public class RandomTextData {
         };
     }
 
-    /***
+    /**
      * 获取可随机角色名称列表
      * @return 可随机角色名称列表
      */
@@ -695,7 +695,7 @@ public class RandomTextData {
         };
     }
 
-    /***
+    /**
      * 获取可随机树林列表
      * @return 可随机树林列表
      */

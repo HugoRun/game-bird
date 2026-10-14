@@ -1,11 +1,12 @@
 package com.qq2008.game.bird.service;
 
-import com.qq2008.game.bird.data.GameConfigGateway;
-import com.qq2008.game.bird.model.dbo.BaseBird;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.qq2008.game.bird.data.GameConfigGateway;
+import com.qq2008.game.bird.model.dbo.BaseBird;
 
 /**
  * 按权重随机抽取一只可捕捉的小鸟。

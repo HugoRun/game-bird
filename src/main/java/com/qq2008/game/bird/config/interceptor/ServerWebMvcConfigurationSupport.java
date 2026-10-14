@@ -1,13 +1,14 @@
 package com.qq2008.game.bird.config.interceptor;
 
-import com.qq2008.game.bird.data.ConstData;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/***
+import com.qq2008.game.bird.data.ConstData;
+
+/**
  * 拦截器注册配置
  *
  * <p>注意：本类原先继承 {@code WebMvcConfigurationSupport}。该基类会让 Spring Boot 的
@@ -19,7 +20,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class ServerWebMvcConfigurationSupport implements WebMvcConfigurer {
 
-    /***
+    /**
      * 提前注入bean
      * @return accountAuthHandlerInterceptor
      */
@@ -28,7 +29,7 @@ public class ServerWebMvcConfigurationSupport implements WebMvcConfigurer {
         return new AccountAuthHandlerInterceptor();
     }
 
-    /***
+    /**
      * 提前注入bean
      * @return roleAuthHandlerInterceptor
      */
@@ -37,7 +38,7 @@ public class ServerWebMvcConfigurationSupport implements WebMvcConfigurer {
         return new RoleAuthHandlerInterceptor();
     }
 
-    /***
+    /**
      * 提前注入bean
      * @return GameStatusHandlerInterceptor
      */
@@ -46,7 +47,7 @@ public class ServerWebMvcConfigurationSupport implements WebMvcConfigurer {
         return new GameStatusHandlerInterceptor();
     }
 
-    /***
+    /**
      * 添加自定义拦截器
      */
     @Override
@@ -66,7 +67,7 @@ public class ServerWebMvcConfigurationSupport implements WebMvcConfigurer {
         // 如果需要拦截错误信息, 屏蔽掉上面的 , "/error*"
     }
 
-    /***
+    /**
      * 排除静态资源拦截
      */
     @Override

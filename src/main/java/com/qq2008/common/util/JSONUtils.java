@@ -3,7 +3,7 @@ package com.qq2008.common.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-/***
+/**
  * JSON工具
  */
 public class JSONUtils {
@@ -11,7 +11,7 @@ public class JSONUtils {
     // ObjectMapper对象
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    /***
+    /**
      * 格式化JSON
      * @param obj 对象
      * @return JSON文本

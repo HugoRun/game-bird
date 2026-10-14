@@ -2,14 +2,6 @@ package com.qq2008.game.bird.controller.game;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.qq2008.common.entity.vo.MessageVO;
-import com.qq2008.game.bird.controller.common.BaseController;
-import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.data.ShopItemAccessors;
-import com.qq2008.game.bird.model.dbo.Role;
-import com.qq2008.game.bird.model.shop.PurchaseResult;
-import com.qq2008.game.bird.model.shop.ShopKind;
-import com.qq2008.game.bird.service.ShopPurchaseService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -19,7 +11,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-/***
+import com.qq2008.game.bird.controller.common.BaseController;
+import com.qq2008.game.bird.data.ConstData;
+import com.qq2008.game.bird.data.ShopItemAccessors;
+import com.qq2008.game.bird.model.dbo.Role;
+import com.qq2008.game.bird.model.shop.PurchaseResult;
+import com.qq2008.game.bird.model.shop.ShopKind;
+import com.qq2008.game.bird.service.ShopPurchaseService;
+
+/**
  * 商店相关路由
  *
  * <p><b>瘦身说明</b>：原先 6 个 {@code buyShopXxx} 各 79 行、共 476 行逐字重复的
@@ -53,7 +53,7 @@ public class ShopController extends BaseController {
 
     // ---------- 6 个列表方法：统一委托 listShopItems ----------
 
-    /***
+    /**
      * 诱饵商店界面
      * @param session session
      * @param model model
@@ -68,7 +68,7 @@ public class ShopController extends BaseController {
         return listShopItems(session, model, ShopKind.BAIT, pageNo, feeType);
     }
 
-    /***
+    /**
      * 陷阱商店界面
      * @param session session
      * @param model model
@@ -83,7 +83,7 @@ public class ShopController extends BaseController {
         return listShopItems(session, model, ShopKind.TRAP, pageNo, feeType);
     }
 
-    /***
+    /**
      * 鸟笼商店界面
      * @param session session
      * @param model model
@@ -98,7 +98,7 @@ public class ShopController extends BaseController {
         return listShopItems(session, model, ShopKind.CAGE, pageNo, feeType);
     }
 
-    /***
+    /**
      * 鸟巢商店界面
      * @param session session
      * @param model model
@@ -113,7 +113,7 @@ public class ShopController extends BaseController {
         return listShopItems(session, model, ShopKind.NEST, pageNo, feeType);
     }
 
-    /***
+    /**
      * 训练场商店界面
      * @param session session
      * @param model model
@@ -128,7 +128,7 @@ public class ShopController extends BaseController {
         return listShopItems(session, model, ShopKind.TRAIN, pageNo, feeType);
     }
 
-    /***
+    /**
      * 道具商店界面
      * @param session session
      * @param model model
@@ -145,7 +145,7 @@ public class ShopController extends BaseController {
 
     // ---------- 6 个购买方法：统一委托 buyShopItem ----------
 
-    /***
+    /**
      * 购买诱饵
      * @param session session
      * @param model model
@@ -160,7 +160,7 @@ public class ShopController extends BaseController {
         return buyShopItem(session, model, ShopKind.BAIT, id, payNum);
     }
 
-    /***
+    /**
      * 购买陷阱
      * @param session session
      * @param model model
@@ -175,7 +175,7 @@ public class ShopController extends BaseController {
         return buyShopItem(session, model, ShopKind.TRAP, id, payNum);
     }
 
-    /***
+    /**
      * 购买鸟笼
      * @param session session
      * @param model model
@@ -190,7 +190,7 @@ public class ShopController extends BaseController {
         return buyShopItem(session, model, ShopKind.CAGE, id, payNum);
     }
 
-    /***
+    /**
      * 购买鸟巢
      * @param session session
      * @param model model
@@ -205,7 +205,7 @@ public class ShopController extends BaseController {
         return buyShopItem(session, model, ShopKind.NEST, id, payNum);
     }
 
-    /***
+    /**
      * 购买训练场
      * @param session session
      * @param model model
@@ -220,7 +220,7 @@ public class ShopController extends BaseController {
         return buyShopItem(session, model, ShopKind.TRAIN, id, payNum);
     }
 
-    /***
+    /**
      * 购买道具
      * @param session session
      * @param model model

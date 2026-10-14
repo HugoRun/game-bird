@@ -1,6 +1,6 @@
 package com.qq2008.game.bird.model.vo;
 
-/***
+/**
  * 游戏状态
  */
 public enum GameStatusVO {

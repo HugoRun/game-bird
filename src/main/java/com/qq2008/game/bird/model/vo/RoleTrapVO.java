@@ -5,7 +5,7 @@ import com.qq2008.game.bird.model.dbo.BaseBird;
 import com.qq2008.game.bird.model.dbo.BaseTrap;
 import com.qq2008.game.bird.model.dbo.RoleTrap;
 
-/***
+/**
  * 陷阱VO
  */
 public class RoleTrapVO extends RoleTrap {

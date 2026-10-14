@@ -1,19 +1,11 @@
 package com.qq2008.game.bird.controller.game;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.qq2008.common.annotation.SkipRole;
-import com.qq2008.common.entity.vo.MessageVO;
-import com.qq2008.common.util.CommonUtils;
-import com.qq2008.game.bird.controller.common.BaseController;
-import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.data.GameConfigGateway;
-import com.qq2008.game.bird.model.dbo.*;
-import com.qq2008.game.bird.model.vo.*;
-import com.qq2008.game.bird.util.MockUtils;
-import com.qq2008.game.bird.model.dbo.*;
-import com.qq2008.game.bird.model.vo.*;
-import com.qq2008.game.bird.util.MockUtils;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
@@ -23,13 +15,26 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.qq2008.common.annotation.SkipRole;
+import com.qq2008.common.entity.vo.MessageVO;
+import com.qq2008.common.util.CommonUtils;
 
+import com.qq2008.game.bird.controller.common.BaseController;
+import com.qq2008.game.bird.data.ConstData;
+import com.qq2008.game.bird.data.GameConfigGateway;
+import com.qq2008.game.bird.model.dbo.BaseField;
+import com.qq2008.game.bird.model.dbo.LogChat;
+import com.qq2008.game.bird.model.dbo.Role;
+import com.qq2008.game.bird.model.dbo.RoleBirth;
+import com.qq2008.game.bird.model.dbo.RoleTrain;
+import com.qq2008.game.bird.model.dbo.RoleTrap;
+import com.qq2008.game.bird.model.vo.ChatMessageVO;
+import com.qq2008.game.bird.model.vo.RoleBirthVO;
+import com.qq2008.game.bird.model.vo.RoleTrainVO;
+import com.qq2008.game.bird.model.vo.RoleTrapVO;
+import com.qq2008.game.bird.util.MockUtils;
 
-/****
+/**
  * 游戏 todo
  * 1. 当前人数可以放在缓存中, 玩家注册角色后触发刷新
  * 2. 最近加入玩家可以放在缓存中
@@ -40,12 +45,11 @@ import org.slf4j.LoggerFactory;
 public class GameController extends BaseController {
 
     /** 游戏配置读取入口，由构造器注入。 */
-    @jakarta.annotation.Resource
+    @Resource
     public GameConfigGateway configGateway;
     // 日志句柄
-    private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
-    /***
+    /**
      * 游戏主界面
      * @param session session
      * @param model model
@@ -133,7 +137,7 @@ public class GameController extends BaseController {
         return "game";
     }
 
-    /***
+    /**
      * 银行界面
      * @param session session
      * @param model model
@@ -144,7 +148,7 @@ public class GameController extends BaseController {
         return "role/bank";
     }
 
-    /***
+    /**
      * 存款
      * @param session session
      * @param model model
@@ -172,7 +176,7 @@ public class GameController extends BaseController {
         return redirectTo("bank");
     }
 
-    /***
+    /**
      * 取款
      * @param session session
      * @param model model
@@ -199,7 +203,7 @@ public class GameController extends BaseController {
         return redirectTo("bank");
     }
 
-    /***
+    /**
      * 下饵界面
      * @param session session
      * @param model model
@@ -252,7 +256,7 @@ public class GameController extends BaseController {
     // 更改小鸟性别
     // 重命名小鸟
 
-    /***
+    /**
      * 角色详情页
      *
      * <p>★ 本方法位于根路径 {@code /profile}，与 {@link RoleController} 的
@@ -273,8 +277,7 @@ public class GameController extends BaseController {
         return "role/profile";
     }
 
-
-    /***
+    /**
      * 充值界面
      * @param session session
      * @param model model
@@ -286,7 +289,7 @@ public class GameController extends BaseController {
         return "vip/pay";
     }
 
-    /***
+    /**
      * 公告消息接口, 用于转发
      * @param session session
      * @param model model

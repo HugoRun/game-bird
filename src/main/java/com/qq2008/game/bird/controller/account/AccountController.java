@@ -1,15 +1,9 @@
 package com.qq2008.game.bird.controller.account;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.qq2008.common.annotation.SkipAccount;
-import com.qq2008.common.annotation.SkipRole;
-import com.qq2008.common.entity.vo.MessageVO;
-import com.qq2008.common.util.CommonUtils;
-import com.qq2008.game.bird.controller.common.BaseController;
-import com.qq2008.game.bird.config.GameProperties;
-import com.qq2008.game.bird.model.dbo.Account;
-import com.qq2008.game.bird.service.AccountService;
-import com.qq2008.game.bird.util.UUIDUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -18,10 +12,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
+import com.qq2008.common.annotation.SkipAccount;
+import com.qq2008.common.annotation.SkipRole;
+import com.qq2008.common.entity.vo.MessageVO;
+import com.qq2008.common.util.CommonUtils;
 
-/***
+import com.qq2008.game.bird.config.GameProperties;
+import com.qq2008.game.bird.controller.common.BaseController;
+import com.qq2008.game.bird.model.dbo.Account;
+import com.qq2008.game.bird.service.AccountService;
+import com.qq2008.game.bird.util.UUIDUtils;
+
+/**
  * 账号路由处理器
  * 对账号的处理使用的路由分支
  */
@@ -35,7 +37,7 @@ public class AccountController extends BaseController {
     @Resource
     GameProperties gameProperties;
 
-    /***
+    /**
      * 登录界面
      * @param session session
      * @param model model
@@ -53,7 +55,7 @@ public class AccountController extends BaseController {
         return redirectTo("/role/login");
     }
 
-    /***
+    /**
      * 登录
      * @param session session
      * @param model model
@@ -94,7 +96,7 @@ public class AccountController extends BaseController {
         return redirectTo("/role/login");
     }
 
-    /***
+    /**
      * 注册账号界面
      * @param session session
      * @param model model
@@ -116,7 +118,7 @@ public class AccountController extends BaseController {
         return "account/register";
     }
 
-    /***
+    /**
      * 注册账号
      * @param session session
      * @param model model
@@ -179,7 +181,7 @@ public class AccountController extends BaseController {
         return redirectTo("/role/login");
     }
 
-    /***
+    /**
      * 常量时间比较两个口令。
      *
      * <p>原先用 {@code password.equals(stored)}，其短路比较会在首个不等字节处立即返回，

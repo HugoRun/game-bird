@@ -1,8 +1,5 @@
 package com.qq2008.game.bird.config.listener;
 
-import com.qq2008.game.bird.data.GameConfigManager;
-import com.qq2008.game.bird.data.GameServer;
-import com.qq2008.game.bird.model.vo.GameStatusVO;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import org.slf4j.Logger;
@@ -11,7 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-/***
+import com.qq2008.game.bird.data.GameConfigManager;
+import com.qq2008.game.bird.data.GameServer;
+import com.qq2008.game.bird.model.vo.GameStatusVO;
+
+/**
  * Servlet上下文监听器
  * 当服务器初始化完成后或者销毁时做一些处理
  */
@@ -41,7 +42,7 @@ public class ServerStartedListener implements ServletContextListener {
             logger.info("————————————————> 游戏启动成功!!! <————————————————");
         } catch (Exception e) {
             GameServer.setStatus(GameStatusVO.NULL);
-            logger.info("————————————————> 游戏启动失败!!! <————————————————");
+            logger.error("————————————————> 游戏启动失败!!! <————————————————");
             // 必须打印完整堆栈：原实现写的是 e.getStackTrace()，那只是把堆栈数组取出来丢弃，
             // 什么都不会输出，启动失败时日志里只剩一句「失败原因」。
             logger.error("游戏启动失败", e);

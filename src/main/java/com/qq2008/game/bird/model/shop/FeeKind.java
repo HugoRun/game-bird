@@ -1,6 +1,7 @@
 package com.qq2008.game.bird.model.shop;
 
 import com.qq2008.common.entity.BizException;
+
 import com.qq2008.game.bird.data.ConstData;
 import com.qq2008.game.bird.model.dbo.Role;
 

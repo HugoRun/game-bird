@@ -1,8 +1,16 @@
 package com.qq2008.game.bird.data;
 
+import java.util.EnumMap;
+import java.util.function.Function;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import org.springframework.stereotype.Component;
+
 import com.qq2008.game.bird.model.shop.ShopItemView;
 import com.qq2008.game.bird.model.shop.ShopKind;
 import com.qq2008.game.bird.service.BaseBaitService;
@@ -11,12 +19,6 @@ import com.qq2008.game.bird.service.BaseNestService;
 import com.qq2008.game.bird.service.BasePropService;
 import com.qq2008.game.bird.service.BaseTrainService;
 import com.qq2008.game.bird.service.BaseTrapService;
-import jakarta.annotation.PostConstruct;
-import org.springframework.stereotype.Component;
-
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.function.Function;
 
 /**
  * 6 种商店配置项的访问器注册表 —— 消除 476 行购买重复的核心。
@@ -88,7 +90,7 @@ public class ShopItemAccessors {
      *
      * @param service 诱饵配置服务
      */
-    @jakarta.annotation.Resource
+    @Resource
     public void setBaseBaitService(BaseBaitService service) {
         this.baseBaitService = service;
     }
@@ -98,7 +100,7 @@ public class ShopItemAccessors {
      *
      * @param service 陷阱配置服务
      */
-    @jakarta.annotation.Resource
+    @Resource
     public void setBaseTrapService(BaseTrapService service) {
         this.baseTrapService = service;
     }
@@ -108,7 +110,7 @@ public class ShopItemAccessors {
      *
      * @param service 鸟笼配置服务
      */
-    @jakarta.annotation.Resource
+    @Resource
     public void setBaseCageService(BaseCageService service) {
         this.baseCageService = service;
     }
@@ -118,7 +120,7 @@ public class ShopItemAccessors {
      *
      * @param service 巢配置服务
      */
-    @jakarta.annotation.Resource
+    @Resource
     public void setBaseNestService(BaseNestService service) {
         this.baseNestService = service;
     }
@@ -128,7 +130,7 @@ public class ShopItemAccessors {
      *
      * @param service 训练场配置服务
      */
-    @jakarta.annotation.Resource
+    @Resource
     public void setBaseTrainService(BaseTrainService service) {
         this.baseTrainService = service;
     }
@@ -138,7 +140,7 @@ public class ShopItemAccessors {
      *
      * @param service 道具配置服务
      */
-    @jakarta.annotation.Resource
+    @Resource
     public void setBasePropService(BasePropService service) {
         this.basePropService = service;
     }

@@ -2,12 +2,7 @@ package com.qq2008.game.bird.controller.game;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.qq2008.game.bird.assembler.RolePackAssembler;
-import com.qq2008.game.bird.config.GameProperties;
-import com.qq2008.game.bird.controller.common.BaseController;
-import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.model.dbo.RolePack;
-import com.qq2008.game.bird.model.vo.RolePackVO;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,7 +10,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-/***
+import com.qq2008.game.bird.assembler.RolePackAssembler;
+import com.qq2008.game.bird.config.GameProperties;
+import com.qq2008.game.bird.controller.common.BaseController;
+import com.qq2008.game.bird.data.ConstData;
+import com.qq2008.game.bird.model.dbo.RolePack;
+import com.qq2008.game.bird.model.vo.RolePackVO;
+
+/**
  * 包裹相关路由
  *
  * <p>6 个列表方法已由 {@link RolePackAssembler#assemble} 统一装配视图对象，
@@ -27,14 +29,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class PackController extends BaseController {
 
     /** 包裹页面视图装配器，由注入取得。 */
-    @jakarta.annotation.Resource
+    @Resource
     public RolePackAssembler packAssembler;
 
     /** 游戏配置（提供包裹总容量）。 */
-    @jakarta.annotation.Resource
+    @Resource
     public GameProperties gameProperties;
 
-    /***
+    /**
      * 诱饵背包界面
      * @param session session
      * @param model model
@@ -46,7 +48,7 @@ public class PackController extends BaseController {
         return listPack(RolePackAssembler.PackItemKind.BAIT, session, model, pageNo, "pack/bait");
     }
 
-    /***
+    /**
      * 鸟笼背包界面
      * @param session session
      * @param model model
@@ -58,7 +60,7 @@ public class PackController extends BaseController {
         return listPack(RolePackAssembler.PackItemKind.CAGE, session, model, pageNo, "pack/cage");
     }
 
-    /***
+    /**
      * 鸟巢背包界面
      * @param session session
      * @param model model
@@ -70,7 +72,7 @@ public class PackController extends BaseController {
         return listPack(RolePackAssembler.PackItemKind.NEST, session, model, pageNo, "pack/nest");
     }
 
-    /***
+    /**
      * 道具背包界面
      * @param session session
      * @param model model
@@ -82,7 +84,7 @@ public class PackController extends BaseController {
         return listPack(RolePackAssembler.PackItemKind.PROP, session, model, pageNo, "pack/prop");
     }
 
-    /***
+    /**
      * 训练场背包界面
      * @param session session
      * @param model model
@@ -94,7 +96,7 @@ public class PackController extends BaseController {
         return listPack(RolePackAssembler.PackItemKind.TRAIN, session, model, pageNo, "pack/train");
     }
 
-    /***
+    /**
      * 陷阱背包界面
      * @param session session
      * @param model model

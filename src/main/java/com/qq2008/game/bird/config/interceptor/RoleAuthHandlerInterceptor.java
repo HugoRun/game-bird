@@ -1,17 +1,17 @@
 package com.qq2008.game.bird.config.interceptor;
 
-import com.qq2008.common.annotation.SkipRole;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.qq2008.common.annotation.SkipRole;
 
-/***
+/**
  * 角色登录认证拦截器
  * 对需要登录角色才能访问的路由进行拦截
  */

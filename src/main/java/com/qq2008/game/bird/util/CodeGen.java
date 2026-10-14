@@ -1,13 +1,13 @@
 package com.qq2008.game.bird.util;
 
-import com.baomidou.mybatisplus.generator.FastAutoGenerator;
-import com.baomidou.mybatisplus.generator.config.OutputFile;
-import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
-
 import java.nio.file.Paths;
 import java.util.Collections;
 
-/***
+import com.baomidou.mybatisplus.generator.config.OutputFile;
+import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
+import com.baomidou.mybatisplus.generator.FastAutoGenerator;
+
+/**
  * 数据库代码生成器
  */
 public class CodeGen {

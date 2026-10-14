@@ -1,15 +1,16 @@
 package com.qq2008.game.bird.assembler;
 
+import java.util.ArrayList;
+import java.util.function.BiConsumer;
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.qq2008.game.bird.data.GameConfigGateway;
-import com.qq2008.game.bird.model.dbo.RolePack;
-import com.qq2008.game.bird.model.vo.RolePackVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiConsumer;
+import com.qq2008.game.bird.data.GameConfigGateway;
+import com.qq2008.game.bird.model.dbo.RolePack;
+import com.qq2008.game.bird.model.vo.RolePackVO;
 
 /**
  * 包裹页面的视图装配器。

@@ -1,6 +1,6 @@
 package com.qq2008.game.bird.data;
 
-/***
+/**
  * 全局常量配置类
  *
  * <p><b>所有字段都是 final 且有私有构造器</b>：常量不应在运行期被改写。

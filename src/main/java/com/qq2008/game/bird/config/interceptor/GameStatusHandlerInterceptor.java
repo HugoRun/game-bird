@@ -1,28 +1,26 @@
 package com.qq2008.game.bird.config.interceptor;
 
-import com.qq2008.common.entity.vo.MessageVO;
-import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.data.GameServer;
-import com.qq2008.game.bird.model.vo.GameStatusVO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.qq2008.common.entity.vo.MessageVO;
 
-/***
+import com.qq2008.game.bird.data.ConstData;
+import com.qq2008.game.bird.data.GameServer;
+import com.qq2008.game.bird.model.vo.GameStatusVO;
+
+/**
  * 游戏状态拦截器
  * 当游戏处于维护状态时禁止访问
  */
 public class GameStatusHandlerInterceptor implements HandlerInterceptor {
 
     // 日志句柄
-    private static final Logger logger = LoggerFactory.getLogger(GameStatusHandlerInterceptor.class);
 
-    /***
+    /**
      * R19 第二层防护。
      *
      * <p>为什么需要：{@code forward()} 会重新进入 DispatcherServlet 并再执行一遍拦截器链。

@@ -4,7 +4,7 @@ import com.qq2008.game.bird.model.dbo.BaseBird;
 import com.qq2008.game.bird.model.dbo.BaseTrain;
 import com.qq2008.game.bird.model.dbo.RoleTrain;
 
-/***
+/**
  * 训练场VO
  */
 public class RoleTrainVO extends RoleTrain {

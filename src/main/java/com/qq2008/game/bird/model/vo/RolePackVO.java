@@ -1,7 +1,12 @@
 package com.qq2008.game.bird.model.vo;
 
-import com.qq2008.game.bird.model.dbo.*;
-import com.qq2008.game.bird.model.dbo.*;
+import com.qq2008.game.bird.model.dbo.BaseBait;
+import com.qq2008.game.bird.model.dbo.BaseCage;
+import com.qq2008.game.bird.model.dbo.BaseNest;
+import com.qq2008.game.bird.model.dbo.BaseProp;
+import com.qq2008.game.bird.model.dbo.BaseTrain;
+import com.qq2008.game.bird.model.dbo.BaseTrap;
+import com.qq2008.game.bird.model.dbo.RolePack;
 
 public class RolePackVO extends RolePack {
 

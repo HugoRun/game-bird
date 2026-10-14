@@ -1,7 +1,8 @@
 package com.qq2008.game.bird.mapper;
 
-import com.qq2008.game.bird.model.dbo.BaseTitle;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import com.qq2008.game.bird.model.dbo.BaseTitle;
 
 /**
  * <p>

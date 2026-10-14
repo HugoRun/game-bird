@@ -1,5 +1,9 @@
 package com.qq2008.game.bird.data;
 
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
 import com.qq2008.game.bird.model.dbo.BaseBait;
 import com.qq2008.game.bird.model.dbo.BaseBird;
 import com.qq2008.game.bird.model.dbo.BaseCage;
@@ -11,9 +15,6 @@ import com.qq2008.game.bird.model.dbo.BaseProp;
 import com.qq2008.game.bird.model.dbo.BaseTitle;
 import com.qq2008.game.bird.model.dbo.BaseTrain;
 import com.qq2008.game.bird.model.dbo.BaseTrap;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * 游戏配置读取的唯一对外入口。

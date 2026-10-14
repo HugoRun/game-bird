@@ -1,9 +1,13 @@
 package com.qq2008.game.bird.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.qq2008.common.entity.BizException;
 import com.qq2008.common.entity.ResultCode;
 import com.qq2008.common.entity.vo.MessageLink;
+
 import com.qq2008.game.bird.data.ShopItemAccessors;
 import com.qq2008.game.bird.model.dbo.Role;
 import com.qq2008.game.bird.model.dbo.RolePack;
@@ -12,8 +16,6 @@ import com.qq2008.game.bird.model.shop.PurchaseResult;
 import com.qq2008.game.bird.model.shop.ShopItemView;
 import com.qq2008.game.bird.model.shop.ShopKind;
 import com.qq2008.game.bird.util.GameUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 商店购买 —— 收敛原 {@code ShopController} 6 个 {@code buyShopXxx}（共 476 行）的唯一实现。

@@ -1,8 +1,9 @@
 package com.qq2008.game.bird.data;
 
-import com.qq2008.game.bird.model.vo.GameStatusVO;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+
+import com.qq2008.game.bird.model.vo.GameStatusVO;
 
 @Component
 public class GameServer {
@@ -12,7 +13,7 @@ public class GameServer {
     // 程序上下文
     protected static volatile ApplicationContext applicationContext;
 
-    /***
+    /**
      * 获取GameServer单例对象
      * @return GameConfig
      * @deprecated 依赖静态 ApplicationContext，无法脱离 Spring 容器使用。
@@ -23,7 +24,7 @@ public class GameServer {
         return GameServer.getApplicationContext().getBean(GameServer.class);
     }
 
-    /***
+    /**
      * 获取Springboot上下文
      * @return ApplicationContext
      * @deprecated 同 {@link #getInstance()}，请改为注入 bean。
@@ -33,7 +34,7 @@ public class GameServer {
         return applicationContext;
     }
 
-    /***
+    /**
      * 设置Springboot上下文
      * @param applicationContext Springboot上下文
      * @deprecated 仅保留给启动流程使用，业务代码不应读取静态上下文。
@@ -43,7 +44,7 @@ public class GameServer {
         GameServer.applicationContext = applicationContext;
     }
 
-    /***
+    /**
      * 设置游戏状态
      * @param status 游戏状态
      */
@@ -51,7 +52,7 @@ public class GameServer {
         GameServer.status = status;
     }
 
-    /***
+    /**
      * 获取游戏状态
      * @return 游戏状态
      */
@@ -59,24 +60,24 @@ public class GameServer {
         return status;
     }
 
-    /***
+    /**
      * 初始化游戏
      */
-    public static void init(){
+    public static void init() {
         // 初始化游戏活动
         getInstance().initActivity();
         // 初始化排行榜 todo
         getInstance().initRank();
     }
 
-    /***
+    /**
      * 初始化活动 todo
      */
     public void initActivity(){
 
     }
 
-    /***
+    /**
      * 初始化排行榜 todo
      */
     public void initRank(){

@@ -1,6 +1,6 @@
 package com.qq2008.common.entity.vo;
 
-/***
+/**
  * 消息链接
  */
 public class MessageLink {

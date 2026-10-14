@@ -1,13 +1,15 @@
 package com.qq2008.game.bird.service;
 
+import org.springframework.stereotype.Service;
+
 import com.qq2008.common.entity.BizException;
 import com.qq2008.common.entity.ResultCode;
+
 import com.qq2008.game.bird.data.GameConfigManager;
 import com.qq2008.game.bird.model.dbo.BaseLevel;
 import com.qq2008.game.bird.model.dbo.Role;
 import com.qq2008.game.bird.model.dbo.RolePack;
 import com.qq2008.game.bird.model.shop.FeeKind;
-import org.springframework.stereotype.Service;
 
 /**
  * 角色数值（经验 / 金币 / 钻石 / 爱心）与包裹数量的原子增减，以及等级计算。
