@@ -107,7 +107,7 @@ public class Role implements Serializable {
     private Long lovePoint;
 
     /**
-
+     * 当前装备称号Id
      */
     private Integer titleId;
 
@@ -117,22 +117,22 @@ public class Role implements Serializable {
     private String avatarUrl;
 
     /**
-     * 等级
+     * 婚姻类型,0无/1喜鹊之恋/2鸳鸯之恋/3比翼鸟之恋/4天使之恋
      */
     private Byte marriageType;
 
     /**
-     * 当前经验值
+     * 个性签名
      */
     private String dynamic;
 
     /**
-     * 当前装备称号Id
+     * 注册时间戳
      */
     private Integer regTime;
 
     /**
-     * 婚姻类型,0无/1喜鹊之恋/2鸳鸯之恋/3比翼鸟之恋/4天使之恋
+     * 最后一次登录时间戳
      */
     private Integer lastLoginTime;
 }

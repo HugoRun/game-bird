@@ -35,12 +35,12 @@ public class RoleCage implements Serializable {
     private String roleId;
 
     /**
-     * 小鸟唯一Id
+     * 排序Id
      */
     private Integer idx;
 
     /**
-     * 排序Id
+     * 出战小鸟唯一Id
      */
     private Integer birdId;
 

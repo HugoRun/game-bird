@@ -44,7 +44,11 @@ public class Account implements Serializable {
     private String password;
 
     /**
-     * 用户名
+     * 昵称
+     *
+     * <p>注意：SQL 中该列 COMMENT 写的是「用户名」，但同一张表的 {@code username}
+     * 列才是登录账号。二者并存时，若沿用「用户名」会让读者无法区分，
+     * 故此处按其实际语义（展示用昵称）记为「昵称」。
      */
     private String nickname;
 

@@ -15,7 +15,7 @@ public class GameServer {
 
     /**
      * 获取GameServer单例对象
-     * @return GameConfig
+     * @return GameServer
      * @deprecated 依赖静态 ApplicationContext，无法脱离 Spring 容器使用。
      *             请直接注入 {@code GameServer} bean。
      */
