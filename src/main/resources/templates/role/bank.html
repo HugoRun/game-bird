@@ -38,14 +38,14 @@
     <div class="l">账户余额:[[${session.sRole.bankCoin}]]金币</div>
     <div class="icon-gray-border">
         <div class="t">存款 (手续费1%，100金币起存)</div>
-        <form method="post" th:action="@{/bankIn.do}">
+        <form method="post" th:action="@{/bankIn}">
             <div class="flex">
                 <input class="large-input mr5" maxlength="10" name="inNum" size="10" type="text" value="0"/>
                 <input class="mini-button" type="submit" value="马上存入"/>
             </div>
         </form>
         <div class="t">取款 (无手续费)</div>
-        <form method="post" th:action="@{/bankOut.do}">
+        <form method="post" th:action="@{/bankOut}">
             <div class="flex">
                 <input class="large-input mr5" maxlength="10" name="outNum" size="10" type="text" value="0"/>
                 <input class="mini-button" type="submit" value="马上取出"/>

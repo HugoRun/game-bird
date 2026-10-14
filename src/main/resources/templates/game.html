@@ -130,7 +130,7 @@
         </ul>
     </div>
     <div>
-        <div class="panel bg-blue">【世界喊话】<a href="/chat/list.do">我要喊话</a></div>
+        <div class="panel bg-blue">【世界喊话】<a th:href="@{/chat/list}">我要喊话</a></div>
         <div th:if="${chatMessageList != null && chatMessageList.size() == 0}">暂未开放</div>
         <ul th:if="${chatMessageList.size() > 0}">
             <li th:each="message, stat : ${chatMessageList}">

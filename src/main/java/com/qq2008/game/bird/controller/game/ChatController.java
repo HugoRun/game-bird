@@ -41,7 +41,7 @@ public class ChatController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/list.do")
+    @GetMapping("/list")
     public String pageChatList(HttpSession session, Model model, @RequestParam(defaultValue = "1") int pageNo, @RequestParam(defaultValue = "1") int chatType) {
         // 参数兼容
         if (pageNo < 1) {
@@ -67,7 +67,7 @@ public class ChatController extends BaseController {
      * @param model model
      * @return view
      */
-    @PostMapping("/chatWorld.do")
+    @PostMapping("/chatWorld")
     public String doChatWorld(HttpSession session, RedirectAttributes model, String message) {
         //
         Role role = getSessionRole(session);
@@ -82,12 +82,12 @@ public class ChatController extends BaseController {
         // 玩家等级不足
         if (role.getLevel() < 10) {
             model.addFlashAttribute("message", MessageVO.error("您的等级不足10级。"));
-            return redirectTo("/chat/list.do");
+            return redirectTo("/chat/list");
         }
         // 聊天消息为空
         if (message == null || message.trim().isEmpty()){
             model.addFlashAttribute("message", MessageVO.error("聊天消息不能为空哦。"));
-            return redirectTo("/chat/list.do");
+            return redirectTo("/chat/list");
         }
         // 插入聊天数据
         LogChat chat = new LogChat();
@@ -100,7 +100,7 @@ public class ChatController extends BaseController {
         chatService.save(chat);
         // 构造
         model.addFlashAttribute("message", MessageVO.success("发送聊天消息成功！"));
-        return redirectTo("/chat/list.do");
+        return redirectTo("/chat/list");
     }
 
 
