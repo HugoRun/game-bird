@@ -143,7 +143,7 @@ public class ShopController extends BaseController {
         return listShopItems(session, model, ShopKind.PROP, pageNo, feeType);
     }
 
-    // ---------- 6 个购买方法：统一委托 buyShopItem ----------
+    // ---------- 6 个购买方法：统一委托 doBuyItem ----------
 
     /**
      * 购买诱饵
@@ -154,10 +154,10 @@ public class ShopController extends BaseController {
      * @return view
      */
     @PostMapping(value = "/bait/purchase")
-    public String buyShopBait(HttpSession session, Model model,
+    public String doBuyBait(HttpSession session, Model model,
                               @RequestParam(defaultValue = "1") int id,
                               @RequestParam(defaultValue = "1") int payNum) {
-        return buyShopItem(session, model, ShopKind.BAIT, id, payNum);
+        return doBuyItem(session, model, ShopKind.BAIT, id, payNum);
     }
 
     /**
@@ -169,10 +169,10 @@ public class ShopController extends BaseController {
      * @return view
      */
     @PostMapping(value = "/trap/purchase")
-    public String buyShopTrap(HttpSession session, Model model,
+    public String doBuyTrap(HttpSession session, Model model,
                               @RequestParam(defaultValue = "1") int id,
                               @RequestParam(defaultValue = "1") int payNum) {
-        return buyShopItem(session, model, ShopKind.TRAP, id, payNum);
+        return doBuyItem(session, model, ShopKind.TRAP, id, payNum);
     }
 
     /**
@@ -184,10 +184,10 @@ public class ShopController extends BaseController {
      * @return view
      */
     @PostMapping(value = "/cage/purchase")
-    public String buyShopCage(HttpSession session, Model model,
+    public String doBuyCage(HttpSession session, Model model,
                               @RequestParam(defaultValue = "1") int id,
                               @RequestParam(defaultValue = "1") int payNum) {
-        return buyShopItem(session, model, ShopKind.CAGE, id, payNum);
+        return doBuyItem(session, model, ShopKind.CAGE, id, payNum);
     }
 
     /**
@@ -199,10 +199,10 @@ public class ShopController extends BaseController {
      * @return view
      */
     @PostMapping(value = "/nest/purchase")
-    public String buyShopNest(HttpSession session, Model model,
+    public String doBuyNest(HttpSession session, Model model,
                               @RequestParam(defaultValue = "1") int id,
                               @RequestParam(defaultValue = "1") int payNum) {
-        return buyShopItem(session, model, ShopKind.NEST, id, payNum);
+        return doBuyItem(session, model, ShopKind.NEST, id, payNum);
     }
 
     /**
@@ -214,10 +214,10 @@ public class ShopController extends BaseController {
      * @return view
      */
     @PostMapping(value = "/train/purchase")
-    public String buyShopTrain(HttpSession session, Model model,
+    public String doBuyTrain(HttpSession session, Model model,
                                @RequestParam(defaultValue = "1") int id,
                                @RequestParam(defaultValue = "1") int payNum) {
-        return buyShopItem(session, model, ShopKind.TRAIN, id, payNum);
+        return doBuyItem(session, model, ShopKind.TRAIN, id, payNum);
     }
 
     /**
@@ -229,10 +229,10 @@ public class ShopController extends BaseController {
      * @return view
      */
     @PostMapping(value = "/prop/purchase")
-    public String buyShopProp(HttpSession session, Model model,
+    public String doBuyProp(HttpSession session, Model model,
                               @RequestParam(defaultValue = "1") int id,
                               @RequestParam(defaultValue = "1") int payNum) {
-        return buyShopItem(session, model, ShopKind.PROP, id, payNum);
+        return doBuyItem(session, model, ShopKind.PROP, id, payNum);
     }
 
     // ---------- 公共实现 ----------
@@ -280,7 +280,7 @@ public class ShopController extends BaseController {
      * @param payNum  购买数量
      * @return 恒为 {@code common/message}，与原实现一致
      */
-    private String buyShopItem(HttpSession session, Model model, ShopKind kind, int id, int payNum) {
+    private String doBuyItem(HttpSession session, Model model, ShopKind kind, int id, int payNum) {
         Role role = getSessionRole(session);
         PurchaseResult result = shopPurchaseService.purchase(role, kind, id, payNum);
         model.addAttribute("message", result.message());

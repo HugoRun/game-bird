@@ -60,7 +60,7 @@ public class RoleController extends BaseController {
      */
     @SkipRole
     @GetMapping("/create")
-    public String postCreateRole(Model model) {
+    public String getCreateRole(Model model) {
         model.addAttribute("randNickName", "");
         return "role/create";
     }
@@ -157,7 +157,7 @@ public class RoleController extends BaseController {
      */
     @SkipRole
     @GetMapping("/login")
-    public String postLoginRole(HttpSession session, Model model) {
+    public String getLoginRole(HttpSession session, Model model) {
         // 获取已登录账号
         Account account = (Account) session.getAttribute("account");
         // 查询账号关联的角色

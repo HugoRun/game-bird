@@ -210,7 +210,7 @@ public class GameController extends BaseController {
      * @return view
      */
     @GetMapping("/field/info")
-    public String pageFile(HttpSession session, Model model, @RequestParam(defaultValue = "0") int fieldId) {
+    public String pageField(HttpSession session, Model model, @RequestParam(defaultValue = "0") int fieldId) {
         BaseField baseField = configGateway.getBaseField(fieldId);
         model.addAttribute("baseField", baseField);
         return "field/fieldInfo";
