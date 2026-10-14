@@ -1,4 +1,4 @@
-package com.qq2008.game.bird.util;
+package com.qq2008.common.util;
 
 import java.util.UUID;
 

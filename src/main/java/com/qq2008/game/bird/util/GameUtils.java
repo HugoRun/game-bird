@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.qq2008.common.util.ArrayUtils;
 import com.qq2008.common.util.CommonUtils;
 
 import com.qq2008.game.bird.data.ConstData;

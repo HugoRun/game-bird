@@ -26,7 +26,7 @@ import com.qq2008.game.bird.model.dbo.RoleTrain;
 import com.qq2008.game.bird.model.dbo.RoleTrap;
 import com.qq2008.game.bird.model.message.MessageLink;
 import com.qq2008.game.bird.model.message.MessageVO;
-import com.qq2008.game.bird.util.UUIDUtils;
+import com.qq2008.common.util.UUIDUtils;
 
 /**
  * 角色

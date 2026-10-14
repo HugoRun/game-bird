@@ -1,6 +1,6 @@
 package com.qq2008.game.bird.data;
 
-import com.qq2008.game.bird.util.ArrayUtils;
+import com.qq2008.common.util.ArrayUtils;
 
 /**
  * 一些用于随机的文本数据
