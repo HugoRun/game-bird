@@ -95,3 +95,17 @@ JAVA语言为基础
   - **应为 POST 而非 GET**。这 5 个都是「使用」写操作（消耗道具、变更状态），与本轮已处理的 4 个 GET 写操作（`doChangeAvatar`、`doChangeTitle`、`doOver`、`pageTest`）同性质，实现时必须一并改为 POST + form 结构，不能沿用当前的 `<a href>`。
   - **诱饵的「使用」是另一条链路**：`pack/bait.html` 指向 `@{/trap/useBait.do(baitId=...)}`，属于 trap 域，与上述 5 条无关，需单独评估。
 
+### 已删除的 5 个零引用路由常量
+
+`ConstData` 曾定义 5 个路由路径常量，全部**零引用**，且硬编码的 `.do` 后缀会与去后缀后的实际路由脱节，故一并删除：
+
+| 已删除常量 | 原值 | 实际路由（现由 `@RequestMapping` 声明） |
+|---|---|---|
+| `PATH_LOGIN` | `/login.do` | `AccountController` → `/login` |
+| `PATH_ROLE_LOGIN` | `/role/login.do` | `RoleController` → `/role/login` |
+| `PATH_ROLE_CREATE` | `/role/create.do` | `RoleController` → `/role/create` |
+| `PATH_ROLE_QUIT` | `/role/quit.do` | `RoleController` → `/role/quit` |
+| `PATH_GAME` | `/game.do` | `GameController` → `/game.do`（**本轮未改，仍带后缀**） |
+
+`ConstData.MESSAGE_PATH = "/message"` **保留** —— 它零引用，但属于 R19 维护页双层防护的预留常量，后续路由批次要启用。
+

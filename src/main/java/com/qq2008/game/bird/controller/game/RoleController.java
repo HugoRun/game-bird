@@ -372,7 +372,7 @@ public class RoleController extends BaseController {
         session.removeAttribute("sRole"); // 红线：session key 必须叫 sRole，原代码写成 role，等于没删干净
         // 注销当前登录账号数据
         session.removeAttribute("account");
-        return redirectTo("/login.do");
+        return redirectTo("/login");
     }
 
 }

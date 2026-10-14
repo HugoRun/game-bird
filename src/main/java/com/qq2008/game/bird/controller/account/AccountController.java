@@ -43,14 +43,14 @@ public class AccountController extends BaseController {
      */
     @SkipAccount
     @SkipRole
-    @GetMapping(value = {"/login.do"})
+    @GetMapping(value = {"/login"})
     public String pageLogin(HttpSession session, Model model) {
         Account account = (Account) session.getAttribute("account");
         if (null == account) {
             return "account/login";
         }
         model.addAttribute("account", account);
-        return redirectTo("/role/login.do");
+        return redirectTo("/role/login");
     }
 
     /***
@@ -63,7 +63,7 @@ public class AccountController extends BaseController {
      */
     @SkipAccount
     @SkipRole
-    @PostMapping(value = "/login.do")
+    @PostMapping(value = "/login")
     public String doLogin(HttpSession session, Model model, @RequestParam String username, @RequestParam String password) {
         // 参数校验
         if (null == username || username.isEmpty()) {
@@ -91,7 +91,7 @@ public class AccountController extends BaseController {
         // 存储账户信息到session
         session.setAttribute("account", account);
         model.addAttribute("account", account);
-        return redirectTo("/role/login.do");
+        return redirectTo("/role/login");
     }
 
     /***
@@ -102,7 +102,7 @@ public class AccountController extends BaseController {
      */
     @SkipAccount
     @SkipRole
-    @GetMapping(value = "/register.do")
+    @GetMapping(value = "/register")
     public String pageRegister(HttpSession session, Model model) {
         // 已禁止注册账号
         if (!gameProperties.isAllowRegister()) {
@@ -111,7 +111,7 @@ public class AccountController extends BaseController {
         }
         Account account = (Account) session.getAttribute("account");
         if (null != account) {
-            return redirectTo("/role/login.do");
+            return redirectTo("/role/login");
         }
         return "account/register";
     }
@@ -127,7 +127,7 @@ public class AccountController extends BaseController {
      */
     @SkipAccount
     @SkipRole
-    @PostMapping(value = "/register.do")
+    @PostMapping(value = "/register")
     public String doRegister(HttpSession session, Model model, @RequestParam String username, @RequestParam String password, @RequestParam String passwordRe) {
         // 已禁止注册账号
         if (!gameProperties.isAllowRegister()) {
@@ -176,7 +176,7 @@ public class AccountController extends BaseController {
         // 存储账户信息到session
         session.setAttribute("account", account);
         model.addAttribute("account", account);
-        return redirectTo("/role/login.do");
+        return redirectTo("/role/login");
     }
 
     /***

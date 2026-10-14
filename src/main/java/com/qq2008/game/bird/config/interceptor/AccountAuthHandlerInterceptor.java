@@ -29,7 +29,7 @@ public class AccountAuthHandlerInterceptor implements HandlerInterceptor {
             HttpSession session = request.getSession();
             if (null == session.getAttribute("account")) {
                 logger.info(methodPath + "未拥有SkipAccount注解，进行账号校验！");
-                response.sendRedirect(request.getContextPath() + "/login.do");
+                response.sendRedirect(request.getContextPath() + "/login");
                 return false;
             }
         }

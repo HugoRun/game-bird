@@ -64,16 +64,10 @@ public final class ConstData {
     ////////////////// 路由路径常量 //////////////////
     // 维护提示页路径（GameStatusHandlerInterceptor 转发至此）
     public static final String MESSAGE_PATH = "/message";
-    // 登录路由
-    public static final String PATH_LOGIN = "/login.do";
-    // 游戏主界面路由
-    public static final String PATH_GAME = "/game.do";
-    // 角色选择/登录路由
-    public static final String PATH_ROLE_LOGIN = "/role/login.do";
-    // 角色创建路由
-    public static final String PATH_ROLE_CREATE = "/role/create.do";
-    // 退出登录路由
-    public static final String PATH_ROLE_QUIT = "/role/quit.do";
+    // 说明：原有 PATH_LOGIN / PATH_GAME / PATH_ROLE_LOGIN / PATH_ROLE_CREATE /
+    // PATH_ROLE_QUIT 五个路由常量已在本轮删除——它们全部零引用，且硬编码的
+    // .do 后缀会与去后缀后的实际路由脱节。路由路径改为由各 Controller 的
+    // @RequestMapping 直接声明，路径常量不再有存在价值。
 
 
     ////////////////// 分页 //////////////////

@@ -29,7 +29,7 @@ public class RoleAuthHandlerInterceptor implements HandlerInterceptor {
             HttpSession session = request.getSession();
             if (null == session.getAttribute("sRole")) {
                 logger.info(methodPath + " 未拥有 @SkipRole 注解，进行角色校验！");
-                response.sendRedirect(request.getContextPath() + "/role/login.do");
+                response.sendRedirect(request.getContextPath() + "/role/login");
                 return false;
             }
         }
