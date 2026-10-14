@@ -8,7 +8,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /***
  * 账号登录认证拦截器
@@ -17,7 +18,7 @@ import java.util.logging.Logger;
 public class AccountAuthHandlerInterceptor implements HandlerInterceptor {
 
     // 日志句柄
-    Logger logger = Logger.getLogger(AccountAuthHandlerInterceptor.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(AccountAuthHandlerInterceptor.class);
 
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) throws Exception {

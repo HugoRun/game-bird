@@ -9,7 +9,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /***
  * 游戏状态拦截器
@@ -18,7 +19,7 @@ import java.util.logging.Logger;
 public class GameStatusHandlerInterceptor implements HandlerInterceptor {
 
     // 日志句柄
-    Logger logger = Logger.getLogger(GameStatusHandlerInterceptor.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(GameStatusHandlerInterceptor.class);
 
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) throws Exception {

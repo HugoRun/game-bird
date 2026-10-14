@@ -8,7 +8,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /***
  * 角色登录认证拦截器
@@ -17,7 +18,7 @@ import java.util.logging.Logger;
 public class RoleAuthHandlerInterceptor implements HandlerInterceptor {
 
     // 日志句柄
-    Logger logger = Logger.getLogger(RoleAuthHandlerInterceptor.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(RoleAuthHandlerInterceptor.class);
 
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) throws Exception {
@@ -27,7 +28,7 @@ public class RoleAuthHandlerInterceptor implements HandlerInterceptor {
             // 检测session中是否存储角色信息, 如果未存储则跳转到角色列表
             HttpSession session = request.getSession();
             if (null == session.getAttribute("sRole")) {
-                logger.info(methodPath + "未拥有SkipRole注解，进行账号校验！");
+                logger.info(methodPath + " 未拥有 @SkipRole 注解，进行角色校验！");
                 response.sendRedirect(request.getContextPath() + "/role/login.do");
                 return false;
             }

@@ -23,7 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /***
  * 聊天相关路由
@@ -32,7 +33,7 @@ import java.util.logging.Logger;
 @RequestMapping("/chat")
 public class ChatController extends BaseController {
     // 日志句柄
-    Logger logger = Logger.getLogger(ChatController.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
 
     /***
      * 聊天主界面
@@ -98,30 +99,10 @@ public class ChatController extends BaseController {
         chat.setTime(CommonUtils.nowTime());
         chatService.save(chat);
         // 构造
-        model.addFlashAttribute("message", MessageVO.error("发送聊天消息成功！"));
+        model.addFlashAttribute("message", MessageVO.success("发送聊天消息成功！"));
         return redirectTo("/chat/list.do");
     }
 
-    /***
-     * 随机聊天玩家名称
-     * @param session session
-     * @param model model
-     * @return view
-     */
-    @GetMapping("/r.do")
-    public String pageTest(HttpSession session, Model model) {
-        String[] aList = RandomTextData.getRandRoleNameArray();
-        // 查询数据
-        List<LogChat> chatList = chatService.list();
-        for (LogChat logChat : chatList) {
-            String roleName = ArrayUtils.randElement(aList);
-            logChat.setRoleName(roleName);
-            chatService.saveOrUpdate(logChat);
-        }
-        //
-        model.addAttribute("message", MessageVO.success("操作成功。"));
-        return "common/message";
-    }
 
 
     // 孵化场 birthBirth
