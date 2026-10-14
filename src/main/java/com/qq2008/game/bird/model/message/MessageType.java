@@ -1,4 +1,4 @@
-package com.qq2008.common.entity.vo;
+package com.qq2008.game.bird.model.message;
 
 public enum MessageType {
 

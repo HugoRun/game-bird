@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.qq2008.common.annotation.SkipAccount;
 import com.qq2008.common.annotation.SkipRole;
-import com.qq2008.common.entity.vo.MessageVO;
 import com.qq2008.common.util.CommonUtils;
 
 import com.qq2008.game.bird.config.GameProperties;
 import com.qq2008.game.bird.controller.common.BaseController;
 import com.qq2008.game.bird.data.ConstData;
 import com.qq2008.game.bird.model.dbo.Account;
+import com.qq2008.game.bird.model.message.MessageVO;
 import com.qq2008.game.bird.service.AccountService;
 import com.qq2008.game.bird.util.UUIDUtils;
 

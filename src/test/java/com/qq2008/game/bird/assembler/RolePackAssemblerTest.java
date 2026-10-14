@@ -1,17 +1,18 @@
 package com.qq2008.game.bird.assembler;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.util.ReflectionUtils;
+
 import com.qq2008.game.bird.data.GameConfigGateway;
 import com.qq2008.game.bird.model.dbo.BaseBait;
 import com.qq2008.game.bird.model.dbo.BaseCage;
 import com.qq2008.game.bird.model.dbo.RolePack;
 import com.qq2008.game.bird.model.vo.RolePackVO;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.util.ReflectionUtils;
-
-import java.lang.reflect.Method;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

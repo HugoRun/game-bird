@@ -6,11 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.qq2008.common.entity.BizException;
 import com.qq2008.common.entity.ResultCode;
-import com.qq2008.common.entity.vo.MessageLink;
 
 import com.qq2008.game.bird.data.ShopItemAccessors;
 import com.qq2008.game.bird.model.dbo.Role;
 import com.qq2008.game.bird.model.dbo.RolePack;
+import com.qq2008.game.bird.model.message.MessageLink;
 import com.qq2008.game.bird.model.shop.FeeKind;
 import com.qq2008.game.bird.model.shop.PurchaseResult;
 import com.qq2008.game.bird.model.shop.ShopItemView;

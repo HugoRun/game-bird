@@ -1,4 +1,4 @@
-package com.qq2008.common.entity.vo;
+package com.qq2008.game.bird.model.message;
 
 import java.util.ArrayList;
 import java.util.List;

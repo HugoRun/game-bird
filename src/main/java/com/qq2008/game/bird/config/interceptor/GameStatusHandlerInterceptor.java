@@ -6,10 +6,9 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import com.qq2008.common.entity.vo.MessageVO;
-
 import com.qq2008.game.bird.data.ConstData;
 import com.qq2008.game.bird.data.GameServer;
+import com.qq2008.game.bird.model.message.MessageVO;
 import com.qq2008.game.bird.model.vo.GameStatusVO;
 
 /**

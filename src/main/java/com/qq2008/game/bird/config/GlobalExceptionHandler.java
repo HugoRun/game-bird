@@ -16,7 +16,8 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import com.qq2008.common.entity.BizException;
 import com.qq2008.common.entity.Result;
 import com.qq2008.common.entity.ResultCode;
-import com.qq2008.common.entity.vo.MessageVO;
+
+import com.qq2008.game.bird.model.message.MessageVO;
 
 /**
  * 全局异常处理。

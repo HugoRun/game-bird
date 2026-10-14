@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.qq2008.common.entity.vo.MessageVO;
 import com.qq2008.common.util.CommonUtils;
 
 import com.qq2008.game.bird.controller.common.BaseController;
@@ -27,6 +26,7 @@ import com.qq2008.game.bird.model.dbo.Role;
 import com.qq2008.game.bird.model.dbo.RolePack;
 import com.qq2008.game.bird.model.dbo.RoleTrap;
 import com.qq2008.game.bird.model.dbo.StorageBird;
+import com.qq2008.game.bird.model.message.MessageVO;
 import com.qq2008.game.bird.model.vo.RolePackVO;
 import com.qq2008.game.bird.model.vo.TrapResultVO;
 import com.qq2008.game.bird.service.BirdRaffleService;

@@ -2,6 +2,7 @@ package com.qq2008.game.bird.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+
 import com.qq2008.game.bird.data.ConstData;
 
 /**

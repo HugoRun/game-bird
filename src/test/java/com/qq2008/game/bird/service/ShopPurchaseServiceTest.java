@@ -1,6 +1,13 @@
 package com.qq2008.game.bird.service;
 
-import com.qq2008.common.entity.vo.MessageVO;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.ui.ExtendedModelMap;
+import org.springframework.ui.Model;
+
 import com.qq2008.game.bird.data.ConstData;
 import com.qq2008.game.bird.data.GameConfigManager;
 import com.qq2008.game.bird.data.ShopItemAccessors;
@@ -12,15 +19,9 @@ import com.qq2008.game.bird.model.dbo.BaseTrain;
 import com.qq2008.game.bird.model.dbo.BaseTrap;
 import com.qq2008.game.bird.model.dbo.Role;
 import com.qq2008.game.bird.model.dbo.RolePack;
+import com.qq2008.game.bird.model.message.MessageVO;
 import com.qq2008.game.bird.model.shop.PurchaseResult;
 import com.qq2008.game.bird.model.shop.ShopKind;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.ui.ExtendedModelMap;
-import org.springframework.ui.Model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

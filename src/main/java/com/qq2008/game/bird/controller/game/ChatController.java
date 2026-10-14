@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.qq2008.common.entity.vo.MessageVO;
 import com.qq2008.common.util.CommonUtils;
 
 import com.qq2008.game.bird.controller.common.BaseController;
 import com.qq2008.game.bird.data.ConstData;
 import com.qq2008.game.bird.model.dbo.LogChat;
 import com.qq2008.game.bird.model.dbo.Role;
+import com.qq2008.game.bird.model.message.MessageVO;
 
 /**
  * 聊天相关路由

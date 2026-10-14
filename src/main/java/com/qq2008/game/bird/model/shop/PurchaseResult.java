@@ -1,7 +1,7 @@
 package com.qq2008.game.bird.model.shop;
 
-import com.qq2008.common.entity.vo.MessageLink;
-import com.qq2008.common.entity.vo.MessageVO;
+import com.qq2008.game.bird.model.message.MessageLink;
+import com.qq2008.game.bird.model.message.MessageVO;
 
 /**
  * 购买结果。<b>只做搬运，不做文案改写</b>。
