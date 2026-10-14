@@ -26,3 +26,5 @@ temp/
 # ---- 操作系统 ----
 .DS_Store
 Thumbs.db
+# 探针文件，禁止提交
+.probe/
