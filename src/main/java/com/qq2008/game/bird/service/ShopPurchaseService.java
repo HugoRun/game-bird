@@ -150,7 +150,7 @@ public class ShopPurchaseService {
                 + GameUtils.getFeeTypeName(item.feeType())
                 + "购买了" + item.name() + "×" + payNum;
         return PurchaseResult.success(text,
-                new MessageLink("去包裹看看", "/pack/" + kind.getKey() + "/list.do"));
+                new MessageLink("去包裹看看", "/pack/" + kind.getKey() + "/items"));
     }
 
     /**

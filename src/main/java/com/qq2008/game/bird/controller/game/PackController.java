@@ -41,7 +41,7 @@ public class PackController extends BaseController {
      * @param pageNo 页码
      * @return view
      */
-    @GetMapping(value = "/bait/list.do")
+    @GetMapping(value = "/bait/items")
     public String pageShopBait(HttpSession session, Model model, @RequestParam(defaultValue = "1") int pageNo) {
         return listPack(RolePackAssembler.PackItemKind.BAIT, session, model, pageNo, "pack/bait");
     }
@@ -53,7 +53,7 @@ public class PackController extends BaseController {
      * @param pageNo 页码
      * @return view
      */
-    @GetMapping(value = "/cage/list.do")
+    @GetMapping(value = "/cage/items")
     public String pageShopCage(HttpSession session, Model model, @RequestParam(defaultValue = "1") int pageNo) {
         return listPack(RolePackAssembler.PackItemKind.CAGE, session, model, pageNo, "pack/cage");
     }
@@ -65,7 +65,7 @@ public class PackController extends BaseController {
      * @param pageNo 页码
      * @return view
      */
-    @GetMapping(value = "/nest/list.do")
+    @GetMapping(value = "/nest/items")
     public String pageShopNest(HttpSession session, Model model, @RequestParam(defaultValue = "1") int pageNo) {
         return listPack(RolePackAssembler.PackItemKind.NEST, session, model, pageNo, "pack/nest");
     }
@@ -77,7 +77,7 @@ public class PackController extends BaseController {
      * @param pageNo 页码
      * @return view
      */
-    @GetMapping(value = "/prop/list.do")
+    @GetMapping(value = "/prop/items")
     public String pageShopProp(HttpSession session, Model model, @RequestParam(defaultValue = "1") int pageNo) {
         return listPack(RolePackAssembler.PackItemKind.PROP, session, model, pageNo, "pack/prop");
     }
@@ -89,7 +89,7 @@ public class PackController extends BaseController {
      * @param pageNo 页码
      * @return view
      */
-    @GetMapping(value = "/train/list.do")
+    @GetMapping(value = "/train/items")
     public String pageShopTrain(HttpSession session, Model model, @RequestParam(defaultValue = "1") int pageNo) {
         return listPack(RolePackAssembler.PackItemKind.TRAIN, session, model, pageNo, "pack/train");
     }
@@ -101,7 +101,7 @@ public class PackController extends BaseController {
      * @param pageNo 页码
      * @return view
      */
-    @GetMapping(value = "/trap/list.do")
+    @GetMapping(value = "/trap/items")
     public String pageShopTrap(HttpSession session, Model model, @RequestParam(defaultValue = "1") int pageNo) {
         return listPack(RolePackAssembler.PackItemKind.TRAP, session, model, pageNo, "pack/trap");
     }

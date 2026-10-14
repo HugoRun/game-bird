@@ -79,3 +79,19 @@ JAVA语言为基础
 - `/pay.do` 由 `GameController` 处理，**可用**，只是尚未随 game 域一起去后缀。
 - `/userBank.do` **全项目零 Controller 映射**，是死链（`userBank` 在 `src/main/java/` 下无任何路由）。它属于 game 域，按「本轮不新增功能、不修死链」的约定保持原样，随 game 域批次一并处理。
 
+### 5 条道具「使用」死链
+
+5 个包裹页（鸟笼、巢穴、道具、训练场、陷阱）各有一个「使用」按钮，指向 `GET /pack/{cage,nest,prop,train,trap}/use.do`，携带参数 `cageId` / `nestId` / `propId` / `trainId` / `trapId`。
+
+这5 条路由**在全项目 `src/main/java/` 下零 Controller 映射**，点下去必然 404。它们与上面的 `/userBank.do` 同属「模板有入口、路由不存在」的死链，按本轮约定保持原样，重构不改。
+
+- **原路由**：
+  - `GET /pack/cage/use.do?cageId={id}`
+  - `GET /pack/nest/use.do?nestId={id}`
+  - `GET /pack/prop/use.do?propId={id}`
+  - `GET /pack/train/use.do?trainId={id}`
+  - `GET /pack/trap/use.do?trapId={id}`
+- **待实现时的两点提示**：
+  - **应为 POST 而非 GET**。这 5 个都是「使用」写操作（消耗道具、变更状态），与本轮已处理的 4 个 GET 写操作（`doChangeAvatar`、`doChangeTitle`、`doOver`、`pageTest`）同性质，实现时必须一并改为 POST + form 结构，不能沿用当前的 `<a href>`。
+  - **诱饵的「使用」是另一条链路**：`pack/bait.html` 指向 `@{/trap/useBait.do(baitId=...)}`，属于 trap 域，与上述 5 条无关，需单独评估。
+
