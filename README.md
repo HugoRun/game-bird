@@ -72,28 +72,38 @@ JAVA语言为基础
 - **可复用的数据访问**：`ShopItemAccessors.load(ShopKind, Integer)` 已提供按 id 单查，且返回已解决 `BaseBait.lu` 为 `Short`、其余五者为 `Integer` 差异的 `ShopItemView` 投影。注意该record **不可放入 Model**（SpEL 不认 record 的 `name()` 访问器，会抛 `EL1008E`），需先转成 JavaBean。
 - **入口**：目前商品列表页无「详情」链接，实现时需一并补上。
 
-### `fragment/shop.html` 中 2 处指向 game 域的死链
+### `fragment/shop.html` 的取款链接曾指向不存在的路由（已修正）
 
-`fragment/shop.html` 顶部的余额栏有两个链接：`@{/userBank.do}`（取款）与 `@{/pay.do}`（获得钻石）。
+`fragment/shop.html` 顶部余额栏的「取款」链接原为 `@{/userBank.do}`，而 `/userBank.do` **全项目零 Controller 映射**，是条死链。现已改指向真实存在的 `@{/bank.do}`（`GameController`）。「获得钻石」的 `@{/pay.do}` 一直有效。
 
-- `/pay.do` 由 `GameController` 处理，**可用**，只是尚未随 game 域一起去后缀。
-- `/userBank.do` **全项目零 Controller 映射**，是死链（`userBank` 在 `src/main/java/` 下无任何路由）。它属于 game 域，按「本轮不新增功能、不修死链」的约定保持原样，随 game 域批次一并处理。
+### 5 条道具「使用」死链（已置灰）
 
-### 5 条道具「使用」死链
+5 个包裹页（鸟笼、巢穴、道具、训练场、陷阱）各有一个「使用」按钮，原指向 `GET /pack/{cage,nest,prop,train,trap}/use.do`。这 5 条路由在全项目 `src/main/java/` 下零 Controller 映射，点下去必然 404。
 
-5 个包裹页（鸟笼、巢穴、道具、训练场、陷阱）各有一个「使用」按钮，指向 `GET /pack/{cage,nest,prop,train,trap}/use.do`，携带参数 `cageId` / `nestId` / `propId` / `trainId` / `trapId`。
+**现状**：入口已保留但**置灰** —— 移除 `th:href`、改用 `<span class="text-muted" title="功能开发中，暂不可用">使用</span>`，文字与位置不变。置灰而非删除，是为了让玩家知道「这里有功能、只是还没做」，而不是让按钮凭空消失。
 
-这5 条路由**在全项目 `src/main/java/` 下零 Controller 映射**，点下去必然 404。它们与上面的 `/userBank.do` 同属「模板有入口、路由不存在」的死链，按本轮约定保持原样，重构不改。
+实现时需注意：应为 **POST** 而非 GET（消耗道具、变更状态属写操作）。
 
-- **原路由**：
-  - `GET /pack/cage/use.do?cageId={id}`
-  - `GET /pack/nest/use.do?nestId={id}`
-  - `GET /pack/prop/use.do?propId={id}`
-  - `GET /pack/train/use.do?trainId={id}`
-  - `GET /pack/trap/use.do?trapId={id}`
-- **待实现时的两点提示**：
-  - **应为 POST 而非 GET**。这 5 个都是「使用」写操作（消耗道具、变更状态），与本轮已处理的 4 个 GET 写操作（`doChangeAvatar`、`doChangeTitle`、`doOver`、`pageTest`）同性质，实现时必须一并改为 POST + form 结构，不能沿用当前的 `<a href>`。
-  - **诱饵的「使用」是另一条链路**：`pack/bait.html` 指向 `@{/trap/useBait.do(baitId=...)}`，属于 trap 域，与上述 5 条无关，需单独评估。
+**诱饵的「使用」是另一条链路**：`pack/bait.html` 指向 `@{/trap/useBait.do(baitId=...)}`，该路由真实存在（`TrapController`），是活链接，未置灰。
+
+### 17 处导航与功能入口死链（已置灰）
+
+除上述 5 条外，另有 17 处入口同样指向不存在的路由，现已统一按同一方式置灰：
+
+| 位置 | 原 `th:href` | 说明 |
+|---|---|---|
+| `fragment/navigation.html` | `/fight/index.do`、`/birth/index.do`、`/train/index.do`、`/storage/bird/list.do`、`/guild/index.do`、`/task/index.do`、`/marriage/index.do`、`/friend/list.do`、`/rank/level.do`、`/notice/list.do`、`/help.do`、`/online.do` | 主导航 12 项 |
+| `role/bank.html` | `/userBankUp` | 存款「提升上限」 |
+| `game.html` | `/notice/detail.do(id=0)` | 公告「真爱至上」 |
+| `game.html` | `/task/list.do` | 主线任务 |
+| `game.html` | `/weal/sign.do` | 福利签到 |
+| `game.html` | `/trap/change.do(trapId=...)` | 更换陷阱 |
+| `trap/over.html` | `/storage/bird.do`（2 处）、`/storage/bird/sellConfirm.do(birdId=...)` | 仓库与出售 |
+
+**有意未置灰**的三条链接：
+
+- `game.html` 的等级「详情」`@{/profile.do}` —— game 域去后缀后自动变为有效。
+- `@{/trap/useBait.do(...)}` 与 `@{/trap/autoUseBait.do}` —— 均有真实映射（后者是仅返回 `redirectTo("/game.do")` 的空壳，属已知未实现功能，不是死链）。
 
 ### 已删除的 5 个零引用路由常量
 
@@ -107,5 +117,30 @@ JAVA语言为基础
 | `PATH_ROLE_QUIT` | `/role/quit.do` | `RoleController` → `/role/quit` |
 | `PATH_GAME` | `/game.do` | `GameController` → `/game.do`（**本轮未改，仍带后缀**） |
 
-`ConstData.MESSAGE_PATH = "/message"` **保留** —— 它零引用，但属于 R19 维护页双层防护的预留常量，后续路由批次要启用。
+`ConstData.MESSAGE_PATH = "/message"` **保留并已启用** —— RT-5 起它是维护页路径的唯一来源，同时被 `GameController` 的映射、`GameStatusHandlerInterceptor` 的转发目标、`ServerWebMvcConfigurationSupport` 的 `excludePathPatterns` 三处引用。配套新增 `ConstData.MESSAGE_FORWARDED` 作为防递归标记键。
 
+### 维护页路由曾三方不一致（已修）
+
+改造前 `GameController` 的映射是 `/message.do`，而拦截器的转发目标与拦截器排除列表都写 `/message` —— **维护态下forward 到一个不存在的映射，必然 404**。现已三方统一为 `/message`，并加了一层与配置无关的兜底：`GameStatusHandlerInterceptor` 在 forward 前先打 `MESSAGE_FORWARDED` 标记，即使 exclude 列表被误改，退化结果也只是「重复 forward」而非 `StackOverflowError`。
+
+### `WebMvcConfigurationSupport` 已迁移为 `WebMvcConfigurer`
+
+原 `ServerWebMvcConfigurationSupport` 继承 `WebMvcConfigurationSupport`，这会让 Spring Boot 的 `WebMvcAutoConfiguration` **整体失效** —— MVC 的 `@ConfigurationProperties` 绑定、`HttpMessageConverter` 自动配置（即 `@ResponseBody` / JSON 序列化）、默认静态资源映射全部不生效。当前能跑只是因为该类手工注册了 `addResourceHandlers`，且项目尚无 `@ResponseBody` 用法。已改为实现 `WebMvcConfigurer` 接口并删除两处 `super.*` 调用，显式的 `/assets/**` 与 `/favicon.ico` 映射保留。
+
+### 收网`GET /trap/over.do` 仍是 GET写操作（已知设计债）
+
+`TrapController.doOver` 会消耗陷阱并结算捕获（**写库**），却仍是 `@GetMapping`。按 REST 语义应为 POST。本轮**有意不改**：改POST 需同步改造 `trap/over` 页的触发方式，属路由规范化批次的后续范围。已知缺陷是浏览器预取或刷新可能重复触发收网。
+
+### 安全项整改记录（RT-6）
+
+| 项 | 改造前 | 改造后 |
+|---|---|---|
+| 数据库凭据 | `application.properties` 明文 `root`/`root` | `${DB_USERNAME:root}` / `${DB_PASSWORD:root}`，URL 的主机/端口/库名同样可外置 |
+| `CodeGen` 凭据 | `main()` 内明文 `root`/`root` | 读 `DB_URL` / `DB_USERNAME` / `DB_PASSWORD`（`main()` 无法用属性注入，只能 `System.getenv`） |
+| CORS | `addAllowedOrigin("*")` +任意头 + 任意方法 | 由 `game.cors.allowed-origins` 驱动，**默认空 = 不开放任何跨域源**。本项目是服务端渲染单体，`src/main/resources` 下无任何 `fetch`/`axios`/`XMLHttpRequest` |
+| Session Cookie | 只设了 `name` 与 `timeout` | 显式声明 `http-only=true`（虽是 Spring Boot 默认值）、`same-site=lax` |
+| 405响应 | 被兜底handler 吞掉，返回 500「系统繁忙」 | `GlobalExceptionHandler` 新增 `HttpRequestMethodNotSupportedException` handler，返回真正的 **405**，并在响应里带上该路径支持的方法 |
+
+**为什么 Cookie 不加 `secure`**：`server.port=80` 是明文 HTTP。一旦标记 `secure`，浏览器在 http 下就不再回传该 Cookie，**全站登录会立即失效**。若将来上 HTTPS，需同时改 `server.port`、设置 `server.forward-headers-strategy`，再开启 `secure=true`。
+
+**为什么 CORS 选 Lax 而非 Strict**：Lax 允许「从站外链接点进来」的顶层导航携带 Cookie，而 Strict 会拦掉，导致从站外跳转进入的正常会话丢失；同时 Lax 仍能阻断「跨站 POST 表单提交」这一类 CSRF 攻击。

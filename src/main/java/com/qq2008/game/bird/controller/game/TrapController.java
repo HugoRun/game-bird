@@ -181,6 +181,13 @@ public class TrapController extends BaseController {
 
     /***
      * 收网
+     *
+     * <p>★ 已知设计债（本轮不改）：本方法会写库（消耗陷阱、结算捕获），
+     * 但仍是 {@code @GetMapping}。按REST 语义，写操作应为 POST。
+     * 本轮**有意不改** —— 改POST 需要同步改造 trap/over 页的触发方式，
+     * 属于路由规范化批次的后续范围，此处仅记录，避免后人误以为是疏漏。
+     * 已知缺陷：GET 收网可被浏览器预取或刷新重复触发。
+     *
      * @param session session
      * @param model model
      * @param trapId 陷阱Id
