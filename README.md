@@ -26,13 +26,20 @@ JAVA语言为基础
 
 ## 路由
 
-全项目**已无 `.do` 后缀**（`grep -rn '\.do\b' src/` 仅余2 处说明性注释，无任何业务引用）。
+全项目**已无 `.do` 后缀**（基线 262 处 → 0 处业务引用；`grep -rn '\.do\b' src/` 仅余 4 处说明性注释）。
 校验命令：
 
 ```bash
-grep -rn '\.do\b' src/ | grep -v 'ConstData.java:77\|GameStatusHandlerInterceptor.java:30'
-grep -rnoE '(href|action)="/[^"]*\.do"' src/     # 硬编码 .do 字面量，应为 0
+# 应输出 4 行，全部是说明性注释（.do 字面量仅出现在解释其危害的注释里）
+grep -rn '\.do\b' src/
+# 硬编码 .do 字面量，应输出 0 行
+grep -rnoE '(href|action)="/[^"]*\.do"' src/
 ```
+
+残留的 4 处注释：`ConstData.java:77`（说明为何删掉硬编码 `.do` 路由常量）、
+`GameStatusHandlerInterceptor.java:30`（举例"`/message.do` 是写法错误的反面教材"）、
+`GlobalExceptionHandler.java:100-101`（说明 `.do` 去后缀后为何要修404）。
+**均为注释，代码中零业务引用。**
 
 ### 三域路由对照表（game / trap / chat）
 
@@ -130,30 +137,43 @@ grep -rnoE '(href|action)="/[^"]*\.do"' src/     # 硬编码 .do 字面量，应
 
 `fragment/shop.html` 顶部余额栏的「取款」链接原为 `@{/userBank.do}`，而 `/userBank.do` **全项目零 Controller 映射**，是条死链。现已改指向真实存在的 `@{/bank}`（`GameController`）。「获得钻石」的 `@{/pay}` 一直有效。
 
-### 5 条道具「使用」死链（已置灰）
+### 26 处死链已置灰，另1 处为修正指向
 
-5 个包裹页（鸟笼、巢穴、道具、训练场、陷阱）各有一个「使用」按钮，原指向 `GET /pack/{cage,nest,prop,train,trap}/use.do`。这 5 条路由在全项目 `src/main/java/` 下零 Controller 映射，点下去必然 404。
+全项目共 **27 处**指向不存在路由的链接：**26 处已置灰**（移除 `th:href`、改用
+`<span class="text-muted" title="功能开发中，暂不可用">文字</span>`，文字与位置不变），
+**1 处为修正指向**（见上节`fragment/shop.html` 的取款链接——它有真实可替代的路由，
+因此改指向而不是置灰）。
 
-**现状**：入口已保留但**置灰** —— 移除 `th:href`、改用 `<span class="text-muted" title="功能开发中，暂不可用">使用</span>`，文字与位置不变。置灰而非删除，是为了让玩家知道「这里有功能、只是还没做」，而不是让按钮凭空消失。
+置灰而非删除，是为了让玩家知道「这里有功能、只是还没做」，而不是让按钮凭空消失。
 
-实现时需注意：应为 **POST** 而非 GET（消耗道具、变更状态属写操作）。
+复核命令：
 
-**诱饵的「使用」是另一条链路**：`pack/bait.html` 指向 `@{/trap/useBait.do(baitId=...)}`，该路由真实存在（`TrapController`），是活链接，未置灰。
+```bash
+grep -rn '功能开发中，暂不可用' src/main/resources/templates/ | wc -l    # 26
+```
 
-### 18 处导航与功能入口死链（已置灰）
+按文件分布：
 
-除上述 5 条外，另有 18 处入口同样指向不存在的路由，现已统一按同一方式置灰：
-
-| 位置 | 原 `th:href` | 说明 |
+| 文件 | 处数 | 置灰内容 |
 |---|---|---|
-| `fragment/navigation.html` | `/fight/index.do`、`/birth/index.do`、`/train/index.do`、`/storage/bird/list.do`、`/guild/index.do`、`/task/index.do`、`/marriage/index.do`、`/friend/list.do`、`/rank/level.do`、`/notice/list.do`、`/help.do`、`/online.do` | 主导航 12 项 |
-| `role/bank.html` | `/userBankUp` | 存款「提升上限」 |
-| `game.html` | `/notice/detail.do(id=0)` | 公告「真爱至上」 |
-| `game.html` | `/task/list.do` | 主线任务 |
-| `game.html` | `/weal/sign.do` | 福利签到 |
-| `game.html` | `/trap/change.do(trapId=...)` | 更换陷阱 |
-| `game.html` | **`/trap/hasten.do`** | **「加速」—— 本轮新发现，见下** |
-| `trap/over.html` | `/storage/bird.do`（2 处）、`/storage/bird/sellConfirm.do(birdId=...)` | 仓库与出售 |
+| `fragment/navigation.html` | 12 | 战斗、配对、训练、仓库、工会、任务、教堂、好友、排行、通知、帮助、谁在玩 |
+| `game.html` | 5 | 公告「真爱至上」、主线「挑战祥瑞之地」、福利「签到」、「更换陷阱」、**「加速」** |
+| `pack/{cage,nest,prop,train,trap}.html` | 5 | 各包裹页的「使用」按钮 |
+| `role/bank.html` | 1 | 存款「提升上限」（原指向 `/userBankUp`） |
+| `trap/over.html` | 3 | 「仓库」（2 处）、「马上出售」、「前往仓库」 |
+
+对应的原 `th:href`：
+
+| 位置 | 原 `th:href` |
+|---|---|
+| `fragment/navigation.html` | `/fight/index.do`、`/birth/index.do`、`/train/index.do`、`/storage/bird/list.do`、`/guild/index.do`、`/task/index.do`、`/marriage/index.do`、`/friend/list.do`、`/rank/level.do`、`/notice/list.do`、`/help.do`、`/online.do` |
+| `game.html` | `/notice/detail.do(id=0)`、`/task/list.do`、`/weal/sign.do`、`/trap/change.do(trapId=...)`、`/trap/hasten.do` |
+| `pack/*.html` | `/pack/{cage,nest,prop,train,trap}/use.do` |
+| `role/bank.html` | `/userBankUp` |
+| `trap/over.html` | `/storage/bird.do`（2 处）、`/storage/bird/sellConfirm.do(birdId=...)` |
+
+**实现时的通用约束**：凡消耗道具、变更状态的入口（道具「使用」、存款「提升上限」、
+「更换陷阱」、「加速」）都应为 **POST** 而非 GET。
 
 #### `/trap/hasten.do`（本轮新发现的死链）
 
@@ -168,6 +188,7 @@ Java 侧**零 Controller 映射**（已由 team-lead 独立 `grep -rn "hasten" s
 
 - `game.html` 的等级「详情」`@{/profile}` —— game 域去后缀后自动变为有效。
 - `@{/trap/useBait(...)}` 与 `@{/trap/autoUseBait}` —— 均有真实映射（后者是仅返回 `redirectTo("/game")` 的空壳，属已知未实现功能，不是死链）。
+- `pack/bait.html` 的 `@{/trap/useBait(...)}` —— 走的是另一条链路，详见上文「5 条道具『使用』死链」。
 
 ### 已删除的 5 个零引用路由常量
 
