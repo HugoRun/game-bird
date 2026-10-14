@@ -62,8 +62,16 @@ public final class ConstData {
 
 
     ////////////////// 路由路径常量 //////////////////
-    // 维护提示页路径（GameStatusHandlerInterceptor 转发至此）
+    // 维护提示页路径。【RT-5】这一个常量同时是三个地方的值来源，缺一即失效：
+    //   1) GameStatusHandlerInterceptor 转发目标（MESSAGE_PATH）
+    //   2) ServerWebMvcConfigurationSupport 的 excludePathPatterns（MESSAGE_PATH）
+    //   3) GameController 的 @GetMapping(MESSAGE_PATH)
+    // 改路由时必须三者同改；漏改任何一个的表现都是「维护态 404」或「无限 forward」。
     public static final String MESSAGE_PATH = "/message";
+    // MESSAGE_FORWARDED 防循环标记：见 GameStatusHandlerInterceptor#preHandle。
+    // forward 会重入 DispatcherServlet 并再跑一遍拦截器链，若不加此标记，
+    // 维护态下 /message 自身可能被再次拦截 → 自我 forward → StackOverflowError。
+    public static final String MESSAGE_FORWARDED = "game-bird.message.forwarded";
     // 说明：原有 PATH_LOGIN / PATH_GAME / PATH_ROLE_LOGIN / PATH_ROLE_CREATE /
     // PATH_ROLE_QUIT 五个路由常量已在本轮删除——它们全部零引用，且硬编码的
     // .do 后缀会与去后缀后的实际路由脱节。路由路径改为由各 Controller 的

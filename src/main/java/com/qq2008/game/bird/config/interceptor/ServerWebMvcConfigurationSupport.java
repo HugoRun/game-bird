@@ -1,5 +1,6 @@
 package com.qq2008.game.bird.config.interceptor;
 
+import com.qq2008.game.bird.data.ConstData;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -47,7 +48,7 @@ public class ServerWebMvcConfigurationSupport extends WebMvcConfigurationSupport
         // 运行状态拦截器
         registry.addInterceptor(gameStatusHandlerInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/assets/**", "/favicon.ico", "/error*", "/message");
+                .excludePathPatterns("/assets/**", "/favicon.ico", "/error*", ConstData.MESSAGE_PATH);
         // 账号登录路由拦截器
         registry.addInterceptor(accountAuthHandlerInterceptor())
                 .addPathPatterns("/**")
