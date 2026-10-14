@@ -127,7 +127,46 @@ JAVA语言为基础
 
 原 `ServerWebMvcConfigurationSupport` 继承 `WebMvcConfigurationSupport`，这会让 Spring Boot 的 `WebMvcAutoConfiguration` **整体失效** —— MVC 的 `@ConfigurationProperties` 绑定、`HttpMessageConverter` 自动配置（即 `@ResponseBody` / JSON 序列化）、默认静态资源映射全部不生效。当前能跑只是因为该类手工注册了 `addResourceHandlers`，且项目尚无 `@ResponseBody` 用法。已改为实现 `WebMvcConfigurer` 接口并删除两处 `super.*` 调用，显式的 `/assets/**` 与 `/favicon.ico` 映射保留。
 
-### 收网`GET /trap/over.do` 仍是 GET写操作（已知设计债）
+### 捕捉结算页是一次性渲染，无按 birdId 重开入口
+
+`GET /trap/over` 展示的成长/克制值**来自本次捕捉流程的内存对象**，不是从 `storage_bird` 回读：
+
+- `TrapController.doOver` 收网后把 `role_trap` 的 `catch_*` 字段**全部清零**（`TrapController.java:230-237`），没有"待结算"中间态；
+- 页面文案取自 `BirdTextUtils.growText(bird.getGrow())`（`TrapController.java:256-257`），`bird` 是本次捕捉时生成并落库的内存实例；
+- `GET /trap/birdInfo` 只读 `base_bird` 配置（类型/重量/单价/经验），**不含成长值**，不能当替代观测口。
+
+**这是既有设计事实，不是本轮引入的缺陷。** 任何想验证或排查成长值的人都会撞到同一堵墙：
+改库后无法通过重开页面观察变化。已实测确认并做过一次完整的
+「捕捉 → 改库 → 复原」验证，等效证明链见 [`docs/验证记录/改库验证-成长值.md`](docs/验证记录/改库验证-成长值.md)。
+
+若未来需要按 birdId 重查历史结算，属于**新增功能**，需单独立项。
+
+### `ko` 的 `/100` 语义待产品确认
+
+结算页克制值同样走 `BirdTextUtils.koText(ko)`，`ko` 存的是放大 100 倍的整数
+（实测 `ko=0` 显示 `0.00%`）。这个 `/100` 约定**未见任何规格文档或注释说明**，
+是逆向推断的结果。当前 `base_bird` 数据全部为 0，无法用真实数据反推验证。
+
+**待产品确认**：`ko` 字段的业务含义、取值范围、以及"是否恒为 0"（若恒为 0，
+则整个 `ko` 链路疑为未实现的占位）。
+
+### 购买失败提示在两个域之间不一致（已知缺陷，本轮未修）
+
+实测结论：
+
+| 域 | 表现 |
+|---|---|
+| **诱饵域** `POST /shop/bait/purchase` | 货币/数量不足时**返回 200 且带提示块**，例如「您的爱心值不足(0/399)。」 |
+| **陷阱域** `POST /shop/trap/purchase` | 同样失败时**返回 200 但响应体为空**（`size=850`），页面上看不到任何提示 |
+
+**定位依据**：实测购买 `base_trap` id=18（`fee_type=3`，即爱心计价）时失败，
+把角色 `level` 提到 20 仍失败——**说明并非等级门槛，而是货币种类分支**：
+角色爱心为 0，而诱饵域的对应分支有兜底提示、陷阱域的对应分支没有。
+
+**本轮不动**，理由：属提示文案/分支补全，是功能改动而非重构，且与本轮
+"新增功能与 DB 写保持为 0"的红线冲突。留档供后续处理。
+
+### `GET /trap/over` 仍是 GET 写操作（已知设计债）
 
 `TrapController.doOver` 会消耗陷阱并结算捕获（**写库**），却仍是 `@GetMapping`。按 REST 语义应为 POST。本轮**有意不改**：改POST 需同步改造 `trap/over` 页的触发方式，属路由规范化批次的后续范围。已知缺陷是浏览器预取或刷新可能重复触发收网。
 
