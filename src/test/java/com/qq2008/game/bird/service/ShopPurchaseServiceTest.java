@@ -625,6 +625,22 @@ class ShopPurchaseServiceTest {
     }
 
     @Test
+    @DisplayName("payNum = 1 是允许的下界，正常扣费发货")
+    void acceptLowerBoundaryPayNum() {
+        Role role = newRole();
+        role.setCoin(100_000L);
+        stubItem(Item.BAIT, ConstData.FEE_TYPE_COIN, UNIT_PRICE, null);
+        RolePack pack = stubExistingPack(Item.BAIT);
+        ExtendedModelMap model = new ExtendedModelMap();
+
+        String view = buy(Item.BAIT, role, model, 1);
+
+        assertEquals("common/message", view);
+        assertEquals(100_000L - UNIT_PRICE, role.getCoin().longValue());
+        assertEquals(PACK_INIT_NUM + 1, pack.getNum());
+    }
+
+    @Test
     @DisplayName("payNum = 999 是允许的上界，仍正常扣费发货")
     void acceptUpperBoundaryPayNum() {
         Role role = newRole();

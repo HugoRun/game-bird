@@ -136,9 +136,10 @@ public enum FeeKind {
      * 静默落到 default）。这里的 if 链是逐值显式比较，加新币种时忘记补分支同样会走到末尾
      * 统一抛异常 —— 行为可控且意图明确。
      *
-     * <p><b>注意与 {@code findShopItem} 的规则相反</b>：那边的 switch 是对<b>枚举</b>
-     * 分派，Java 编译器能在开发者漏加 case 时直接编译报错，因此那里刻意<b>不写</b>
-     * default（写了反而会掩盖未来的编译期保护）。两处规则不同是有意为之。
+     * <p><b>注意与 {@code ShopItemAccessors#load} 的枚举分派规则相反</b>：那边对
+     * {@link ShopKind}（枚举）分派，Java 编译器能在开发者漏加 case 时直接编译报错，
+     * 因此那里刻意<b>不写</b> default（写了反而会掩盖未来的编译期保护）。
+     * 两处规则不同是有意为之。
      *
      * @param feeType 支付类型
      * @return 对应的枚举
