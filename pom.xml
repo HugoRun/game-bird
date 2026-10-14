@@ -137,6 +137,36 @@
             </plugin>
         </plugins>
     </build>
+
+    <!--
+      容器化构建 profile（仅在 -Pcontainer 时生效，不影响 IDE / 本地原开发方式）。
+
+      上游原本未声明 spring-boot-maven-plugin，作者是用 IDE 直接跑 main 方法的，
+      因此 mvn package 只产出「普通 jar」：无 Main-Class、无内嵌依赖，
+      用 java -jar 启动会报 "no main manifest attribute"。
+      此profile 把 repackage 绑定到 package 阶段，产出可执行的 fat jar。
+    -->
+    <profiles>
+        <profile>
+            <id>container</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <version>3.2.7</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <repositories>
         <repository>
             <id>maven_central</id>
