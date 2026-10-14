@@ -91,6 +91,21 @@ public class ShopPurchaseService {
             throw new BizException(ResultCode.PARAM_INVALID, "购买参数不合法。");
         }
 
+        // ---- 步骤 1：参数校验（Q-D 漏洞修复）
+        //
+        // 【行为变更，刻意为之】重构前 6 个 buyShopXxx 只判断了 payNum == null，
+        // 于是 payNum=0 会「白送道具并写库」，payNum<0 会让总价为负、
+        // 反而倒扣玩家已有道具。这里补齐范围校验，三条文案为本单元新增。
+        if (id == null || id <= 0) {
+            return PurchaseResult.fail("商品编号无效。");
+        }
+        if (payNum == null || payNum <= 0) {
+            return PurchaseResult.fail("购买数量必须大于 0。");
+        }
+        if (payNum > MAX_PAY_NUM) {
+            return PurchaseResult.fail("单次购买数量不能超过 " + MAX_PAY_NUM + "。");
+        }
+
         // ---- 步骤 2：载入配置
         ShopItemView item = accessors.load(kind, id);
         if (item == null) {

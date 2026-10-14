@@ -601,4 +601,77 @@ class ShopPurchaseServiceTest {
         assertSame(MessageVO.class, message.getClass());
         return ((MessageVO) message).getMessage();
     }
+
+    // ------------------------------------------------------------------
+    // Q-D 漏洞：payNum 缺失校验导致的白送 / 倒扣
+    // ------------------------------------------------------------------
+
+    @Test
+    @DisplayName("payNum = 0 被拒：文案「购买数量必须大于 0。」且不写库")
+    void rejectZeroPayNum() {
+        assertRejectedPayNum(0, "购买数量必须大于 0。");
+    }
+
+    @Test
+    @DisplayName("payNum 为负被拒：防止总价为负导致不扣费反而倒扣玩家道具")
+    void rejectNegativePayNum() {
+        assertRejectedPayNum(-1, "购买数量必须大于 0。");
+    }
+
+    @Test
+    @DisplayName("payNum = 1000 被拒：单次上限 999")
+    void rejectTooLargePayNum() {
+        assertRejectedPayNum(1000, "单次购买数量不能超过 " + ShopPurchaseService.MAX_PAY_NUM + "。");
+    }
+
+    @Test
+    @DisplayName("payNum = 999 是允许的上界，仍正常扣费发货")
+    void acceptUpperBoundaryPayNum() {
+        Role role = newRole();
+        role.setCoin(100_000L);
+        stubItem(Item.BAIT, ConstData.FEE_TYPE_COIN, UNIT_PRICE, null);
+        RolePack pack = stubExistingPack(Item.BAIT);
+        ExtendedModelMap model = new ExtendedModelMap();
+
+        String view = buy(Item.BAIT, role, model, ShopPurchaseService.MAX_PAY_NUM);
+
+        assertEquals("common/message", view);
+        assertEquals(100_000L - UNIT_PRICE * ShopPurchaseService.MAX_PAY_NUM, role.getCoin().longValue());
+        assertEquals(ShopPurchaseService.MAX_PAY_NUM, pack.getNum());
+    }
+
+    @Test
+    @DisplayName("id <= 0 被拒：文案「商品编号无效。」且不写库")
+    void rejectInvalidId() {
+        Role role = newRole();
+
+        PurchaseResult result = service.purchase(role, ShopKind.BAIT, 0, PAY_NUM);
+
+        assertNotNull(result);
+        assertEquals("商品编号无效。", result.message().getMessage());
+        assertEquals(INIT_COIN, role.getCoin(), "被拒时不得改动任何货币");
+        Mockito.verify(packService, Mockito.never()).saveOrUpdate(any());
+        Mockito.verify(roleService, Mockito.never()).saveOrUpdate(any());
+    }
+
+    /**
+     * 断言某个购买数量被拒绝，且角色未被改动、未发生写库。
+     *
+     * @param payNum购买数量
+     * @param expectedText 期望文案
+     */
+    private void assertRejectedPayNum(int payNum, String expectedText) {
+        Role role = newRole();
+        stubItem(Item.BAIT, ConstData.FEE_TYPE_COIN, UNIT_PRICE, null);
+
+        PurchaseResult result = service.purchase(role, ShopKind.BAIT, ITEM_ID, payNum);
+
+        assertNotNull(result, "payNum=" + payNum + " 应返回结果而非抛异常");
+        assertEquals(expectedText, result.message().getMessage());
+        assertEquals(INIT_COIN, role.getCoin(), "payNum=" + payNum + " 不得改动金币");
+        assertEquals(INIT_DIAMOND, role.getDiamond(), "payNum=" + payNum + " 不得改动钻石");
+        assertEquals(INIT_LOVE_POINT, role.getLovePoint(), "payNum=" + payNum + " 不得改动爱心值");
+        Mockito.verify(packService, Mockito.never()).saveOrUpdate(any());
+        Mockito.verify(roleService, Mockito.never()).saveOrUpdate(any());
+    }
 }
