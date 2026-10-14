@@ -51,7 +51,7 @@ public class GameController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping(value = {"/", "/game.do"})
+    @GetMapping(value = {"/", "/game"})
     public String game(HttpSession session, Model model) {
         Role role = getSessionRole(session);
         // 当前角色数量
@@ -139,7 +139,7 @@ public class GameController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/bank.do")
+    @GetMapping("/bank")
     public String pageBank(HttpSession session, Model model) {
         return "role/bank";
     }
@@ -150,17 +150,17 @@ public class GameController extends BaseController {
      * @param model model
      * @return view
      */
-    @PostMapping("/bankIn.do")
+    @PostMapping("/bankIn")
     public String doBankIn(HttpSession session, RedirectAttributes model, @RequestParam(defaultValue = "0") int inNum) {
         Role role = getSessionRole(session);
         // 100金币起存
         if (inNum < 100) {
             model.addFlashAttribute("message", MessageVO.error("100金币起存。"));
-            return redirectTo("bank.do");
+            return redirectTo("bank");
         }
         if (inNum > role.getCoin()) {
             model.addFlashAttribute("message", MessageVO.error("您的现金不足。"));
-            return redirectTo("bank.do");
+            return redirectTo("bank");
         }
         int addBankCoin = inNum * 99 / 100;
         // 更新并保存数据 todo
@@ -169,7 +169,7 @@ public class GameController extends BaseController {
         roleService.saveOrUpdate(role);
         saveSessionRole(session, role);
         model.addFlashAttribute("message", MessageVO.success("存款成功。<br />本次存入现金" + addBankCoin + ", 银行收取了" + (inNum - addBankCoin) + "的手续费"));
-        return redirectTo("bank.do");
+        return redirectTo("bank");
     }
 
     /***
@@ -178,17 +178,17 @@ public class GameController extends BaseController {
      * @param model model
      * @return view
      */
-    @PostMapping("/bankOut.do")
+    @PostMapping("/bankOut")
     public String doBankOut(HttpSession session, RedirectAttributes model, @RequestParam(defaultValue = "0") int outNum) {
         Role role = getSessionRole(session);
         // 检测陷阱信息
         if (outNum > role.getBankCoin()) {
             model.addFlashAttribute("message", MessageVO.error("银行余额不足。"));
-            return redirectTo("bank.do");
+            return redirectTo("bank");
         }
         if (outNum == 0) {
             model.addFlashAttribute("message", MessageVO.error("取款金额错误。"));
-            return redirectTo("bank.do");
+            return redirectTo("bank");
         }
         // 查询已拥有的诱饵数据
         role.setBankCoin(role.getBankCoin() - outNum);
@@ -196,7 +196,7 @@ public class GameController extends BaseController {
         roleService.saveOrUpdate(role);
         saveSessionRole(session, role);
         model.addFlashAttribute("message", MessageVO.success("取款成功。"));
-        return redirectTo("bank.do");
+        return redirectTo("bank");
     }
 
     /***
@@ -205,7 +205,7 @@ public class GameController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/field/info.do")
+    @GetMapping("/field/info")
     public String pageFile(HttpSession session, Model model, @RequestParam(defaultValue = "0") int fieldId) {
         BaseField baseField = configGateway.getBaseField(fieldId);
         model.addAttribute("baseField", baseField);
@@ -252,7 +252,23 @@ public class GameController extends BaseController {
     // 更改小鸟性别
     // 重命名小鸟
 
-    @GetMapping("/profile.do")
+    /***
+     * 角色详情页
+     *
+     * <p>★ 本方法位于根路径 {@code /profile}，与 {@link RoleController} 的
+     * {@code /role/profile} 是<b>同一个功能的两条路径</b>，二者都渲染
+     * {@code role/profile} 视图。本类没有类级 {@code @RequestMapping}，所以路径落在根上；
+     * 两者技术上的不冲突，靠的是这一层路径前缀差异。
+     *
+     * <p>之所以不合并成一条：删除其一属于路由行为变更（外部可能已有链接指向它），
+     * 不在本轮「仅去后缀」的授权范围内。<b>后人若要合并，务必同时改掉模板中的
+     * 对应引用</b>，否则会产出死链。
+     *
+     * @param session session
+     * @param model model
+     * @return view
+     */
+    @GetMapping("/profile")
     public String pageProfile(HttpSession session, Model model) {
         return "role/profile";
     }
@@ -265,7 +281,7 @@ public class GameController extends BaseController {
      * @return view
      */
     @SkipRole
-    @GetMapping("/pay.do")
+    @GetMapping("/pay")
     public String pagePay(HttpSession session, Model model) {
         return "vip/pay";
     }

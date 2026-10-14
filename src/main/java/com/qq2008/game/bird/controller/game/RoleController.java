@@ -128,7 +128,7 @@ public class RoleController extends BaseController {
         roleBirth1.setIdx(1);
         birthService.save(roleBirth1);
         //
-        MessageLink link = new MessageLink("开始游戏", "/game.do");
+        MessageLink link = new MessageLink("开始游戏", "/game");
         MessageVO messageVO = MessageVO.success("""
                 青鸟之神创造这世界以后就沉睡去了…
                 善良的小鸟们创立了璀璨的文明，快乐祥和地生活着。
@@ -168,7 +168,7 @@ public class RoleController extends BaseController {
         roleService.saveOrUpdate(role);
         // 更新当前登录角色
         saveSessionRole(session, role);
-        return redirectTo("/game.do");
+        return redirectTo("/game");
     }
 
     /***

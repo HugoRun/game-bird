@@ -19,10 +19,10 @@
         <div>经验+[[${result.addExp}]]</div>
         <div th:if="${result.newLevel > result.oldLevel}">你升级啦, Lv:[[${result.oldLevel}]]->[[${result.newLevel}]]</div>
         <div>你还差[[${result.needExp}]]点经验就升级了！</div>
-        <div><a th:href="@{/game.do}">继续收网</a></div>
+        <div><a th:href="@{/game}">继续收网</a></div>
         <div><span class="text-muted" title="功能开发中，暂不可用">马上出售</span></div>
         <div><span class="text-muted" title="功能开发中，暂不可用">前往仓库</span></div>
-        <div><a th:href="@{/game.do}">返回游戏</a></div>
+        <div><a th:href="@{/game}">返回游戏</a></div>
     </div>
 </div>
 </body>

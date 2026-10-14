@@ -146,7 +146,7 @@ public class TrapController extends BaseController {
         // 更新陷阱数据到数据库
         trapService.saveOrUpdate(roleTrap);
 
-        return redirectTo("/game.do");
+        return redirectTo("/game");
     }
 
     /***
@@ -160,7 +160,7 @@ public class TrapController extends BaseController {
     @GetMapping("/autoUseBait.do")
     public String pageAutoUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int baitId, @RequestParam(defaultValue = "0") int trapId){
 
-        return redirectTo("/game.do");
+        return redirectTo("/game");
     }
 
     /***

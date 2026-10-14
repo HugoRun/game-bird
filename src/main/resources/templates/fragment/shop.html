@@ -28,9 +28,9 @@
 </div>
 <!-- 商店信息 -->
 <div th:fragment="shopInfo">
-    金币:[[${session.sRole.coin}]]&nbsp;<a href="#" th:href="@{/bank.do}">取款</a>
+    金币:[[${session.sRole.coin}]]&nbsp;<a href="#" th:href="@{/bank}">取款</a>
     <br/>
-    爱心:[[${session.sRole.lovePoint}]]&nbsp;钻石:[[${session.sRole.diamond}]]&nbsp;<a href="../pay.html" th:href="@{/pay.do}">获得钻石</a>
+    爱心:[[${session.sRole.lovePoint}]]&nbsp;钻石:[[${session.sRole.diamond}]]&nbsp;<a href="../pay.html" th:href="@{/pay}">获得钻石</a>
 </div>
 <!-- 类型导航 -->
 <div class="panel bg-blue navList" th:fragment="shopType(type)">

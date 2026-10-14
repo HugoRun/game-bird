@@ -12,8 +12,8 @@
     <div>
         <div class="panel bg-blue">"<span href="#" th:text="|小菜鸟|"></span>" <span href="#" th:text="|${session.sRole.roleName}|"></span> <a href="#" onclick="toggleShow('p1')">收起</a></div>
         <div id="p1">
-            <div>等级:<span th:text="|${session.sRole.level}|"></span>级(20%) <img alt="" class="vip-icon" src="../../static/images/vip/vip_3.png" th:src="|/assets/images/vip/vip_${session.sRole.vip}.png|"/> <a th:href="@{/profile.do}">详情</a></div>
-            <div>爱心:<span th:text="|${session.sRole.lovePoint}|"></span> 金币:<span th:text="|${session.sRole.coin}|"></span> <a th:href="@{/bank.do}">存款</a></div>
+            <div>等级:<span th:text="|${session.sRole.level}|"></span>级(20%) <img alt="" class="vip-icon" src="../../static/images/vip/vip_3.png" th:src="|/assets/images/vip/vip_${session.sRole.vip}.png|"/> <a th:href="@{/profile}">详情</a></div>
+            <div>爱心:<span th:text="|${session.sRole.lovePoint}|"></span> 金币:<span th:text="|${session.sRole.coin}|"></span> <a th:href="@{/bank}">存款</a></div>
             <div>鲜花:<span th:text="|${session.sRole.diamond}|"></span> 钻石:<span th:text="|${session.sRole.diamond}|"></span></div>
             <div th:if="${session.sRole.marriageType > 0}">爱人:<span><a href="#" th:text="|这段情、|">详情</a></span></div>
             <div hidden="hidden">徒弟:<span><a href="#" th:text="|丂①花花世界的爱情|">详情</a></span> <span><a href="#" th:text="|丂①花花世界的爱情|">详情</a></span> <span><a href="#" th:text="|丂①花花世界的爱情|">详情</a></span></div>
@@ -23,12 +23,12 @@
     </div>
     <div>
         <div class="panel bg-blue">
-            【<a href="./myField.html" th:href="@{/field/info.do(fieldId=${session.sRole.fieldId})}" th:text="${@gameUtils.getFieldName(session.sRole.fieldId)}">彩虹树林</a>】 <a th:href="@{/trap/autoUseBait.do}">一键下饵</a>
+            【<a href="./myField.html" th:href="@{/field/info(fieldId=${session.sRole.fieldId})}" th:text="${@gameUtils.getFieldName(session.sRole.fieldId)}">彩虹树林</a>】 <a th:href="@{/trap/autoUseBait.do}">一键下饵</a>
         </div>
         <div>
             <div>
                 <img class="icon-gray-border" src="../../static/images/field/1.gif" th:alt="${@gameUtils.getFieldName(session.sRole.fieldId)}" th:src="|/assets/images/field/${session.sRole.fieldId}.gif|">
-                <a th:href="@{/game.do}">刷新</a>
+                <a th:href="@{/game}">刷新</a>
             </div>
             <div hidden="hidden">守卫:5小时后小鸟入侵</div>
             <div hidden="hidden">出征:抢夺敌人财富 <a href="#">出征</a></div>
