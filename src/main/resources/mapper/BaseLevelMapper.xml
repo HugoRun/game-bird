@@ -7,6 +7,6 @@
   指向 classpath*:mapper/*.xml，且代码生成器要求每个实体有对应文件；
   直接删除会让配置指向空目录，也让下次运行 CodeGen 时重新生成，属预期行为。
 -->
-<mapper namespace="com.qq2008.game.bird.mapper.BaseLevelMapper">
+<mapper namespace="com.gamebird.game.bird.mapper.BaseLevelMapper">
 
 </mapper>
