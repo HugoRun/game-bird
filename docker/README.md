@@ -6,14 +6,24 @@
 
 ## 快速命令
 
+**推荐用一键脚本**（自动生成 `.env`、构建、等健康、HTTP 探活、核对镜像 ID）：
+
+```bash
+./deploy.sh            # 一键构建 + 部署
+./deploy.sh status     # 查看状态与健康检查
+./deploy.sh --help     # 全部子命令
+```
+
+手动命令（等价于脚本内部做的事）：
+
 ```bash
 cd docker
 
-docker compose up -d --build# 启动（首次会构建镜像，约 3 分钟）
-docker compose ps              # 查看状态
-docker compose logs -f app     # 看应用日志
-docker compose down            # 停止（保留数据）
-docker compose down -v         # 停止并删除数据卷（⚠️ 数据丢失）
+docker compose up -d --build     # 启动（首次会构建镜像，约 3 分钟）
+docker compose ps                # 查看状态
+docker compose logs -f app       # 看应用日志
+docker compose down              # 停止（保留数据）
+docker compose down -v           # 停止并删除数据卷（⚠️ 数据丢失）
 ```
 
 访问：**http://127.0.0.1:9090**
@@ -42,11 +52,41 @@ docker compose down -v         # 停止并删除数据卷（⚠️ 数据丢失�
 
 | 文件 | 作用 |
 |---|---|
+| `docker/deploy.sh` | **一键构建与部署脚本**（子命令见脚本内 `--help`） |
 | `docker/Dockerfile` | 多阶段构建：Maven 编译 → JRE 17 运行 |
 | `docker/docker-compose.yml` | 应用 + 数据库编排 |
 | `docker/settings.xml` | Maven 阿里云镜像 + 中央仓库兜底 |
-| `docker/.env` |密码与端口（**已gitignore，勿提交**） |
+| `docker/.env` | 密码与端口（**已 gitignore，勿提交**；由脚本自动生成） |
 | `docker/.env.example` | 配置模板 |
+
+### `deploy.sh` 子命令
+
+| 命令 | 作用 |
+|---|---|
+| `./deploy.sh` / `deploy` | 一键构建 + 部署（默认） |
+| `stop` / `down` | 停止，保留数据卷 |
+| `start` / `up` | 启动，不重新构建 |
+| `restart` | 仅重启 app（改 `.env` 后热生效） |
+| `status` / `ps` | 容器状态 + 健康检查结果 + 镜像 ID |
+| `logs` | 跟踪 app 日志 |
+| `backup` | 备份数据库到 `../backup_YYYYMMDD_HHMMSS.sql` |
+| `verify` | 只验证不构建（HTTP 探活 + 重定向检查） |
+| `env` | 重新生成 `.env`（随机密码，交互确认） |
+| `reset` | ⚠️ 删卷重建，需输入 `RESET` 确认 |
+
+脚本内置的防护：
+
+- **`.env` 不存在时自动生成**，密码为 20 位随机串，文件权限 `600`
+- **构建输出必须含 `Built` 标记**，否则判定「构建静默失败、沿用旧镜像」并中止（见坑二）
+- **等待 db 与 app 双双 healthy**，超时（默认 180s）即报错退出，不假装成功
+- **HTTP 探活**：`GET /login` 必须 200，`GET /game` 必须 302 到 `/login`
+- 备份用 `MYSQL_PWD` 传密码，不出现在 `ps` 与命令行历史里
+
+> ⚠️ **判据为什么不是镜像 ID**：源码未变时层缓存命中，构建产物 ID 本就相同
+> （已实测：二次构建 2 分钟、12 处 `CACHED`、镜像 ID 不变、完全正常）。
+> 若按「ID 未变化即失败」来判断，第二次部署必被误报中止。可靠判据是输出里的
+> `Built` 标记——它证明构建流程真的跑完了。需要强制完整重建时用
+> `./deploy.sh deploy --no-cache`。
 
 ---
 
@@ -121,7 +161,8 @@ RUN test -f /build/target/game-bird-0.0.1-SNAPSHOT.jar \
 - 运行时**非 root**（`adduser spring`）
 - 基础镜像 `eclipse-temurin:17-jre-alpine`（JRE 而非 JDK）
 - JVM 堆上限 `-XX:MaxRAMPercentage=75.0`，避免容器内存溢出
-- 密码由脚本随机生成 20 位，存`docker/.env`，通过 Compose 变量注入，**不入镜像层、不入库**
+- 密码由 `deploy.sh` 随机生成 20 位，存 `docker/.env`（权限 600），通过 Compose 变量注入，**不入镜像层、不入库**
+- `.env` 已在 `.gitignore` 中；`git ls-files docker/` 确认未被跟踪
 
 ---
 
@@ -140,7 +181,14 @@ docker exec -i game-bird-db mysql -uroot -p<密码> game_bird < sql/game_bird.sq
 ### 备份
 
 ```bash
+./deploy.sh backup          # 推荐：自动从 .env 取密码，输出到 ../backup_YYYYMMDD_HHMMSS.sql
+```
+
+等价的手动命令（注意 `source` 会把密码泄进环境变量，仅限本机使用）：
+
+```bash
 cd docker
+source .env
 docker exec game-bird-db mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" \
   --single-transaction --default-character-set=utf8mb4 \
   game_bird > ../backup_game_bird_$(date +%Y%m%d).sql
@@ -176,6 +224,6 @@ docker exec game-bird-db mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -D game_bird \
 镜像与配置均在版本控制下，回滚只需：
 
 ```bash
-git checkout pom.xml# 还原 pom 改动
+git checkout pom.xml          # 还原 pom 改动
 docker compose down && docker compose up -d --build
 ```
