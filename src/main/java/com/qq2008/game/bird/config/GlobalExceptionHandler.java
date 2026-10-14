@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
@@ -82,6 +83,33 @@ public class GlobalExceptionHandler {
     public Object handleNoHandlerFound(NoHandlerFoundException e, HttpServletRequest request) {
         logger.warn("请求的路径不存在 uri={}", request.getRequestURI());
         return respond(request, ResultCode.SYSTEM_ERROR, "页面不存在。", HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * 405：请求方法不被该路径支持。
+     *
+     * <p><b>为什么必须显式声明</b>：下面 {@code handleException(Exception)} 会把
+     * {@code HttpRequestMethodNotSupportedException} 一并吞掉。典型场景是「把只有
+     * {@code @PostMapping} 的路由用 GET 访问」—— 例如误把 {@code /login} 的 POST 当GET 用。
+     * 改造前这会返回 500「系统繁忙」，运维与前端都会误判为服务故障，而真实原因只是方法不对。
+     *
+     * <p>响应体带 {@code Allow} 头，告知客户端该路径支持哪些方法。
+     *
+     * <p>★ 注意：状态码必须是 {@link HttpStatus#METHOD_NOT_ALLOWED}。若误用
+     * {@code HttpStatus.OK}，405 会被响应成 200，比原来的 500 更糟（客户端会认为成功）。
+     *
+     * @param e       方法不允许异常
+     * @param request 当前请求
+     * @return JSON 或 HTML
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public Object handleMethodNotSupported(HttpRequestMethodNotSupportedException e, HttpServletRequest request) {
+        String allow = String.join(", ", e.getSupportedMethods() == null
+                ? new String[]{"?"} : e.getSupportedMethods());
+        logger.warn("请求方法不被支持 uri={} method={} allow={}",
+                request.getRequestURI(), request.getMethod(), allow);
+        return respond(request, ResultCode.PARAM_INVALID,
+                "请求方式不正确，请用 " + allow + " 方式访问该地址。", HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     /**
