@@ -1,6 +1,6 @@
 package com.qq2008.game.bird.config.interceptor;
 
-import com.qq2008.common.entiy.vo.MessageVO;
+import com.qq2008.common.entity.vo.MessageVO;
 import com.qq2008.game.bird.data.GameServer;
 import com.qq2008.game.bird.model.vo.GameStatusVO;
 import jakarta.servlet.http.HttpServletRequest;

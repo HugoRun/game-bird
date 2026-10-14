@@ -24,7 +24,7 @@
                 <div>密码:</div>
                 <div><input name="passwordRe" type="text"/></div>
             </div>
-            <div class="text-danger text-end" th:if="${!#strings.isEmpty(errorMsg)}" th:text="${errorMsg}"></div>
+            <div th:if="${message}"><div class="text-danger text-end" th:utext="${message.message}"></div></div>
             <div class="mb-1 text-end">
                 <input class="btn btn-outline-primary" type="submit" value="注册">
             </div>

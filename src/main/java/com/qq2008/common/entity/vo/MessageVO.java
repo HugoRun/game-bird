@@ -1,6 +1,6 @@
-package com.qq2008.common.entiy.vo;
+package com.qq2008.common.entity.vo;
 
-import com.qq2008.common.entiy.ResultCode;
+import com.qq2008.common.entity.ResultCode;
 
 import java.util.ArrayList;
 import java.util.List;

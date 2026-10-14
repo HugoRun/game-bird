@@ -1,4 +1,4 @@
-package com.qq2008.common.entiy.vo;
+package com.qq2008.common.entity.vo;
 
 public enum MessageType {
 

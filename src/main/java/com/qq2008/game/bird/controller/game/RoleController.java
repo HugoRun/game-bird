@@ -2,8 +2,8 @@ package com.qq2008.game.bird.controller.game;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.qq2008.common.annotation.SkipRole;
-import com.qq2008.common.entiy.vo.MessageLink;
-import com.qq2008.common.entiy.vo.MessageVO;
+import com.qq2008.common.entity.vo.MessageLink;
+import com.qq2008.common.entity.vo.MessageVO;
 import com.qq2008.common.util.CommonUtils;
 import com.qq2008.game.bird.controller.common.BaseController;
 import com.qq2008.game.bird.data.ConstData;
@@ -56,7 +56,7 @@ public class RoleController extends BaseController {
     public String postCreateRole(HttpSession session, String roleName, Model model) {
         // 参数校验
         if (null == roleName || roleName.isEmpty()) {
-            model.addAttribute("errorMsg", "角色名不能为空。");
+            model.addAttribute("message", MessageVO.error("角色名不能为空。"));
             return "role/create";
         }
         // 角色名长度和铭感词检测 todo
@@ -67,14 +67,14 @@ public class RoleController extends BaseController {
         roleQueryWrapper.eq(Role::getUserId, account.getUserId());
         List<Role> roles = roleService.list(roleQueryWrapper);
         if (null != roles && !roles.isEmpty()) {
-            model.addAttribute("errorMsg", "您已经创建角色。");
+            model.addAttribute("message", MessageVO.error("您已经创建角色。"));
             return "role/create";
         }
         roleQueryWrapper = new LambdaQueryWrapper<>();
         roleQueryWrapper.eq(Role::getRoleName, roleName);
         roles = roleService.list(roleQueryWrapper);
         if (null != roles && !roles.isEmpty()) {
-            model.addAttribute("errorMsg", "角色名已被注册。");
+            model.addAttribute("message", MessageVO.error("角色名已被注册。"));
             return "role/create";
         }
         // 创建角色
@@ -146,7 +146,7 @@ public class RoleController extends BaseController {
         Role role = roleService.getOne(queryWrapper);
         // 没有角色跳转到创建角色界面
         if (null == role) {
-            model.addAttribute("errorMsg", "未找到相关角色。");
+            model.addAttribute("message", MessageVO.error("未找到相关角色。"));
             return redirectTo("create.do");
         }
         // 写登录日志(更新登录时间戳)
@@ -164,7 +164,6 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @SkipRole
     @GetMapping("/profile.do")
     public String pageProfile(HttpSession session, Model model) {
         return "role/profile";
@@ -176,7 +175,6 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @SkipRole
     @GetMapping("/change/avatar.do")
     public String pageChangeAvatar(HttpSession session, Model model) {
         return "role/changeAvatar";
@@ -188,7 +186,6 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @SkipRole
     @GetMapping("/change/avatar2.do")
     public String doChangeAvatar(HttpSession session, Model model, @RequestParam(defaultValue = "1") int img) {
         Role role = getSessionRole(session);
@@ -211,7 +208,6 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @SkipRole
     @GetMapping("/change/title.do")
     public String pageChangeTitle(HttpSession session, Model model) {
         List<BaseTitle> titleList = configGateway.getBaseTitleList();
@@ -225,7 +221,6 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @SkipRole
     @GetMapping("/change/title2.do")
     public String doChangeTitle(HttpSession session, Model model, @RequestParam(defaultValue = "1") int titleId) {
         Role role = getSessionRole(session);
@@ -250,7 +245,6 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @SkipRole
     @GetMapping("/change/dynamic.do")
     public String pageChangeDynamic(HttpSession session, Model model) {
         return "role/changeDynamic";
@@ -262,7 +256,6 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @SkipRole
     @PostMapping("/change/dynamic.do")
     public String doChangeDynamic(HttpSession session, Model model, String dynamic) {
         Role role = getSessionRole(session);
@@ -286,7 +279,6 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @SkipRole
     @GetMapping("/change/name.do")
     public String pageChangeName(HttpSession session, Model model) {
         return "role/changeName";
@@ -298,7 +290,6 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @SkipRole
     @PostMapping("/change/name.do")
     public String doChangeName(HttpSession session, Model model, String roleName) {
         Role role = getSessionRole(session);
@@ -330,7 +321,6 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @SkipRole
     @GetMapping("/change/sex.do")
     public String pageChangeSex(HttpSession session, Model model) {
         return "role/changeSex";
@@ -342,7 +332,6 @@ public class RoleController extends BaseController {
      * @param model model
      * @return view
      */
-    @SkipRole
     @PostMapping("/change/sex.do")
     public String doChangeSex(HttpSession session, Model model, @RequestParam(defaultValue = "0") Byte sex) {
         Role role = getSessionRole(session);
@@ -367,7 +356,7 @@ public class RoleController extends BaseController {
     @RequestMapping(value = {"/quit.do"})
     public String quit(HttpSession session) {
         // 注销当前登录角色数据
-        session.removeAttribute("role");
+        session.removeAttribute("sRole"); // 红线：session key 必须叫 sRole，原代码写成 role，等于没删干净
         // 注销当前登录账号数据
         session.removeAttribute("account");
         return redirectTo("/login.do");

@@ -2,8 +2,8 @@ package com.qq2008.game.bird.controller.game;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.qq2008.common.entiy.vo.MessageLink;
-import com.qq2008.common.entiy.vo.MessageVO;
+import com.qq2008.common.entity.vo.MessageLink;
+import com.qq2008.common.entity.vo.MessageVO;
 import com.qq2008.game.bird.controller.common.BaseController;
 import com.qq2008.game.bird.data.ConstData;
 import com.qq2008.game.bird.model.dbo.*;

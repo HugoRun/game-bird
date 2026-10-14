@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>出错了</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<div class="main">
+    <!-- 复用既有的「球球提示」片段，视觉与/message 页面保持一致 -->
+    <div th:replace="~{fragment/message::message}"></div>
+    <div class="text-center mt-3">
+        <a class="btn btn-sm btn-secondary" href="javascript:history.back()">返回上一页</a>
+    </div>
+</div>
+</body>
+</html>
