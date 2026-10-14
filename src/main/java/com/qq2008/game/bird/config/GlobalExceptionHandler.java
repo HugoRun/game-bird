@@ -32,7 +32,8 @@ import org.springframework.web.servlet.NoHandlerFoundException;
  * </ul>
  *
  * <p><b>协商规则</b>：优先看 {@code X-Requested-With: XMLHttpRequest}（项目内 AJAX 全部带此头），
- * 其次看请求路径是否以 {@code .do} 结尾且显式 Accept JSON，否则按页面请求处理。
+ * 其次看 Accept 是否显式要求 JSON 且不含 HTML，否则按页面请求处理。
+ * 路由已统一去掉历史后缀，故不再按路径后缀做判断。
  *
  * <p><b>注意</b>：本类只负责「未被业务代码捕获的异常」。已被 {@code catch} 吞掉并
  * {@code return "xxx"} 的分支不在此列——那是文档 R19（ResultDispatcher 重入）要解决的另一问题。

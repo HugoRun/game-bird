@@ -24,12 +24,12 @@ import java.util.List;
 /***
  * 角色
  *
- * <p><b>路由命名（RT-3）</b>：本类 16 条映射去掉 {@code .do} 后缀，
+ * <p><b>路由命名（RT-3）</b>：本类 16 条映射去掉了历史遗留的路由后缀，
  * 并把「设置页」与「设置动作」收敛到同一路径、靠 HTTP method 区分：
  * {@code GET /role/avatar} 列出 19 个头像，{@code POST /role/avatar} 落库；
  * {@code GET /role/title} 列出称号，{@code POST /role/title} 落库。
  *
- * <p>原先的 {@code avatar2.do} / {@code title2.do} 是历史遗留的分裂 ——
+ * <p>原先的「设置头像 2」「设置称号 2」两条路径是历史遗留的分裂 ——
  * 同一功能的「进入页」与「提交」被拆成两条路径，只有后缀可区分。
  * 它们同时是<b>GET 写操作</b>（会 {@code roleService.saveOrUpdate}），本次一并转为 POST。
  * 合并后误用 {@code <a href>} 只会 GET 到设置页而不会改数据，比原先更安全。

@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * 已收敛为 {@link ShopItemAccessors#pageShopItems}。本类现在只做三件事：
  * 映射路由、从session 取角色、选视图名。
  *
- * <p><b>路由命名（RT-1）</b>：本类 12 条路由去掉了 {@code .do} 后缀，
+ * <p><b>路由命名（RT-1）</b>：本类 12 条路由去掉了历史遗留的路由后缀，
  * 并采用资源化命名 —— 列表是资源（{@code /shop/{t}/items}，GET），
  * 购买是动作（{@code /shop/{t}/purchase}，POST）。原先的 6 条
  * {@code /xxx/buy} 被重命名为 {@code /xxx/purchase}。
