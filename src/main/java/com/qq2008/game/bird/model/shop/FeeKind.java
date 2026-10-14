@@ -11,8 +11,10 @@ import com.qq2008.game.bird.model.dbo.Role;
  * <p><b>为什么必须用枚举取代 3 个独立 if</b>（实测 {@code ShopController} 原文）：
  * 现状是 {@code if (COIN) {...} if (DIAMOND) {...} if (LOVE_POINT) {...}} 三段
  * <b>彼此独立、不是 else if</b>，且每段扣费校验通过后都<b>不 return</b>，直接往下走发货逻辑。
- * 现状之所以没出事，纯粹是因为前置的 {@code isFeeTypeError()} 保证 feeType 必属三者之一。
- * 一旦 {@code base_*} 表新增第 4 种 feeType、或 {@code isFeeTypeError()} 被误改，
+ * 现状之所以没出事，纯粹是因为调用方保证了 feeType 必属三者之一
+ * （重构前由 {@code BaseController.isFeeTypeError()} 前置拦截，该方法已因零调用点删除；
+ * 现在由 {@code ShopPurchaseService} 在 {@code FeeKind.of} 匹配不到时直接返回失败）。
+ * 一旦 {@code base_*} 表新增第 4 种 feeType 而此处未同步扩展，
  * 三个分支都不进 → <b>道具白送且不扣任何货币</b>。这是典型的静默漏扣费隐患。
  *
  * <p>本枚举用穷举分派取代 3 个 if：匹配不到即抛

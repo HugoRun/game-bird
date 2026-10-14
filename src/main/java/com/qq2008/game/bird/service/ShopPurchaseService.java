@@ -115,6 +115,7 @@ public class ShopPurchaseService {
         }
         // feeType 非法时返回「没有该商品哦。」，与重构前 isFeeTypeError() 分支的
         // 用户可见行为**逐字一致**：仍是 common/message 视图 + 红色提示。
+        // （isFeeTypeError() 本身已因零调用点删除，此处由 FeeKind.of 匹配不到兜底。）
         //
         // 【与设计文档的偏离，刻意为之】文档 §2.1.7 建议此处让 FeeKind.of 抛
         // BizException，由 GlobalExceptionHandler 渲染 error.html。但那会把失败页面
