@@ -15,7 +15,7 @@
             </div>
         </div>
         <div th:if="${baitList.size() > 0}">
-            <form action="/trap/useBait.do" method="post">
+            <form th:action="@{/trap/useBait}" method="post">
                 <input type="hidden" name="trapId" th:value="${trapId}">
                 <label style="margin:  10px 0;">
                     <select name="baitId">

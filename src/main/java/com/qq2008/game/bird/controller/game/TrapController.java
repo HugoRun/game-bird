@@ -46,7 +46,7 @@ public class TrapController extends BaseController {
      * @param trapId 陷阱Id
      * @return view
      */
-    @GetMapping("/useBait.do")
+    @GetMapping("/useBait")
     public String pageUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int trapId){
         Role role = getSessionRole(session);
         // 检测陷阱信息
@@ -90,7 +90,7 @@ public class TrapController extends BaseController {
      * @param trapId 陷阱Id
      * @return view
      */
-    @PostMapping("/useBait.do")
+    @PostMapping("/useBait")
     public String doUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int baitId, @RequestParam(defaultValue = "0") int trapId){
         Role role = getSessionRole(session);
         // 未选择陷阱
@@ -157,7 +157,7 @@ public class TrapController extends BaseController {
      * @param trapId 陷阱Id
      * @return view
      */
-    @GetMapping("/autoUseBait.do")
+    @GetMapping("/autoUseBait")
     public String pageAutoUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int baitId, @RequestParam(defaultValue = "0") int trapId){
 
         return redirectTo("/game");
@@ -171,7 +171,7 @@ public class TrapController extends BaseController {
      * @param trapId 陷阱Id
      * @return view
      */
-    @PostMapping("/autoUseBait.do")
+    @PostMapping("/autoUseBait")
     public String doAutoUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int baitId, @RequestParam(defaultValue = "0") int trapId){
 
 
@@ -183,7 +183,7 @@ public class TrapController extends BaseController {
      * 收网
      *
      * <p>★ 已知设计债（本轮不改）：本方法会写库（消耗陷阱、结算捕获），
-     * 但仍是 {@code @GetMapping}。按REST 语义，写操作应为 POST。
+     * 但仍是 {@code @GetMapping}。按 REST 语义，写操作应为 POST。
      * 本轮**有意不改** —— 改POST 需要同步改造 trap/over 页的触发方式，
      * 属于路由规范化批次的后续范围，此处仅记录，避免后人误以为是疏漏。
      * 已知缺陷：GET 收网可被浏览器预取或刷新重复触发。
@@ -193,7 +193,7 @@ public class TrapController extends BaseController {
      * @param trapId 陷阱Id
      * @return view
      */
-    @GetMapping("/over.do")
+    @GetMapping("/over")
     public String doOver(HttpSession session, Model model, @RequestParam(defaultValue = "0") int trapId){
         Role role = getSessionRole(session);
         // 仓库鸟上限 todo
@@ -273,7 +273,7 @@ public class TrapController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/birdInfo.do")
+    @GetMapping("/birdInfo")
     public String pageBirdInfo(HttpSession session, Model model, @RequestParam(defaultValue = "0") int birdId){
         BaseBird baseBird = configGateway.getBaseBird(birdId);
         model.addAttribute("baseBird", baseBird);

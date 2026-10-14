@@ -23,7 +23,7 @@
     </div>
     <div>
         <div class="panel bg-blue">
-            【<a href="./myField.html" th:href="@{/field/info(fieldId=${session.sRole.fieldId})}" th:text="${@gameUtils.getFieldName(session.sRole.fieldId)}">彩虹树林</a>】 <a th:href="@{/trap/autoUseBait.do}">一键下饵</a>
+            【<a href="./myField.html" th:href="@{/field/info(fieldId=${session.sRole.fieldId})}" th:text="${@gameUtils.getFieldName(session.sRole.fieldId)}">彩虹树林</a>】 <a th:href="@{/trap/autoUseBait}">一键下饵</a>
         </div>
         <div>
             <div>
@@ -50,23 +50,23 @@
                 <div class="list1-info" th:if="${trap.baitId == 0}">
                     <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><span class="text-muted" title="功能开发中，暂不可用">更换陷阱</span></span></p>
                     <p>空闲中</p>
-                    <p><a href="#" th:href="@{/trap/useBait.do(trapId=${trap.id})}">下饵</a></p>
+                    <p><a href="#" th:href="@{/trap/useBait(trapId=${trap.id})}">下饵</a></p>
                 </div>
 
                 <div class="list1-icon" th:if="${trap.baitId > 0}">
                     <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${trap.catchBirdId}.gif|}">
                 </div>
                 <div class="list1-info" th:if="${trap.baitId > 0 && trap.catchEndTime > nowTime}">
-                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/trap/birdInfo.do(birdId=${trap.catchBird.id})}" th:text="${trap.catchBird.name}">麻雀</a> <th:block
+                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/trap/birdInfo(birdId=${trap.catchBird.id})}" th:text="${trap.catchBird.name}">麻雀</a> <th:block
                             th:text="${@gameUtils.getStarName(trap.catchBirdStar)}"></th:block></span></p>
                     <p><th:block th:text="${@gameUtils.getTimeDiff(trap.catchEndTime, nowTime)}"></th:block>后捕获</p>
-                    <p><a th:href="@{/trap/hasten.do(trapId=${trap.id})}">加速</a></p>
+                    <p><span class="text-muted" title="功能开发中，暂不可用">加速</span></p>
                 </div>
                 <div class="list1-info" th:if="${trap.baitId > 0 && trap.catchEndTime <= nowTime}">
-                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/trap/birdInfo.do(birdId=${trap.catchBird.id})}" th:text="${trap.catchBird.name}">麻雀</a> <th:block
+                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/trap/birdInfo(birdId=${trap.catchBird.id})}" th:text="${trap.catchBird.name}">麻雀</a> <th:block
                             th:text="${@gameUtils.getStarName(trap.catchBirdStar)}"></th:block></span></p>
                     <p>已捕获</p>
-                    <p><a href="#" th:href="@{/trap/over.do(trapId=${trap.id})}">去收网</a></p>
+                    <p><a href="#" th:href="@{/trap/over(trapId=${trap.id})}">去收网</a></p>
                 </div>
             </li>
         </ul>
