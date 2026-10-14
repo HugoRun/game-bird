@@ -131,13 +131,12 @@ public class GameController extends BaseController {
         // 树林记录数据
         Page<ChatMessageVO> treeMessagePage = MockUtils.mockTreeMessageList(7, role);
         model.addAttribute("treeMessagePage", treeMessagePage);
-        // 世界动态数据。
-        // ★ 改造前这里调的是 mockTreeMessageList，与上面的树林记录完全相同。
-        // 现改用专属 mock。但注意 game.html 的「世界动态」区块仍是 hidden + 硬编码
-        // 静态 HTML，并未读取本变量——要真正显示需先改模板，见 MockUtils 的 Javadoc。
-        Page<ChatMessageVO> globalMessagePage = MockUtils.mockGlobalMessageList(7, role);
-        model.addAttribute("globalMessagePage", globalMessagePage);
-        return "game";
+        // 世界动态：不在此处算数据。
+        // ★ game.html 的「世界动态」面板（:150）既未接线也不可见——整块 hidden 且
+        // 内容是写死的示例文本，模板侧零读取 globalMessagePage。按「不计算没人读的
+        // 数据」原则，这里不再生成该 mock。要开放该面板需同时做模板接线与真实数据
+        // 查询，属功能开发，详见 README 已知问题。
+        return ConstData.VIEW_GAME;
     }
 
     /**
@@ -277,7 +276,7 @@ public class GameController extends BaseController {
      */
     @GetMapping("/profile")
     public String pageProfile(HttpSession session, Model model) {
-        return "role/profile";
+        return ConstData.VIEW_ROLE_PROFILE;
     }
 
     /**

@@ -62,7 +62,7 @@ public class RoleController extends BaseController {
     @GetMapping("/create")
     public String getCreateRole(Model model) {
         model.addAttribute("randNickName", "");
-        return "role/create";
+        return ConstData.VIEW_ROLE_CREATE;
     }
 
     /**
@@ -77,7 +77,7 @@ public class RoleController extends BaseController {
         // 参数校验
         if (null == roleName || roleName.isEmpty()) {
             model.addAttribute("message", MessageVO.error("角色名不能为空。"));
-            return "role/create";
+            return ConstData.VIEW_ROLE_CREATE;
         }
         // 角色名长度和铭感词检测 todo
         // 获取账户信息
@@ -88,14 +88,14 @@ public class RoleController extends BaseController {
         List<Role> roles = roleService.list(roleQueryWrapper);
         if (null != roles && !roles.isEmpty()) {
             model.addAttribute("message", MessageVO.error("您已经创建角色。"));
-            return "role/create";
+            return ConstData.VIEW_ROLE_CREATE;
         }
         roleQueryWrapper = new LambdaQueryWrapper<>();
         roleQueryWrapper.eq(Role::getRoleName, roleName);
         roles = roleService.list(roleQueryWrapper);
         if (null != roles && !roles.isEmpty()) {
             model.addAttribute("message", MessageVO.error("角色名已被注册。"));
-            return "role/create";
+            return ConstData.VIEW_ROLE_CREATE;
         }
         // 创建角色
         int nowTime = CommonUtils.nowTime();
@@ -186,7 +186,7 @@ public class RoleController extends BaseController {
      */
     @GetMapping("/profile")
     public String pageProfile(HttpSession session, Model model) {
-        return "role/profile";
+        return ConstData.VIEW_ROLE_PROFILE;
     }
 
     /**

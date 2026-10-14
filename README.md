@@ -218,14 +218,34 @@ grep -rn '功能开发中，暂不可用' src/main/resources/templates/ | wc -l 
 **诱饵的「使用」是另一条链路**：`pack/bait.html` 走 `@{/trap/useBait(...)}`，
 该路由真实存在，未置灰。
 
-### 4. 世界动态与树林记录展示完全相同（功能性缺陷）
+### 4. 游戏主页两个内容面板均不可见，且接线状态不同
 
-`GameController.java:132` 的 `globalMessagePage` 重复调用了
-`mockTreeMessageList()`，导致「世界动态」页展示的内容与「树林记录」完全一致。
-根因是 `MockUtils` 只有 `mockChatMessageList` / `mockTreeMessageList` 两个方法，
-**没有世界动态的 mock 数据源**。
+`game.html` 上有两个面板都带 `hidden="hidden"`，但**接线状态不一样**，
+处理方式因此不同：
 
-**当前批次未修**，待裁决。若要修，需先为世界动态补一个独立的 mock 数据源。
+**「树林记录」面板 —— 已接线但不可见**（`game.html:141`）
+
+整块 `hidden`，但 `:143-146` 确实用 `th:each` 读取了 `treeMessagePage`。
+后端 `GameController` 也在算这份 mock 数据。属「已接线、待开放」的连贯状态，
+**去掉 `hidden` 即可见**，无需其他改动。
+
+**「世界动态」面板 —— 既未接线也不可见**（`game.html:150-156`）
+
+整块 `hidden`，且 `:152-156` 是**写死的静态 `<li>` 示例文本**加一句「暂未开放」，
+**没有任何 `th:each`，模板侧零读取后端数据**。
+
+因此本项**已做的处理是删除后端的死计算**：原先 `GameController` 会调
+`MockUtils.mockGlobalMessageList(7, role)` 生成一份 mock 数据并塞进 model，
+但没有任何模板读它——那是算了也不会被展示的无效计算，
+按「不计算没人读的数据」原则已删除，`mockGlobalMessageList` 方法一并移除。
+
+**要真正开放「世界动态」需同时做两件事**（属功能开发，不在规范化批次范围）：
+
+1. **模板接线**：去掉 `hidden`，把写死的 `<li>` 示例换成
+   `th:each="message : ${globalMessagePage.getRecords()}"` 遍历；
+2. **真实数据源**：当前没有「世界动态」的数据表或查询逻辑，
+    mock 只能让页面「有东西可看」，开放前需确定数据来源
+   （是全服聊天记录，还是独立的事件流）。
 
 ### 5. 捕捉结算页是一次性渲染，无按 birdId 重开入口
 
