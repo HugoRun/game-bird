@@ -24,6 +24,60 @@ JAVA语言为基础
 导入数据库后记得修改`application.yml`配置的数据库信息
 
 
+## 路由
+
+全项目**已无 `.do` 后缀**（`grep -rn '\.do\b' src/` 仅余2 处说明性注释，无任何业务引用）。
+校验命令：
+
+```bash
+grep -rn '\.do\b' src/ | grep -v 'ConstData.java:77\|GameStatusHandlerInterceptor.java:30'
+grep -rnoE '(href|action)="/[^"]*\.do"' src/     # 硬编码 .do 字面量，应为 0
+```
+
+### 三域路由对照表（game / trap / chat）
+
+| 原路由（含 `.do`） | 现路由 | Method | 视图 / 行为 |
+|---|---|---|---|
+| `/game.do` | `/game`（或裸 `/`） | GET | `game` 游戏主页 |
+| `/bank.do` | `/bank` | GET | `role/bank` |
+| `/bankIn.do` | `/bankIn` | POST | 存款 |
+| `/bankOut.do` | `/bankOut` | POST | 取款 |
+| `/field/info.do` | `/field/info` | GET | 场地信息 |
+| `/profile.do` | `/profile` | GET | `role/profile` 角色状态 |
+| `/pay.do` | `/pay` | GET | 获得钻石 |
+| `/trap/useBait.do` | `/trap/useBait` | GET + POST | 同一路径按 method 区分读写 |
+| `/trap/autoUseBait.do` | `/trap/autoUseBait` | GET + POST | 同一路径按 method 区分读写 |
+| `/trap/over.do` | `/trap/over` | GET | 收网结算（**保持 GET，见已知问题**） |
+| `/trap/birdInfo.do` | `/trap/birdInfo` | GET | 鸟信息（只读 `base_bird` 配置） |
+| `/chat/list.do` | `/chat/list` | GET | 聊天大厅 |
+| `/chat/chatWorld.do` | `/chat/chatWorld` | POST | 世界喊话 |
+
+**命名约定**：同一资源路径下用 HTTP method 区分读写（`GET /trap/useBait` 查看、
+`POST /trap/useBait` 提交），不再为读写各起一条路径。
+
+**游戏主页统一走 `/game`**：`GameController` 的映射保留 `{"/", "/game"}` 两个别名
+（裸 `/` 是历史入口，保留兼容），但**模板内所有引用一律写 `@{/game}`**，
+不混用裸 `/`——否则同一页面在不同入口下生成的链接不一致。
+
+**根 `/profile` 与 `/role/profile` 不冲突**：`GameController` 只有 `@Controller`、
+**无类级 `@RequestMapping`**，方法路径直接落在根路径；而 `RoleController` 有
+`@RequestMapping("/role")`，故其`/profile` 实际是 `/role/profile`。两者渲染
+同一视图 `role/profile`（同一功能的两条路径），`GameController.pageProfile`
+已加注释说明区别，防止后人误删其一。合并二者属**路由行为变更**，超出「仅去后缀」范围。
+
+### 硬编码 `.do` 字面量清零
+
+改造前有两处 `href`/`action` **不带 `@{}`**，是批量替换时最易漏的点，已单独处理：
+
+| 位置 | 原写法 | 现写法 |
+|---|---|---|
+| `templates/trap/bait.html:18` | `<form action="/trap/useBait.do" method="post">` | `<form th:action="@{/trap/useBait}" method="post">` |
+| `templates/game.html:133` | `<a href="/chat/list.do">我要喊话</a>` | `<a th:href="@{/chat/list}">我要喊话</a>` |
+
+两处都改成了 Thymeleaf 表达式——原先的硬编码路径**不会渲染上下文路径**，
+应用挂在非根context 时必然 404。其余 6 处 `<form action="">` 均为空action
+（提交到当前页），无需处理。
+
 ## 截图
 
 ![](./screenshot/msedge_kBB3OpU6qk.png)
@@ -74,7 +128,7 @@ JAVA语言为基础
 
 ### `fragment/shop.html` 的取款链接曾指向不存在的路由（已修正）
 
-`fragment/shop.html` 顶部余额栏的「取款」链接原为 `@{/userBank.do}`，而 `/userBank.do` **全项目零 Controller 映射**，是条死链。现已改指向真实存在的 `@{/bank.do}`（`GameController`）。「获得钻石」的 `@{/pay.do}` 一直有效。
+`fragment/shop.html` 顶部余额栏的「取款」链接原为 `@{/userBank.do}`，而 `/userBank.do` **全项目零 Controller 映射**，是条死链。现已改指向真实存在的 `@{/bank}`（`GameController`）。「获得钻石」的 `@{/pay}` 一直有效。
 
 ### 5 条道具「使用」死链（已置灰）
 
@@ -86,9 +140,9 @@ JAVA语言为基础
 
 **诱饵的「使用」是另一条链路**：`pack/bait.html` 指向 `@{/trap/useBait.do(baitId=...)}`，该路由真实存在（`TrapController`），是活链接，未置灰。
 
-### 17 处导航与功能入口死链（已置灰）
+### 18 处导航与功能入口死链（已置灰）
 
-除上述 5 条外，另有 17 处入口同样指向不存在的路由，现已统一按同一方式置灰：
+除上述 5 条外，另有 18 处入口同样指向不存在的路由，现已统一按同一方式置灰：
 
 | 位置 | 原 `th:href` | 说明 |
 |---|---|---|
@@ -98,12 +152,22 @@ JAVA语言为基础
 | `game.html` | `/task/list.do` | 主线任务 |
 | `game.html` | `/weal/sign.do` | 福利签到 |
 | `game.html` | `/trap/change.do(trapId=...)` | 更换陷阱 |
+| `game.html` | **`/trap/hasten.do`** | **「加速」—— 本轮新发现，见下** |
 | `trap/over.html` | `/storage/bird.do`（2 处）、`/storage/bird/sellConfirm.do(birdId=...)` | 仓库与出售 |
+
+#### `/trap/hasten.do`（本轮新发现的死链）
+
+`game.html` 的「加速」入口原指向 `/trap/hasten.do`，而该路由**全仓仅此一处引用**，
+Java 侧**零 Controller 映射**（已由 team-lead 独立 `grep -rn "hasten" src/` 复核确认）。
+
+**它不在重构规格的死链清单里，是规格的遗漏**——已按前批同规范置灰为
+`<span class="text-muted" title="功能开发中，暂不可用">加速</span>`，
+文字与位置不变。若将来实现「加速」，应为 POST（消耗道具、变更状态属写操作）。
 
 **有意未置灰**的三条链接：
 
-- `game.html` 的等级「详情」`@{/profile.do}` —— game 域去后缀后自动变为有效。
-- `@{/trap/useBait.do(...)}` 与 `@{/trap/autoUseBait.do}` —— 均有真实映射（后者是仅返回 `redirectTo("/game.do")` 的空壳，属已知未实现功能，不是死链）。
+- `game.html` 的等级「详情」`@{/profile}` —— game 域去后缀后自动变为有效。
+- `@{/trap/useBait(...)}` 与 `@{/trap/autoUseBait}` —— 均有真实映射（后者是仅返回 `redirectTo("/game")` 的空壳，属已知未实现功能，不是死链）。
 
 ### 已删除的 5 个零引用路由常量
 
@@ -115,7 +179,7 @@ JAVA语言为基础
 | `PATH_ROLE_LOGIN` | `/role/login.do` | `RoleController` → `/role/login` |
 | `PATH_ROLE_CREATE` | `/role/create.do` | `RoleController` → `/role/create` |
 | `PATH_ROLE_QUIT` | `/role/quit.do` | `RoleController` → `/role/quit` |
-| `PATH_GAME` | `/game.do` | `GameController` → `/game.do`（**本轮未改，仍带后缀**） |
+| `PATH_GAME` | `/game.do` | `GameController` → `/game`（game 域去后缀后已同步） |
 
 `ConstData.MESSAGE_PATH = "/message"` **保留并已启用** —— RT-5 起它是维护页路径的唯一来源，同时被 `GameController` 的映射、`GameStatusHandlerInterceptor` 的转发目标、`ServerWebMvcConfigurationSupport` 的 `excludePathPatterns` 三处引用。配套新增 `ConstData.MESSAGE_FORWARDED` 作为防递归标记键。
 
