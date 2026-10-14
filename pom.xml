@@ -36,42 +36,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
-        <!-- mybatis支持 -->
-        <dependency>
-            <groupId>org.mybatis.spring.boot</groupId>
-            <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>3.0.3</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mybatis</groupId>
-                    <artifactId>mybatis</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis.spring.boot</groupId>
-            <artifactId>mybatis-spring-boot-starter-test</artifactId>
-            <version>3.0.3</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mybatis</groupId>
-                    <artifactId>mybatis</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- 对用户名和密码进行base64加密 -->
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.17.0</version>
-        </dependency>
-        <!-- HTTP客户端支持 -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.13</version>
-        </dependency>
         <!-- json支持 -->
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -79,10 +43,31 @@
             <version>2.0.52</version>
         </dependency>
         <!-- mybatis plus 支持 -->
+        <!--
+          注意：此处刻意不声明 mybatis-spring-boot-starter。它 exclude 了
+          org.mybatis:mybatis，与 mybatis-plus-boot-starter 的 AutoConfiguration 冲突，
+          现状是靠「排除后由 MP 补回」侥幸可用。MP starter 已自带 mybatis + mybatis-spring。
+        -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>3.5.7</version>
+        </dependency>
+        <!--
+          ⚠️ 必须显式钉住 mybatis-spring 的版本，理由如下（实测踩坑，勿删）：
+          mybatis-plus-boot-starter:3.5.7 传递依赖的是 mybatis-spring:2.1.2，
+          而 2.1.x 与 Spring 6.1（Boot 3.2.x）不兼容，启动直接失败：
+            IllegalArgumentException: Invalid value type for attribute
+            'factoryBeanObjectType': java.lang.String
+          升级 mybatis-spring 到 3.0.3+ 即可修复。
+          此前该版本是被 mybatis-spring-boot-starter:3.0.3「顺带」顶上去的
+          （Maven 就近原则），删掉那个 starter 后就暴露了 2.1.2 —— 属于
+          「靠巧合可用」的典型。显式声明后不再依赖任何其他依赖的副作用。
+        -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>3.0.3</version>
         </dependency>
         <dependency>
             <groupId>com.github.yulichang</groupId>
@@ -94,38 +79,33 @@
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
         </dependency>
-        <!-- 上传支持 -->
+        <!-- 字符串工具（GameUtils / 各 Controller 使用 org.apache.commons.lang3） -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.15.0</version>
         </dependency>
-        <!-- 上传支持 -->
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>1.9.4</version>
-        </dependency>
-        <!-- 上传支持 -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-fileupload2-jakarta-servlet6</artifactId>
-            <version>2.0.0-M2</version>
-        </dependency>
 
+        <!--
+          代码生成器：仅 CodeGen.java 使用，运行期不需要，故 scope=provided。
+          （生成的实体已全部入库，日常构建不需要该依赖。）
+        -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-generator</artifactId>
             <version>3.5.7</version>
+            <scope>provided</scope>
         </dependency>
+
+        <!--
+          Lombok：消除 25 个 dbo 实体的样板 getter/setter。
+          <optional>true</optional> —— 编译期生效，不传递给下游消费者。
+          注意 Account.java 禁用 @Data（其 toString 会带出明文密码）。
+        -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-freemarker</artifactId>
-            <version>2.4.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
@@ -134,6 +114,31 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- 显式开启注解处理器，保证 lombok 在各 IDE / CI 下行为一致 -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!--
+                      固定单 JVM、串行执行：GameConfigManager / GameServer 持有全静态可变状态
+                      （配置缓存、程序状态），并行测试会互相污染。forkCount=1 + parallel=none
+                      是让单元测试可重复（deterministic）的必要条件，不可为了提速去掉。
+                    -->
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
+                    <parallel>none</parallel>
+                    <trimStackTrace>false</trimStackTrace>
+                </configuration>
             </plugin>
         </plugins>
     </build>
