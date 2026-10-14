@@ -5,9 +5,9 @@
 
 <div class="main">
     <div>
-        <div th:replace="~{fragment/pack::packHeader(type='nest', label='巢穴', shopUrl='/shop/nest/list.do')}"></div>
+        <div th:replace="~{fragment/pack::packHeader(type='nest', label='巢穴', shopUrl='/shop/nest/items')}"></div>
         <div th:if="${page.getTotal() == 0}">
-            <div th:replace="~{fragment/pack::packEmpty(label='巢穴', shopUrl='/shop/nest/list.do')}"></div>
+            <div th:replace="~{fragment/pack::packEmpty(label='巢穴', shopUrl='/shop/nest/items')}"></div>
         </div>
         <div th:if="${page.getTotal() > 0}">
             <ul class="list1">

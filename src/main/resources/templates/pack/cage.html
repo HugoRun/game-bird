@@ -33,9 +33,9 @@
 
 <div class="main">
     <div>
-        <div th:replace="~{fragment/pack::packHeader(type='cage', label='鸟笼', shopUrl='/shop/cage/list.do')}"></div>
+        <div th:replace="~{fragment/pack::packHeader(type='cage', label='鸟笼', shopUrl='/shop/cage/items')}"></div>
         <div th:if="${page.getTotal() == 0}">
-            <div th:replace="~{fragment/pack::packEmpty(label='鸟笼', shopUrl='/shop/cage/list.do')}"></div>
+            <div th:replace="~{fragment/pack::packEmpty(label='鸟笼', shopUrl='/shop/cage/items')}"></div>
         </div>
         <div th:if="${page.getTotal() > 0}">
             <ul class="list1">

@@ -11,7 +11,7 @@
         <div th:if="${baitList.size() == 0}">
             <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
             <div class="npc-talk">
-                <div>您还没有任何诱饵哦,马上去<a href="../../shop/bait.html" th:href="@{/shop/bait/list.do}">商店</a>购买吧！</div>
+                <div>您还没有任何诱饵哦,马上去<a href="../../shop/bait.html" th:href="@{/shop/bait/items}">商店</a>购买吧！</div>
             </div>
         </div>
         <div th:if="${baitList.size() > 0}">

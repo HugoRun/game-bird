@@ -28,9 +28,16 @@ import org.springframework.web.bind.annotation.RequestParam;
  * 已收敛为 {@link ShopItemAccessors#pageShopItems}。本类现在只做三件事：
  * 映射路由、从session 取角色、选视图名。
  *
- * <p><b>路由保持不变</b>：6 条 {@code /xxx/list.do} 与 6 条 {@code /xxx/buy.do}
- * 逐字保留。去后缀的路由规范化是另一批的工作，且必须与模板、字符串引用
- * 一起原子提交，不在本单元范围内。
+ * <p><b>路由命名（RT-1）</b>：本类 12 条路由去掉了 {@code .do} 后缀，
+ * 并采用资源化命名 —— 列表是资源（{@code /shop/{t}/items}，GET），
+ * 购买是动作（{@code /shop/{t}/purchase}，POST）。原先的 6 条
+ * {@code /xxx/buy} 被重命名为 {@code /xxx/purchase}。
+ *
+ * <p><b>6 条 detail 路由已删除</b>：原{@code pageShopXxxDetail} 方法体
+ * 恒返回 {@code shop/xxxDetail}，而这 6 个模板<b>从未存在</b>，
+ * 也没有任何模板引用这 6 条路由，因此它们基线上就是 500。
+ * 与改密功能 D-a 同源处理：删代码、留规格 —— 「这里本该有商品详情页」
+ * 这一产品线索记录在 README「已知问题」，不靠一具抛 500 的尸体承载。
  */
 @RequestMapping("/shop")
 @Controller
@@ -54,7 +61,7 @@ public class ShopController extends BaseController {
      * @param feeType 货币类型过滤，小于等于 0 不过滤
      * @return view
      */
-    @GetMapping(value = "/bait/list.do")
+    @GetMapping(value = "/bait/items")
     public String pageShopBait(HttpSession session, Model model,
                                @RequestParam(defaultValue = "1") int pageNo,
                                @RequestParam(defaultValue = "0") int feeType) {
@@ -69,7 +76,7 @@ public class ShopController extends BaseController {
      * @param feeType 货币类型过滤，小于等于 0 不过滤
      * @return view
      */
-    @GetMapping(value = "/trap/list.do")
+    @GetMapping(value = "/trap/items")
     public String pageShopTrap(HttpSession session, Model model,
                                @RequestParam(defaultValue = "1") int pageNo,
                                @RequestParam(defaultValue = "0") int feeType) {
@@ -84,7 +91,7 @@ public class ShopController extends BaseController {
      * @param feeType 货币类型过滤，小于等于 0 不过滤
      * @return view
      */
-    @GetMapping(value = "/cage/list.do")
+    @GetMapping(value = "/cage/items")
     public String pageShopCage(HttpSession session, Model model,
                                @RequestParam(defaultValue = "1") int pageNo,
                                @RequestParam(defaultValue = "0") int feeType) {
@@ -99,7 +106,7 @@ public class ShopController extends BaseController {
      * @param feeType 货币类型过滤，小于等于 0 不过滤
      * @return view
      */
-    @GetMapping(value = "/nest/list.do")
+    @GetMapping(value = "/nest/items")
     public String pageShopNest(HttpSession session, Model model,
                                @RequestParam(defaultValue = "1") int pageNo,
                                @RequestParam(defaultValue = "0") int feeType) {
@@ -114,7 +121,7 @@ public class ShopController extends BaseController {
      * @param feeType 货币类型过滤，小于等于 0 不过滤
      * @return view
      */
-    @GetMapping(value = "/train/list.do")
+    @GetMapping(value = "/train/items")
     public String pageShopTrain(HttpSession session, Model model,
                                 @RequestParam(defaultValue = "1") int pageNo,
                                 @RequestParam(defaultValue = "0") int feeType) {
@@ -129,7 +136,7 @@ public class ShopController extends BaseController {
      * @param feeType 货币类型过滤，小于等于 0 不过滤
      * @return view
      */
-    @GetMapping(value = "/prop/list.do")
+    @GetMapping(value = "/prop/items")
     public String pageShopProp(HttpSession session, Model model,
                                @RequestParam(defaultValue = "1") int pageNo,
                                @RequestParam(defaultValue = "0") int feeType) {
@@ -146,7 +153,7 @@ public class ShopController extends BaseController {
      * @param payNum 购买数量
      * @return view
      */
-    @PostMapping(value = "/bait/buy.do")
+    @PostMapping(value = "/bait/purchase")
     public String buyShopBait(HttpSession session, Model model,
                               @RequestParam(defaultValue = "1") int id,
                               @RequestParam(defaultValue = "1") int payNum) {
@@ -161,7 +168,7 @@ public class ShopController extends BaseController {
      * @param payNum 购买数量
      * @return view
      */
-    @PostMapping(value = "/trap/buy.do")
+    @PostMapping(value = "/trap/purchase")
     public String buyShopTrap(HttpSession session, Model model,
                               @RequestParam(defaultValue = "1") int id,
                               @RequestParam(defaultValue = "1") int payNum) {
@@ -176,7 +183,7 @@ public class ShopController extends BaseController {
      * @param payNum 购买数量
      * @return view
      */
-    @PostMapping(value = "/cage/buy.do")
+    @PostMapping(value = "/cage/purchase")
     public String buyShopCage(HttpSession session, Model model,
                               @RequestParam(defaultValue = "1") int id,
                               @RequestParam(defaultValue = "1") int payNum) {
@@ -191,7 +198,7 @@ public class ShopController extends BaseController {
      * @param payNum 购买数量
      * @return view
      */
-    @PostMapping(value = "/nest/buy.do")
+    @PostMapping(value = "/nest/purchase")
     public String buyShopNest(HttpSession session, Model model,
                               @RequestParam(defaultValue = "1") int id,
                               @RequestParam(defaultValue = "1") int payNum) {
@@ -206,7 +213,7 @@ public class ShopController extends BaseController {
      * @param payNum 购买数量
      * @return view
      */
-    @PostMapping(value = "/train/buy.do")
+    @PostMapping(value = "/train/purchase")
     public String buyShopTrain(HttpSession session, Model model,
                                @RequestParam(defaultValue = "1") int id,
                                @RequestParam(defaultValue = "1") int payNum) {
@@ -221,91 +228,11 @@ public class ShopController extends BaseController {
      * @param payNum 购买数量
      * @return view
      */
-    @PostMapping(value = "/prop/buy.do")
+    @PostMapping(value = "/prop/purchase")
     public String buyShopProp(HttpSession session, Model model,
                               @RequestParam(defaultValue = "1") int id,
                               @RequestParam(defaultValue = "1") int payNum) {
         return buyShopItem(session, model, ShopKind.PROP, id, payNum);
-    }
-
-    // ---------- 6 个详情页：方法体原本就是单行返回视图名，保留原样 ----------
-
-    /***
-     * 诱饵详情
-     * @param session session
-     * @param model model
-     * @param id 配置id
-     * @return view
-     */
-    @GetMapping(value = "/bait/detail.do")
-    public String pageShopBaitDetail(HttpSession session, Model model,
-                                     @RequestParam(defaultValue = "1") int id) {
-        return "shop/baitDetail";
-    }
-
-    /***
-     * 陷阱详情
-     * @param session session
-     * @param model model
-     * @param id 配置id
-     * @return view
-     */
-    @GetMapping(value = "/trap/detail.do")
-    public String pageShopTrapDetail(HttpSession session, Model model,
-                                     @RequestParam(defaultValue = "1") int id) {
-        return "shop/trapDetail";
-    }
-
-    /***
-     * 鸟笼详情
-     * @param session session
-     * @param model model
-     * @param id 配置id
-     * @return view
-     */
-    @GetMapping(value = "/cage/detail.do")
-    public String pageShopCageDetail(HttpSession session, Model model,
-                                     @RequestParam(defaultValue = "1") int id) {
-        return "shop/cageDetail";
-    }
-
-    /***
-     * 鸟巢详情
-     * @param session session
-     * @param model model
-     * @param id 配置id
-     * @return view
-     */
-    @GetMapping(value = "/nest/detail.do")
-    public String pageShopNestDetail(HttpSession session, Model model,
-                                     @RequestParam(defaultValue = "1") int id) {
-        return "shop/nestDetail";
-    }
-
-    /***
-     * 训练场详情
-     * @param session session
-     * @param model model
-     * @param id 配置id
-     * @return view
-     */
-    @GetMapping(value = "/train/detail.do")
-    public String pageShopTrainDetail(HttpSession session, Model model,
-                                      @RequestParam(defaultValue = "1") int id) {
-        return "shop/trainDetail";
-    }
-
-    /***
-     * 道具详情
-     * @param session session
-     * @param model model
-     * @param id 配置id
-     * @return view
-     */
-    @GetMapping(value = "/prop/detail.do")
-    public String pageShopPropDetail(HttpSession session, Model model,
-                                     @RequestParam(defaultValue = "1") int id) {
-        return "shop/propDetail";
     }
 
     // ---------- 公共实现 ----------

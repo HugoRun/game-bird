@@ -19,7 +19,7 @@
                         <p>功能:<span th:text="${baseTrain.func}"></span></p>
                         <p>价格:<span th:text="${baseTrain.getFeePrice()}"></span><span th:text="${@gameUtils.getFeeTypeName(baseTrain.getFeeType())}"></span></p>
                         <div class="btl">
-                            <form class="inline-block" method="post" th:action="@{/shop/train/buy.do}">
+                            <form class="inline-block" method="post" th:action="@{/shop/train/purchase}">
                                 <input name="id" th:value="${baseTrain.id}" type="hidden">
                                 购买:<input class="mini-input" maxlength="3" name="payNum" th:value="1" type="text">份 <input class="mini-button" th:value="确定购买" type="submit"/>
                             </form>

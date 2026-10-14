@@ -5,9 +5,9 @@
 
 <div class="main">
     <div>
-        <div th:replace="~{fragment/pack::packHeader(type='bait', label='诱饵', shopUrl='/shop/bait/list.do')}"></div>
+        <div th:replace="~{fragment/pack::packHeader(type='bait', label='诱饵', shopUrl='/shop/bait/items')}"></div>
         <div th:if="${page.getTotal() == 0}">
-            <div th:replace="~{fragment/pack::packEmpty(label='诱饵', shopUrl='/shop/bait/list.do')}"></div>
+            <div th:replace="~{fragment/pack::packEmpty(label='诱饵', shopUrl='/shop/bait/items')}"></div>
         </div>
         <div th:if="${page.getTotal() > 0}">
             <ul class="list1">
