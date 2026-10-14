@@ -11,17 +11,17 @@ import com.qq2008.game.bird.model.dbo.BaseProp;
 import com.qq2008.game.bird.model.dbo.BaseTitle;
 import com.qq2008.game.bird.model.dbo.BaseTrain;
 import com.qq2008.game.bird.model.dbo.BaseTrap;
-import com.qq2008.game.bird.service.IBaseBaitService;
-import com.qq2008.game.bird.service.IBaseBirdService;
-import com.qq2008.game.bird.service.IBaseCageService;
-import com.qq2008.game.bird.service.IBaseFieldService;
-import com.qq2008.game.bird.service.IBaseGeneService;
-import com.qq2008.game.bird.service.IBaseLevelService;
-import com.qq2008.game.bird.service.IBaseNestService;
-import com.qq2008.game.bird.service.IBasePropService;
-import com.qq2008.game.bird.service.IBaseTitleService;
-import com.qq2008.game.bird.service.IBaseTrainService;
-import com.qq2008.game.bird.service.IBaseTrapService;
+import com.qq2008.game.bird.service.BaseBaitService;
+import com.qq2008.game.bird.service.BaseBirdService;
+import com.qq2008.game.bird.service.BaseCageService;
+import com.qq2008.game.bird.service.BaseFieldService;
+import com.qq2008.game.bird.service.BaseGeneService;
+import com.qq2008.game.bird.service.BaseLevelService;
+import com.qq2008.game.bird.service.BaseNestService;
+import com.qq2008.game.bird.service.BasePropService;
+import com.qq2008.game.bird.service.BaseTitleService;
+import com.qq2008.game.bird.service.BaseTrainService;
+import com.qq2008.game.bird.service.BaseTrapService;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,27 +63,27 @@ public class GameConfigManager {
 
     //
     @Resource
-    public IBaseBaitService baseBaitService;
+    public BaseBaitService baseBaitService;
     @Resource
-    public IBaseBirdService baseBirdService;
+    public BaseBirdService baseBirdService;
     @Resource
-    public IBaseCageService baseCageService;
+    public BaseCageService baseCageService;
     @Resource
-    public IBaseFieldService baseFieldService;
+    public BaseFieldService baseFieldService;
     @Resource
-    public IBaseGeneService baseGeneService;
+    public BaseGeneService baseGeneService;
     @Resource
-    public IBaseLevelService baseLevelService;
+    public BaseLevelService baseLevelService;
     @Resource
-    public IBaseNestService baseNestService;
+    public BaseNestService baseNestService;
     @Resource
-    public IBasePropService basePropService;
+    public BasePropService basePropService;
     @Resource
-    public IBaseTrainService baseTrainService;
+    public BaseTrainService baseTrainService;
     @Resource
-    public IBaseTrapService baseTrapService;
+    public BaseTrapService baseTrapService;
     @Resource
-    public IBaseTitleService baseTitleService;
+    public BaseTitleService baseTitleService;
 
     /***
      * 计算人物等级

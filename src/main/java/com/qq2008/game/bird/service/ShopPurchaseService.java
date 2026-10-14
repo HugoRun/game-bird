@@ -42,9 +42,9 @@ public class ShopPurchaseService {
     /** 角色数值增减（扣费、加包裹数量）。 */
     private final RoleValueService roleValueService;
 
-    private final IRoleService roleService;
+    private final RoleService roleService;
 
-    private final IRolePackService packService;
+    private final RolePackService packService;
 
     /**
      * 构造注入。
@@ -56,8 +56,8 @@ public class ShopPurchaseService {
      */
     public ShopPurchaseService(ShopItemAccessors accessors,
                                RoleValueService roleValueService,
-                               IRoleService roleService,
-                               IRolePackService packService) {
+                               RoleService roleService,
+                               RolePackService packService) {
         this.accessors = accessors;
         this.roleValueService = roleValueService;
         this.roleService = roleService;

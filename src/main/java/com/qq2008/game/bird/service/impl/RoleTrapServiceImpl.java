@@ -2,7 +2,7 @@ package com.qq2008.game.bird.service.impl;
 
 import com.qq2008.game.bird.model.dbo.RoleTrap;
 import com.qq2008.game.bird.mapper.RoleTrapMapper;
-import com.qq2008.game.bird.service.IRoleTrapService;
+import com.qq2008.game.bird.service.RoleTrapService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2024-11-17
  */
 @Service
-public class RoleTrapServiceImpl extends ServiceImpl<RoleTrapMapper, RoleTrap> implements IRoleTrapService {
+public class RoleTrapServiceImpl extends ServiceImpl<RoleTrapMapper, RoleTrap> implements RoleTrapService {
 
 }

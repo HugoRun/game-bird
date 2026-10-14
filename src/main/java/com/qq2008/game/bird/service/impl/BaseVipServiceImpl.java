@@ -2,7 +2,7 @@ package com.qq2008.game.bird.service.impl;
 
 import com.qq2008.game.bird.model.dbo.BaseVip;
 import com.qq2008.game.bird.mapper.BaseVipMapper;
-import com.qq2008.game.bird.service.IBaseVipService;
+import com.qq2008.game.bird.service.BaseVipService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2024-11-17
  */
 @Service
-public class BaseVipServiceImpl extends ServiceImpl<BaseVipMapper, BaseVip> implements IBaseVipService {
+public class BaseVipServiceImpl extends ServiceImpl<BaseVipMapper, BaseVip> implements BaseVipService {
 
 }

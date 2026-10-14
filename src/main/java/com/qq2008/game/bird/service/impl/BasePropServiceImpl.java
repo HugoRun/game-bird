@@ -2,7 +2,7 @@ package com.qq2008.game.bird.service.impl;
 
 import com.qq2008.game.bird.model.dbo.BaseProp;
 import com.qq2008.game.bird.mapper.BasePropMapper;
-import com.qq2008.game.bird.service.IBasePropService;
+import com.qq2008.game.bird.service.BasePropService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2024-11-17
  */
 @Service
-public class BasePropServiceImpl extends ServiceImpl<BasePropMapper, BaseProp> implements IBasePropService {
+public class BasePropServiceImpl extends ServiceImpl<BasePropMapper, BaseProp> implements BasePropService {
 
 }

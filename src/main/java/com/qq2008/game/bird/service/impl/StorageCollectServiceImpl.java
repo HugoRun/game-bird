@@ -2,7 +2,7 @@ package com.qq2008.game.bird.service.impl;
 
 import com.qq2008.game.bird.model.dbo.StorageCollect;
 import com.qq2008.game.bird.mapper.StorageCollectMapper;
-import com.qq2008.game.bird.service.IStorageCollectService;
+import com.qq2008.game.bird.service.StorageCollectService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2024-11-17
  */
 @Service
-public class StorageCollectServiceImpl extends ServiceImpl<StorageCollectMapper, StorageCollect> implements IStorageCollectService {
+public class StorageCollectServiceImpl extends ServiceImpl<StorageCollectMapper, StorageCollect> implements StorageCollectService {
 
 }

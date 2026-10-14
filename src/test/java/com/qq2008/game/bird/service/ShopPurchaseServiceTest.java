@@ -57,14 +57,14 @@ class ShopPurchaseServiceTest {
     private ShopItemAccessors accessors;
 
     /** 6 个商品类型对应的 mock Service。 */
-    private IBaseBaitService baseBaitService;
-    private IBaseCageService baseCageService;
-    private IBaseNestService baseNestService;
-    private IBaseTrainService baseTrainService;
-    private IBaseTrapService baseTrapService;
-    private IBasePropService basePropService;
-    private IRolePackService packService;
-    private IRoleService roleService;
+    private BaseBaitService baseBaitService;
+    private BaseCageService baseCageService;
+    private BaseNestService baseNestService;
+    private BaseTrainService baseTrainService;
+    private BaseTrapService baseTrapService;
+    private BasePropService basePropService;
+    private RolePackService packService;
+    private RoleService roleService;
 
     /** 真实实例：扣币 / 加包裹数量是本测试要验证的行为，不能 mock 掉。 */
     private RoleValueService roleValueService;
@@ -124,14 +124,14 @@ class ShopPurchaseServiceTest {
      */
     @BeforeEach
     void setUp() {
-        baseBaitService = mock(IBaseBaitService.class);
-        baseCageService = mock(IBaseCageService.class);
-        baseNestService = mock(IBaseNestService.class);
-        baseTrainService = mock(IBaseTrainService.class);
-        baseTrapService = mock(IBaseTrapService.class);
-        basePropService = mock(IBasePropService.class);
-        packService = mock(IRolePackService.class);
-        roleService = mock(IRoleService.class);
+        baseBaitService = mock(BaseBaitService.class);
+        baseCageService = mock(BaseCageService.class);
+        baseNestService = mock(BaseNestService.class);
+        baseTrainService = mock(BaseTrainService.class);
+        baseTrapService = mock(BaseTrapService.class);
+        basePropService = mock(BasePropService.class);
+        packService = mock(RolePackService.class);
+        roleService = mock(RoleService.class);
         roleValueService = new RoleValueService(mock(GameConfigManager.class));
 
         // 配置访问器用真实实例（它只是 6 个方法引用的容器），
@@ -146,12 +146,6 @@ class ShopPurchaseServiceTest {
         accessors.bind();
 
         service = new ShopPurchaseService(accessors, roleValueService, roleService, packService);
-    }
-
-    /**
-     * 占位别名，仅为让上面的 import 列表保持可读；实际类型见 {@link IBaseNestService}。
-     */
-    private interface INestServiceAlias extends IBaseNestService {
     }
 
     // ------------------------------------------------------------------

@@ -5,12 +5,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.qq2008.game.bird.model.shop.ShopItemView;
 import com.qq2008.game.bird.model.shop.ShopKind;
-import com.qq2008.game.bird.service.IBaseBaitService;
-import com.qq2008.game.bird.service.IBaseCageService;
-import com.qq2008.game.bird.service.IBaseNestService;
-import com.qq2008.game.bird.service.IBasePropService;
-import com.qq2008.game.bird.service.IBaseTrainService;
-import com.qq2008.game.bird.service.IBaseTrapService;
+import com.qq2008.game.bird.service.BaseBaitService;
+import com.qq2008.game.bird.service.BaseCageService;
+import com.qq2008.game.bird.service.BaseNestService;
+import com.qq2008.game.bird.service.BasePropService;
+import com.qq2008.game.bird.service.BaseTrainService;
+import com.qq2008.game.bird.service.BaseTrapService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
@@ -52,17 +52,17 @@ import java.util.function.Function;
 public class ShopItemAccessors {
 
     /** 6 个配置 Service，由 {@link #bind()} 在初始化期绑定进 loaders。 */
-    private IBaseBaitService baseBaitService;
+    private BaseBaitService baseBaitService;
 
-    private IBaseTrapService baseTrapService;
+    private BaseTrapService baseTrapService;
 
-    private IBaseCageService baseCageService;
+    private BaseCageService baseCageService;
 
-    private IBaseNestService baseNestService;
+    private BaseNestService baseNestService;
 
-    private IBaseTrainService baseTrainService;
+    private BaseTrainService baseTrainService;
 
-    private IBasePropService basePropService;
+    private BasePropService basePropService;
 
     /** {@code ShopKind} → 按 id 载入配置。 */
     private final Map<ShopKind, Function<Integer, ShopItemView>> loaders = new EnumMap<>(ShopKind.class);
@@ -89,7 +89,7 @@ public class ShopItemAccessors {
      * @param service 诱饵配置服务
      */
     @jakarta.annotation.Resource
-    public void setBaseBaitService(IBaseBaitService service) {
+    public void setBaseBaitService(BaseBaitService service) {
         this.baseBaitService = service;
     }
 
@@ -99,7 +99,7 @@ public class ShopItemAccessors {
      * @param service 陷阱配置服务
      */
     @jakarta.annotation.Resource
-    public void setBaseTrapService(IBaseTrapService service) {
+    public void setBaseTrapService(BaseTrapService service) {
         this.baseTrapService = service;
     }
 
@@ -109,7 +109,7 @@ public class ShopItemAccessors {
      * @param service 鸟笼配置服务
      */
     @jakarta.annotation.Resource
-    public void setBaseCageService(IBaseCageService service) {
+    public void setBaseCageService(BaseCageService service) {
         this.baseCageService = service;
     }
 
@@ -119,7 +119,7 @@ public class ShopItemAccessors {
      * @param service 巢配置服务
      */
     @jakarta.annotation.Resource
-    public void setBaseNestService(IBaseNestService service) {
+    public void setBaseNestService(BaseNestService service) {
         this.baseNestService = service;
     }
 
@@ -129,7 +129,7 @@ public class ShopItemAccessors {
      * @param service 训练场配置服务
      */
     @jakarta.annotation.Resource
-    public void setBaseTrainService(IBaseTrainService service) {
+    public void setBaseTrainService(BaseTrainService service) {
         this.baseTrainService = service;
     }
 
@@ -139,7 +139,7 @@ public class ShopItemAccessors {
      * @param service 道具配置服务
      */
     @jakarta.annotation.Resource
-    public void setBasePropService(IBasePropService service) {
+    public void setBasePropService(BasePropService service) {
         this.basePropService = service;
     }
 

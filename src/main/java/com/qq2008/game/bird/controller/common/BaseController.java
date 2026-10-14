@@ -20,41 +20,41 @@ public class BaseController {
     // 注意：下面 19 个字段刻意保持 public。20+ 个子类 Controller 直接以继承方式访问它们，
     // 改成 private 会导致子类编译失败，且逐个改为 protected 属于本轮范围外的机械改动。
     @Resource
-    public IBaseBaitService baseBaitService;
+    public BaseBaitService baseBaitService;
     @Resource
-    public IBaseBirdService baseBirdService;
+    public BaseBirdService baseBirdService;
     @Resource
-    public IBaseCageService baseCageService;
+    public BaseCageService baseCageService;
     @Resource
-    public IBaseFieldService baseFieldService;
+    public BaseFieldService baseFieldService;
     @Resource
-    public IBaseGeneService baseGeneService;
+    public BaseGeneService baseGeneService;
     @Resource
-    public IBaseLevelService baseLevelService;
+    public BaseLevelService baseLevelService;
     @Resource
-    public IBaseNestService baseNestService;
+    public BaseNestService baseNestService;
     @Resource
-    public IBasePropService basePropService;
+    public BasePropService basePropService;
     @Resource
-    public IBaseTrainService baseTrainService;
+    public BaseTrainService baseTrainService;
     @Resource
-    public IBaseTrapService baseTrapService;
+    public BaseTrapService baseTrapService;
     @Resource
-    public IAccountService accountService;
+    public AccountService accountService;
     @Resource
-    public IRoleService roleService;
+    public RoleService roleService;
     @Resource
-    public IRoleBirthService birthService;
+    public RoleBirthService birthService;
     @Resource
-    public IRolePackService packService;
+    public RolePackService packService;
     @Resource
-    public IRoleTrainService trainService;
+    public RoleTrainService trainService;
     @Resource
-    public IRoleTrapService trapService;
+    public RoleTrapService trapService;
     @Resource
-    public ILogChatService chatService;
+    public LogChatService chatService;
     @Resource
-    public IStorageBirdService storageBirdService;
+    public StorageBirdService storageBirdService;
 
     /**
      * 角色数值服务。9 个数值方法已下沉至此，本类只保留一行委托，

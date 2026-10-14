@@ -8,7 +8,7 @@ import com.qq2008.common.util.CommonUtils;
 import com.qq2008.game.bird.controller.common.BaseController;
 import com.qq2008.game.bird.config.GameProperties;
 import com.qq2008.game.bird.model.dbo.Account;
-import com.qq2008.game.bird.service.IAccountService;
+import com.qq2008.game.bird.service.AccountService;
 import com.qq2008.game.bird.util.UUIDUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
@@ -29,7 +29,7 @@ import java.security.MessageDigest;
 public class AccountController extends BaseController {
 
     @Resource
-    IAccountService accountService;
+    AccountService accountService;
 
     /** 游戏开关配置（是否允许注册）。原先是ConstData 里的 public static 字段，任何代码都能改。 */
     @Resource

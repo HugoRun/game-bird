@@ -2,7 +2,7 @@ package com.qq2008.game.bird.service.impl;
 
 import com.qq2008.game.bird.model.dbo.Account;
 import com.qq2008.game.bird.mapper.AccountMapper;
-import com.qq2008.game.bird.service.IAccountService;
+import com.qq2008.game.bird.service.AccountService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2024-11-17
  */
 @Service
-public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> implements IAccountService {
+public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> implements AccountService {
 
 }
