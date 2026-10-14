@@ -1,0 +1,21 @@
+package com.gamebird.game.bird.service.impl;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
+
+import com.gamebird.game.bird.mapper.BasePropMapper;
+import com.gamebird.game.bird.model.dbo.BaseProp;
+import com.gamebird.game.bird.service.BasePropService;
+
+/**
+ * <p>
+ * 道具配置表 服务实现类
+ * </p>
+ *
+ * @author HugoRun
+ * @since 2024-11-17
+ */
+@Service
+public class BasePropServiceImpl extends ServiceImpl<BasePropMapper, BaseProp> implements BasePropService {
+
+}
