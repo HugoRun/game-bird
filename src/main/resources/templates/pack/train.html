@@ -19,7 +19,7 @@
                         <p th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${trainVO.baseTrain.name}+'×'+${trainVO.getNum()}">谷子(25级)</p>
                         <p>功能:<span th:text="${trainVO.baseTrain.func}"></span></p>
                         <p>数量:<span th:text="${trainVO.num}"></span></p>
-                        <p class="btl"><a href="#" th:href="@{/pack/train/use.do(trainId=${trainVO.baseId})}">使用</a>
+                        <p class="btl"><span class="text-muted" title="功能开发中，暂不可用">使用</span>
                     </div>
                 </li>
             </ul>

@@ -4,10 +4,10 @@
 <body>
 <div class="main">
     <div class="panel bg-green">
-        <div>公告:<img src="../../static/images/icon/guide.gif" th:src="@{/assets/images/icon/guide.gif}"/><a href="./notice/detail.do" th:href="@{/notice/detail.do(id=0)}">真爱至上</a></div>
-        <div>主线:<i class="task-a"></i><a href="./task/list.html" th:href="@{/task/list.do}">挑战祥瑞之地</a></div>
+        <div>公告:<img src="../../static/images/icon/guide.gif" th:src="@{/assets/images/icon/guide.gif}"/><span class="text-muted" title="功能开发中，暂不可用">真爱至上</span></div>
+        <div>主线:<i class="task-a"></i><span class="text-muted" title="功能开发中，暂不可用">挑战祥瑞之地</span></div>
         <div>任务:<i class="task-a"></i><a href="#">愤怒的传奇(未完成)</a></div>
-        <div>福利:<a href="./weal/sign.html" th:href="@{/weal/sign.do}">签到</a>(未签到)</div>
+        <div>福利:<span class="text-muted" title="功能开发中，暂不可用">签到</span>(未签到)</div>
     </div>
     <div>
         <div class="panel bg-blue">"<span href="#" th:text="|小菜鸟|"></span>" <span href="#" th:text="|${session.sRole.roleName}|"></span> <a href="#" onclick="toggleShow('p1')">收起</a></div>
@@ -48,7 +48,7 @@
                     <img alt="" class="icon-gray-border" src="../../static/images/trap/1.gif" th:src="@{|/assets/images/trap/${trap.useTrap.id}.gif|}">
                 </div>
                 <div class="list1-info" th:if="${trap.baitId == 0}">
-                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/trap/change.do(trapId=${trap.id})}">更换陷阱</a></span></p>
+                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><span class="text-muted" title="功能开发中，暂不可用">更换陷阱</span></span></p>
                     <p>空闲中</p>
                     <p><a href="#" th:href="@{/trap/useBait.do(trapId=${trap.id})}">下饵</a></p>
                 </div>

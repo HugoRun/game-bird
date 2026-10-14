@@ -19,7 +19,7 @@
                         <p th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${nestVO.baseNest.name}+'×'+${nestVO.getNum()}">谷子(25级)</p>
                         <p>功能:<span th:text="${nestVO.baseNest.func}"></span></p>
                         <p>耐久度:<span th:text="${nestVO.baseNest.num}"></span> 数量:<span th:text="${nestVO.num}"></span></p>
-                        <p class="btl"><a href="#" th:href="@{/pack/nest/use.do(nestId=${nestVO.baseId})}">使用</a>
+                        <p class="btl"><span class="text-muted" title="功能开发中，暂不可用">使用</span>
                     </div>
                 </li>
             </ul>

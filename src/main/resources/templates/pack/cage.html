@@ -47,7 +47,7 @@
                         <p th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${cageVO.baseCage.name}+'×'+${cageVO.getNum()}">谷子(25级)</p>
                         <p>功能:<span th:text="${cageVO.baseCage.func}"></span></p>
                         <p>耐久度:<span th:text="${cageVO.baseCage.num}"></span> 数量:<span th:text="${cageVO.num}"></span></p>
-                        <p class="btl"><a href="#" th:href="@{/pack/cage/use.do(cageId=${cageVO.baseId})}">使用</a>
+                        <p class="btl"><span class="text-muted" title="功能开发中，暂不可用">使用</span>
                     </div>
                 </li>
             </ul>
