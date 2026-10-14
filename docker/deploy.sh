@@ -280,10 +280,24 @@ cmd_backup() {
     local pw
     pw="$(env_get MYSQL_ROOT_PASSWORD)"
     [ -n "$pw" ] || die "$ENV_FILE 中缺少 MYSQL_ROOT_PASSWORD"
-    # MYSQL_PWD 方式避免密码出现在 ps 与 shell 历史里
-    MYSQL_PWD="$pw" docker exec "${COMPOSE_PROJECT_NAME}-db" \
-        mysqldump -uroot --single-transaction --default-character-set=utf8mb4 \
-        "$(env_get MYSQL_DATABASE || echo game_bird)" > "$out"
+
+    # 注意两处必须这么写，否则会静默产出 0 字节备份：
+    #   1) 密码要走 `docker exec -e` 传进容器。写成 `MYSQL_PWD=... docker exec ...`
+    #      只是把变量放进宿主机 shell 环境，docker exec 不会透传给容器内进程，
+    #      mysqldump 会报 1045 (using password: NO)。
+    #   2) 失败时删掉半成品文件。mysqldump 出错仍会创建（空）重定向目标，
+    #      留着会被误当成一次成功备份。
+    if ! docker exec -i -e MYSQL_PWD="$pw" "${COMPOSE_PROJECT_NAME}-db" \
+            mysqldump -uroot --single-transaction --default-character-set=utf8mb4 \
+            "$(env_get MYSQL_DATABASE || echo game_bird)" > "$out"; then
+        rm -f "$out"
+        die "备份失败（未生成有效文件）"
+    fi
+    # 兜底：dump 成功但内容为空同样视为失败（例如库名写错）
+    if [ ! -s "$out" ]; then
+        rm -f "$out"
+        die "备份文件为空，已删除：$out"
+    fi
     ok "备份完成：$out ($(du -h "$out" | cut -f1))"
 }
 
