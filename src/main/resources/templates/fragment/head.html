@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!--
+  公共页面头部（U11 新增）。
+
+  抽出前 23 个页面的 <head> 块除标题外几乎逐字相同，共约 161 行重复维护。
+  抽出后本页成为唯一来源。
+
+  参数 title：页面标题，缺省「小鸟情人」（占位内容）。
+
+  关于两个 <link> 上的静态 href：它是禁用 Thymeleaf 时的回退路径，各页面原有
+  深浅不同（一层用 ../static，两层用 ../../static）。抽成 fragment 后无法再用
+  相对路径还原这种「按调用方位置变化」的值，因此这里统一写成最深的两级形式。
+  这不影响正常渲染 —— Thymeleaf 总会用 th:href 覆盖 href，浏览器读到的始终是
+  绝对路径 /assets/**（红线项未变）。仅在 Thymeleaf 完全不生效的场景下，
+  二层页面的回退路径正确，一层页面的回退路径多退一级，属无实际影响的差异。
+-->
+<head th:fragment="pageHead(title)">
+    <meta charset="UTF-8">
+    <title th:text="${title}">小鸟情人</title>
+    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
+    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+</body>
+</html>
