@@ -24,7 +24,7 @@
 <body>
 <div class="main">
     <div class="mb-1 panel bg-green">修改玩家性别</div>
-    <form th:action="@{/role/change/sex.do}" method="post">
+    <form th:action="@{/role/sex}" method="post">
         <div class="mb-1">
             <select name="sex">
                 <option value="0">保密</option>
@@ -36,8 +36,8 @@
             <input type="submit" value="确定修改">
         </div>
     </form>
-    <div class="panel "><a class="" href="./profile.html" th:href="@{/role/profile.do}">返回</a></div>
-    <div class="panel"><a class="" href="../game.html" th:href="@{/game.do}">返回首页</a></div>
+    <div class="panel "><a class="" href="./profile.html" th:href="@{/role/profile}">返回</a></div>
+    <div class="panel"><a class="" href="../game.html" th:href="@{/game}">返回首页</a></div>
 </div>
 </body>
 </html>

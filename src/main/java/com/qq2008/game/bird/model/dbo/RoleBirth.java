@@ -3,6 +3,9 @@ package com.qq2008.game.bird.model.dbo;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 /**
@@ -14,6 +17,8 @@ import java.io.Serializable;
  * @since 2024-11-17
  */
 @TableName("role_birth")
+@Getter
+@Setter
 public class RoleBirth implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -83,127 +88,4 @@ public class RoleBirth implements Serializable {
      * 使用巢穴剩余次数
      */
     private Integer useNestNum;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(String roleId) {
-        this.roleId = roleId;
-    }
-
-    public Integer getIdx() {
-        return idx;
-    }
-
-    public void setIdx(Integer idx) {
-        this.idx = idx;
-    }
-
-    public Integer getBirdId() {
-        return birdId;
-    }
-
-    public void setBirdId(Integer birdId) {
-        this.birdId = birdId;
-    }
-
-    public Integer getBirdBaseId() {
-        return birdBaseId;
-    }
-
-    public void setBirdBaseId(Integer birdBaseId) {
-        this.birdBaseId = birdBaseId;
-    }
-
-    public Integer getMatchRoleId() {
-        return matchRoleId;
-    }
-
-    public void setMatchRoleId(Integer matchRoleId) {
-        this.matchRoleId = matchRoleId;
-    }
-
-    public String getMatchRoleName() {
-        return matchRoleName;
-    }
-
-    public void setMatchRoleName(String matchRoleName) {
-        this.matchRoleName = matchRoleName;
-    }
-
-    public Integer getMatchBirdId() {
-        return matchBirdId;
-    }
-
-    public void setMatchBirdId(Integer matchBirdId) {
-        this.matchBirdId = matchBirdId;
-    }
-
-    public Integer getMatchBirdBaseId() {
-        return matchBirdBaseId;
-    }
-
-    public void setMatchBirdBaseId(Integer matchBirdBaseId) {
-        this.matchBirdBaseId = matchBirdBaseId;
-    }
-
-    public Integer getBirthTime() {
-        return birthTime;
-    }
-
-    public void setBirthTime(Integer birthTime) {
-        this.birthTime = birthTime;
-    }
-
-    public Integer getBirthEndTime() {
-        return birthEndTime;
-    }
-
-    public void setBirthEndTime(Integer birthEndTime) {
-        this.birthEndTime = birthEndTime;
-    }
-
-    public Integer getUseNestId() {
-        return useNestId;
-    }
-
-    public void setUseNestId(Integer useNestId) {
-        this.useNestId = useNestId;
-    }
-
-    public Integer getUseNestNum() {
-        return useNestNum;
-    }
-
-    public void setUseNestNum(Integer useNestNum) {
-        this.useNestNum = useNestNum;
-    }
-
-    @Override
-    public String toString() {
-        return "RoleBirth{" +
-            "id = " + id +
-            ", roleId = " + roleId +
-            ", idx = " + idx +
-            ", birdId = " + birdId +
-            ", birdBaseId = " + birdBaseId +
-            ", matchRoleId = " + matchRoleId +
-            ", matchRoleName = " + matchRoleName +
-            ", matchBirdId = " + matchBirdId +
-            ", matchBirdBaseId = " + matchBirdBaseId +
-            ", birthTime = " + birthTime +
-            ", birthEndTime = " + birthEndTime +
-            ", useNestId = " + useNestId +
-            ", useNestNum = " + useNestNum +
-        "}";
-    }
 }

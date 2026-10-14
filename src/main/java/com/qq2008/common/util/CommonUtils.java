@@ -4,7 +4,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/***
+ * 公共工具类
+ */
 public class CommonUtils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonUtils.class);
     /***
      * 获取当前时间戳(秒级)
      * @return 当前时间戳(秒级)
@@ -48,8 +56,15 @@ public class CommonUtils {
         return (int) (Math.random() * (maxNum - minNum + 1) + minNum);
     }
 
+    /**
+     * 手工试算入口，非业务代码。
+     *
+     * @param args 未使用
+     * @deprecated 仅供开发期手工验证，生产路径不应依赖。
+     */
+    @Deprecated
     public static void main(String[] args) {
-        System.out.println("nowTime:" + nowTime());
-        System.out.println("nowDate:" + nowDate());
+        LOGGER.debug("nowTime:{}", nowTime());
+        LOGGER.debug("nowDate:{}", nowDate());
     }
 }

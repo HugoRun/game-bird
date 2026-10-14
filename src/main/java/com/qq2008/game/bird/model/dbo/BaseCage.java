@@ -1,6 +1,9 @@
 package com.qq2008.game.bird.model.dbo;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 /**
@@ -12,6 +15,8 @@ import java.io.Serializable;
  * @since 2024-11-17
  */
 @TableName("base_cage")
+@Getter
+@Setter
 public class BaseCage implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -70,109 +75,4 @@ public class BaseCage implements Serializable {
      * 是否在商店出售
      */
     private Byte isShopping;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescText() {
-        return descText;
-    }
-
-    public void setDescText(String descText) {
-        this.descText = descText;
-    }
-
-    public Byte getFeeType() {
-        return feeType;
-    }
-
-    public void setFeeType(Byte feeType) {
-        this.feeType = feeType;
-    }
-
-    public Integer getFeePrice() {
-        return feePrice;
-    }
-
-    public void setFeePrice(Integer feePrice) {
-        this.feePrice = feePrice;
-    }
-
-    public String getFunc() {
-        return func;
-    }
-
-    public void setFunc(String func) {
-        this.func = func;
-    }
-
-    public Integer getNum() {
-        return num;
-    }
-
-    public void setNum(Integer num) {
-        this.num = num;
-    }
-
-    public Byte getStatus() {
-        return status;
-    }
-
-    public void setStatus(Byte status) {
-        this.status = status;
-    }
-
-    public Integer getParam() {
-        return param;
-    }
-
-    public void setParam(Integer param) {
-        this.param = param;
-    }
-
-    public Integer getLu() {
-        return lu;
-    }
-
-    public void setLu(Integer lu) {
-        this.lu = lu;
-    }
-
-    public Byte getIsShopping() {
-        return isShopping;
-    }
-
-    public void setIsShopping(Byte isShopping) {
-        this.isShopping = isShopping;
-    }
-
-    @Override
-    public String toString() {
-        return "BaseCage{" +
-            "id = " + id +
-            ", name = " + name +
-            ", descText = " + descText +
-            ", feeType = " + feeType +
-            ", feePrice = " + feePrice +
-            ", func = " + func +
-            ", num = " + num +
-            ", status = " + status +
-            ", param = " + param +
-            ", lu = " + lu +
-            ", isShopping = " + isShopping +
-        "}";
-    }
 }

@@ -5,10 +5,11 @@ import com.qq2008.game.bird.data.GameServer;
 import com.qq2008.game.bird.model.vo.GameStatusVO;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import java.util.logging.Logger;
 
 /***
  * Servlet上下文监听器
@@ -17,8 +18,11 @@ import java.util.logging.Logger;
 @Component
 public class ServerStartedListener implements ServletContextListener {
 
-    // 日志句柄
-    Logger logger = Logger.getLogger(ServerStartedListener.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ServerStartedListener.class);
+
+    /** 配置管理器，直接注入而非经静态方法反查容器。 */
+    @Autowired
+    private GameConfigManager configManager;
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
@@ -27,7 +31,7 @@ public class ServerStartedListener implements ServletContextListener {
             GameServer.setStatus(GameStatusVO.LOADING);
             GameServer.setApplicationContext(WebApplicationContextUtils.getWebApplicationContext(event.getServletContext()));
             logger.info("————————————————> 加载游戏配置... <————————————————");
-            GameConfigManager.init();
+            configManager.init();
             logger.info("————————————————> 游戏配置加载完成!!! <————————————————");
             logger.info("————————————————> 初始化游戏功能... <————————————————");
             GameServer.init();
@@ -38,8 +42,9 @@ public class ServerStartedListener implements ServletContextListener {
         } catch (Exception e) {
             GameServer.setStatus(GameStatusVO.NULL);
             logger.info("————————————————> 游戏启动失败!!! <————————————————");
-            logger.info("失败原因：" + e);
-            e.getStackTrace();
+            // 必须打印完整堆栈：原实现写的是 e.getStackTrace()，那只是把堆栈数组取出来丢弃，
+            // 什么都不会输出，启动失败时日志里只剩一句「失败原因」。
+            logger.error("游戏启动失败", e);
         }
     }
 

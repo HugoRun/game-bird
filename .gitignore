@@ -1,0 +1,30 @@
+# ---- 敏感配置（严禁入库）----
+# docker/.env 含数据库明文密码
+docker/.env
+
+# ---- Docker 运行产物 ----
+target/
+*.jar
+*.jar.original
+
+# ---- IDE ----
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.project
+.classpath
+
+# ---- 日志与临时文件 ----
+*.log
+logs/
+tmp/
+temp/
+
+# ---- 操作系统 ----
+.DS_Store
+Thumbs.db
+# 探针文件，禁止提交
+.probe/

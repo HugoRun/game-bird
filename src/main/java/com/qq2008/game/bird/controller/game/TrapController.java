@@ -1,14 +1,16 @@
 package com.qq2008.game.bird.controller.game;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.qq2008.common.entiy.vo.MessageVO;
+import com.qq2008.common.entity.vo.MessageVO;
 import com.qq2008.common.util.CommonUtils;
 import com.qq2008.game.bird.controller.common.BaseController;
 import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.data.GameConfigManager;
+import com.qq2008.game.bird.data.GameConfigGateway;
+import com.qq2008.game.bird.service.BirdRaffleService;
 import com.qq2008.game.bird.model.dbo.*;
 import com.qq2008.game.bird.model.vo.RolePackVO;
 import com.qq2008.game.bird.model.vo.TrapResultVO;
+import com.qq2008.game.bird.util.BirdTextUtils;
 import com.qq2008.game.bird.util.GameUtils;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
@@ -29,6 +31,14 @@ import java.util.List;
 @RequestMapping("/trap")
 public class TrapController extends BaseController {
 
+    /** 游戏配置读取入口，由字段注入。 */
+    @jakarta.annotation.Resource
+    public GameConfigGateway configGateway;
+
+    /** 按权重随机抽鸟。抽离自本类，使算法可脱离 Spring 容器做单元测试。 */
+    @jakarta.annotation.Resource
+    public BirdRaffleService birdRaffleService;
+
     /***
      * 下饵界面
      * @param session session
@@ -36,7 +46,7 @@ public class TrapController extends BaseController {
      * @param trapId 陷阱Id
      * @return view
      */
-    @GetMapping("/useBait.do")
+    @GetMapping("/useBait")
     public String pageUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int trapId){
         Role role = getSessionRole(session);
         // 检测陷阱信息
@@ -65,7 +75,7 @@ public class TrapController extends BaseController {
         for (RolePack item : packList1) {
             RolePackVO roleBaitVO = new RolePackVO();
             BeanUtils.copyProperties(item, roleBaitVO);
-            roleBaitVO.setBaseBait(GameConfigManager.getInstance().getBaseBait(roleBaitVO.getBaseId()));
+            roleBaitVO.setBaseBait(configGateway.getBaseBait(roleBaitVO.getBaseId()));
             packList.add(roleBaitVO);
         }
         model.addAttribute("baitList", packList);
@@ -80,7 +90,7 @@ public class TrapController extends BaseController {
      * @param trapId 陷阱Id
      * @return view
      */
-    @PostMapping("/useBait.do")
+    @PostMapping("/useBait")
     public String doUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int baitId, @RequestParam(defaultValue = "0") int trapId){
         Role role = getSessionRole(session);
         // 未选择陷阱
@@ -104,14 +114,14 @@ public class TrapController extends BaseController {
             model.addAttribute("message", MessageVO.error("诱饵数量不足"));
             return "common/message";
         }
-        BaseBait baseBait = GameConfigManager.getInstance().getBaseBait(packBait.getBaseId());
+        BaseBait baseBait = configGateway.getBaseBait(packBait.getBaseId());
         if(baseBait == null || baseBait.getBirdSet() == null || baseBait.getBirdSet().trim().isEmpty()){
             model.addAttribute("message", MessageVO.error("诱饵配置错误"));
             return "common/message";
         }
         int nowTime = CommonUtils.nowTime();
         // 随机小鸟
-        BaseBird baseBird = randBird(baseBait.getBirdSet().split(","));
+        BaseBird baseBird = birdRaffleService.randBird(baseBait.getBirdSet().split(","));
         if(baseBird == null){
             model.addAttribute("message", MessageVO.error("诱饵或者小鸟配置错误"));
             return "common/message";
@@ -136,7 +146,7 @@ public class TrapController extends BaseController {
         // 更新陷阱数据到数据库
         trapService.saveOrUpdate(roleTrap);
 
-        return redirectTo("/game.do");
+        return redirectTo("/game");
     }
 
     /***
@@ -147,10 +157,10 @@ public class TrapController extends BaseController {
      * @param trapId 陷阱Id
      * @return view
      */
-    @GetMapping("/autoUseBait.do")
+    @GetMapping("/autoUseBait")
     public String pageAutoUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int baitId, @RequestParam(defaultValue = "0") int trapId){
 
-        return redirectTo("/game.do");
+        return redirectTo("/game");
     }
 
     /***
@@ -161,7 +171,7 @@ public class TrapController extends BaseController {
      * @param trapId 陷阱Id
      * @return view
      */
-    @PostMapping("/autoUseBait.do")
+    @PostMapping("/autoUseBait")
     public String doAutoUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int baitId, @RequestParam(defaultValue = "0") int trapId){
 
 
@@ -171,12 +181,19 @@ public class TrapController extends BaseController {
 
     /***
      * 收网
+     *
+     * <p>★ 已知设计债（本轮不改）：本方法会写库（消耗陷阱、结算捕获），
+     * 但仍是 {@code @GetMapping}。按 REST 语义，写操作应为 POST。
+     * 本轮**有意不改** —— 改POST 需要同步改造 trap/over 页的触发方式，
+     * 属于路由规范化批次的后续范围，此处仅记录，避免后人误以为是疏漏。
+     * 已知缺陷：GET 收网可被浏览器预取或刷新重复触发。
+     *
      * @param session session
      * @param model model
      * @param trapId 陷阱Id
      * @return view
      */
-    @GetMapping("/over.do")
+    @GetMapping("/over")
     public String doOver(HttpSession session, Model model, @RequestParam(defaultValue = "0") int trapId){
         Role role = getSessionRole(session);
         // 仓库鸟上限 todo
@@ -207,7 +224,7 @@ public class TrapController extends BaseController {
         bird.setIsLock((byte) 0);
         bird.setTime(CommonUtils.nowTime());
         // 获取小鸟配置
-        BaseBird baseBird = GameConfigManager.getInstance().getBaseBird(bird.getBirdId());
+        BaseBird baseBird = configGateway.getBaseBird(bird.getBirdId());
         long addExp = baseBird.getCatchExp();
         // 更新陷阱信息
         roleTrap.setBaitId(0);
@@ -226,7 +243,7 @@ public class TrapController extends BaseController {
         roleService.saveOrUpdate(role);
         // 计算升到下一级所需要的经验值
         long needExp = 0;
-        BaseLevel baseLevel = GameConfigManager.getInstance().getBaseLevel(role.getLevel() + 1);
+        BaseLevel baseLevel = configGateway.getBaseLevel(role.getLevel() + 1);
         if(baseLevel != null){
             needExp = baseLevel.getTotalExp() - role.getTotalExp();
         }
@@ -236,8 +253,8 @@ public class TrapController extends BaseController {
         resultVO.setBirdBaseId( baseBird.getId());
         resultVO.setNameText(bird.getWeight() / 100.0 + "斤的" + GameUtils.getBirdSexName(bird.getSex()) + baseBird.getName());
         resultVO.setStarText(GameUtils.getStarName(bird.getStar()));
-        resultVO.setGrowText("2.78%(0.01~5.00)");
-        resultVO.setKoText("196%(1~300)");
+        resultVO.setGrowText(BirdTextUtils.growText(bird.getGrow()));
+        resultVO.setKoText(BirdTextUtils.koText(bird.getKo()));
         resultVO.setMinWeight(baseBird.getMinWeight());
         resultVO.setMaxWeight(baseBird.getMaxWeight());
         resultVO.setAddExp(addExp);
@@ -256,43 +273,11 @@ public class TrapController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/birdInfo.do")
+    @GetMapping("/birdInfo")
     public String pageBirdInfo(HttpSession session, Model model, @RequestParam(defaultValue = "0") int birdId){
-        BaseBird baseBird = GameConfigManager.getInstance().getBaseBird(birdId);
+        BaseBird baseBird = configGateway.getBaseBird(birdId);
         model.addAttribute("baseBird", baseBird);
         return "trap/birdInfo";
     }
 
-    /***
-     * 随机一只小鸟
-     * @param birdIdList 小鸟Id,...
-     * @return BaseBird 小鸟配置
-     */
-    BaseBird randBird(String[] birdIdList){
-        //
-        if(birdIdList == null || birdIdList.length == 0){
-            return null;
-        }
-        // 获取配置列表
-        List<BaseBird> baseBirdList = new ArrayList<>();
-        // 总权重
-        int totalRatio = 0;
-        for(String birdId : birdIdList){
-            BaseBird baseBird = GameConfigManager.getInstance().getBaseBird(Integer.valueOf(birdId.trim()));
-            if(baseBird != null && baseBird.getProbability() > 0){
-                baseBirdList.add(baseBird);
-                totalRatio += baseBird.getProbability();
-            }
-        }
-        int randRatio =  (int)(Math.random() * totalRatio + 1);
-        // 获取总权重
-        int i = 0;
-        for(BaseBird bird : baseBirdList){
-            i += bird.getProbability();
-            if(randRatio <= i){
-                return bird;
-            }
-        }
-        return null;
-    }
 }

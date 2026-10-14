@@ -2,9 +2,9 @@ package com.qq2008.game.bird.controller.game;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.qq2008.common.entiy.ResultCode;
-import com.qq2008.common.entiy.vo.MessageLink;
-import com.qq2008.common.entiy.vo.MessageVO;
+import com.qq2008.common.entity.ResultCode;
+import com.qq2008.common.entity.vo.MessageLink;
+import com.qq2008.common.entity.vo.MessageVO;
 import com.qq2008.common.util.CommonUtils;
 import com.qq2008.game.bird.controller.common.BaseController;
 import com.qq2008.game.bird.data.ConstData;
@@ -23,7 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /***
  * 聊天相关路由
@@ -32,7 +33,7 @@ import java.util.logging.Logger;
 @RequestMapping("/chat")
 public class ChatController extends BaseController {
     // 日志句柄
-    Logger logger = Logger.getLogger(ChatController.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
 
     /***
      * 聊天主界面
@@ -40,7 +41,7 @@ public class ChatController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/list.do")
+    @GetMapping("/list")
     public String pageChatList(HttpSession session, Model model, @RequestParam(defaultValue = "1") int pageNo, @RequestParam(defaultValue = "1") int chatType) {
         // 参数兼容
         if (pageNo < 1) {
@@ -66,7 +67,7 @@ public class ChatController extends BaseController {
      * @param model model
      * @return view
      */
-    @PostMapping("/chatWorld.do")
+    @PostMapping("/chatWorld")
     public String doChatWorld(HttpSession session, RedirectAttributes model, String message) {
         //
         Role role = getSessionRole(session);
@@ -81,12 +82,12 @@ public class ChatController extends BaseController {
         // 玩家等级不足
         if (role.getLevel() < 10) {
             model.addFlashAttribute("message", MessageVO.error("您的等级不足10级。"));
-            return redirectTo("/chat/list.do");
+            return redirectTo("/chat/list");
         }
         // 聊天消息为空
         if (message == null || message.trim().isEmpty()){
             model.addFlashAttribute("message", MessageVO.error("聊天消息不能为空哦。"));
-            return redirectTo("/chat/list.do");
+            return redirectTo("/chat/list");
         }
         // 插入聊天数据
         LogChat chat = new LogChat();
@@ -98,30 +99,10 @@ public class ChatController extends BaseController {
         chat.setTime(CommonUtils.nowTime());
         chatService.save(chat);
         // 构造
-        model.addFlashAttribute("message", MessageVO.error("发送聊天消息成功！"));
-        return redirectTo("/chat/list.do");
+        model.addFlashAttribute("message", MessageVO.success("发送聊天消息成功！"));
+        return redirectTo("/chat/list");
     }
 
-    /***
-     * 随机聊天玩家名称
-     * @param session session
-     * @param model model
-     * @return view
-     */
-    @GetMapping("/r.do")
-    public String pageTest(HttpSession session, Model model) {
-        String[] aList = RandomTextData.getRandRoleNameArray();
-        // 查询数据
-        List<LogChat> chatList = chatService.list();
-        for (LogChat logChat : chatList) {
-            String roleName = ArrayUtils.randElement(aList);
-            logChat.setRoleName(roleName);
-            chatService.saveOrUpdate(logChat);
-        }
-        //
-        model.addAttribute("message", MessageVO.success("操作成功。"));
-        return "common/message";
-    }
 
 
     // 孵化场 birthBirth

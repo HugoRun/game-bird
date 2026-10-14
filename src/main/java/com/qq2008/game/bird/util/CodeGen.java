@@ -13,10 +13,16 @@ import java.util.Collections;
 public class CodeGen {
 
     public static void main(String[] args) {
-        // DB配置
-        String JDBC_URL = "jdbc:mysql://localhost:3306/game_bird?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false";
-        String DB_USER = "root";
-        String DB_PASSWORD = "root";
+        // DB配置。【RT-6 安全项】user/password 原为明文硬编码 root/root 并进 git 仓库。
+        // 改为读环境变量，变量名与 application.properties 保持一致（DB_USERNAME / DB_PASSWORD），
+        // 便于统一在 docker/.env 里配置。
+        // 【注意】这是 main 方法，不读 application.properties（那需要 Spring 上下文），
+        // 只能用 System.getenv。默认值仅保证本地开发免配置可用，
+        // 共享 / CI 环境必须显式提供环境变量。
+        String JDBC_URL = System.getenv().getOrDefault("DB_URL",
+                "jdbc:mysql://localhost:3306/game_bird?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false");
+        String DB_USER = System.getenv().getOrDefault("DB_USERNAME", "root");
+        String DB_PASSWORD = System.getenv().getOrDefault("DB_PASSWORD", "root");
         // 生成路径配置
         String CODE_PATH_PROJECT = Paths.get(System.getProperty("user.dir")) + "/src/main/java";
         String CODE_PATH_TEST = Paths.get(System.getProperty("user.dir")) + "/code-gen";

@@ -5,7 +5,8 @@ import jakarta.servlet.http.HttpSessionEvent;
 import jakarta.servlet.http.HttpSessionListener;
 import org.springframework.stereotype.Component;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /***
  * Session管理监听器
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
 @Component
 public class OnlineCounterListener implements HttpSessionListener {
     // 日志句柄
-    Logger logger = Logger.getLogger(OnlineCounterListener.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(OnlineCounterListener.class);
 
     @Override
     public void sessionCreated(HttpSessionEvent event) {

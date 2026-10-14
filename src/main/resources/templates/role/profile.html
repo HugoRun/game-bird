@@ -9,10 +9,10 @@
 </head>
 <body>
 <div class="main">
-    <div class="avatar-wrapper"><img alt="头像" th:src="${session.sRole.avatarUrl}"><a href="./changeAvatar.html" th:href="@{/role/change/avatar.do}">设置头像</a></div>
-    <div>姓名:<span>[[${session.sRole.roleName}]]</span><a href="./changeName.html" th:href="@{/role/change/name.do}"><span>设置</span></a></div>
-    <div>性别:<span><span th:text="${@gameUtils.getSexName(session.sRole.sex)}"></span></span><a href="#" th:href="@{/role/change/sex.do}">设置</a></div>
-    <div>称号:"<span th:text="${@gameUtils.getTitleName(session.sRole.titleId)}"></span>" <a href="#" th:href="@{/role/change/title.do}">设置</a></div>
+    <div class="avatar-wrapper"><img alt="头像" th:src="${session.sRole.avatarUrl}"><a href="./changeAvatar.html" th:href="@{/role/avatar}">设置头像</a></div>
+    <div>姓名:<span>[[${session.sRole.roleName}]]</span><a href="./changeName.html" th:href="@{/role/name}"><span>设置</span></a></div>
+    <div>性别:<span><span th:text="${@gameUtils.getSexName(session.sRole.sex)}"></span></span><a href="#" th:href="@{/role/sex}">设置</a></div>
+    <div>称号:"<span th:text="${@gameUtils.getTitleName(session.sRole.titleId)}"></span>" <a href="#" th:href="@{/role/title}">设置</a></div>
     <div>等级:<span th:text="${session.sRole.level}"></span>级 (12%)</div>
     <div>当前经验:5200</div>
     <div>下级经验:6110</div>
@@ -22,8 +22,8 @@
     <div>胜率:0 % (0胜/0负)</div>
     <div class="bg-blue"> 最佳宠物:</div>
     <div> 暂无最佳宠物</div>
-    <div class="qianlan"><span>心情短语:[[${session.sRole.dynamic}]]</span><a href="#" th:href="@{/role/change/dynamic.do}">更改</a></div>
-    <div class="bg-blue"><a class="" th:href="@{/game.do}">返回游戏</a></div>
+    <div class="qianlan"><span>心情短语:[[${session.sRole.dynamic}]]</span><a href="#" th:href="@{/role/dynamic}">更改</a></div>
+    <div class="bg-blue"><a class="" th:href="@{/game}">返回游戏</a></div>
 </div>
 </body>
 </html>

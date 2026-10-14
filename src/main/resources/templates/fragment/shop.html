@@ -5,77 +5,86 @@
     <title>Title</title>
 </head>
 <body>
+<!--
+  商店页骨架（U12 新增）。
+
+  抽出前 6 个 shop/*.html 各自复制同一段「logo 图 → 钱包信息 → 类型导航 → 筛选器 →
+  空态提示」。现在只有一份，页面按 type 一个参数调用。
+
+  参数 type：物品种类 key（bait/trap/cage/nest/train/prop），决定类型导航的高亮项。
+-->
+<div th:fragment="shopHeader(type)">
+    <div class="pic">
+        <img alt="" src="../../static/images/logo/shop.gif" th:src="@{/assets/images/logo/shop.gif}"/>
+    </div>
+    <div th:replace="~{fragment/shop::shopInfo}"></div>
+    <div th:replace="~{fragment/shop::shopType(type=${type})}"></div>
+    <div th:replace="~{fragment/feeTypeFilter::feeTypeFilter}"></div>
+</div>
+<!-- 商店空态提示：6 个商店页原本各写一遍，且逐字相同。 -->
+<div th:fragment="shopEmpty">
+    <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+    <div class="npc-talk">商店现在还没有开门哦。</div>
+</div>
 <!-- 商店信息 -->
 <div th:fragment="shopInfo">
-    金币:[[${session.sRole.coin}]]&nbsp;<a href="./userBank.html" th:href="@{/userBank.do}">取款</a>
+    金币:[[${session.sRole.coin}]]&nbsp;<a href="#" th:href="@{/bank}">取款</a>
     <br/>
-    爱心:[[${session.sRole.lovePoint}]]&nbsp;钻石:[[${session.sRole.diamond}]]&nbsp;<a href="../pay.html" th:href="@{/pay.do}">获得钻石</a>
+    爱心:[[${session.sRole.lovePoint}]]&nbsp;钻石:[[${session.sRole.diamond}]]&nbsp;<a href="../pay.html" th:href="@{/pay}">获得钻石</a>
 </div>
 <!-- 类型导航 -->
 <div class="panel bg-blue navList" th:fragment="shopType(type)">
     <ul th:if="${type == 'bait'}">
         <li>▣诱饵</li>
-        <li><a th:href="@{/shop/trap/list.do}" href="./trap.html">◻陷阱</a></li>
-        <li><a th:href="@{/shop/cage/list.do}" href="./cage.html">◻鸟笼</a></li>
-        <li><a th:href="@{/shop/nest/list.do}" href="./nest.html">◻巢穴</a></li>
-        <li><a th:href="@{/shop/train/list.do}" href="./train.html">◻训练场</a></li>
-        <li><a th:href="@{/shop/prop/list.do}" href="./prop.html">◻道具</a></li>
+        <li><a th:href="@{/shop/trap/items}" href="./trap.html">◻陷阱</a></li>
+        <li><a th:href="@{/shop/cage/items}" href="./cage.html">◻鸟笼</a></li>
+        <li><a th:href="@{/shop/nest/items}" href="./nest.html">◻巢穴</a></li>
+        <li><a th:href="@{/shop/train/items}" href="./train.html">◻训练场</a></li>
+        <li><a th:href="@{/shop/prop/items}" href="./prop.html">◻道具</a></li>
     </ul>
     <ul th:if="${type == 'cage'}">
-        <li><a th:href="@{/shop/bait/list.do}" href="./bait.html">◻诱饵</a></li>
-        <li><a th:href="@{/shop/trap/list.do}" href="./trap.html">◻陷阱</a></li>
+        <li><a th:href="@{/shop/bait/items}" href="./bait.html">◻诱饵</a></li>
+        <li><a th:href="@{/shop/trap/items}" href="./trap.html">◻陷阱</a></li>
         <li>▣鸟笼</li>
-        <li><a th:href="@{/shop/nest/list.do}" href="./nest.html">◻巢穴</a></li>
-        <li><a th:href="@{/shop/train/list.do}" href="./train.html">◻训练场</a></li>
-        <li><a th:href="@{/shop/prop/list.do}" href="./prop.html">◻道具</a></li>
+        <li><a th:href="@{/shop/nest/items}" href="./nest.html">◻巢穴</a></li>
+        <li><a th:href="@{/shop/train/items}" href="./train.html">◻训练场</a></li>
+        <li><a th:href="@{/shop/prop/items}" href="./prop.html">◻道具</a></li>
     </ul>
     <ul th:if="${type == 'nest'}">
-        <li><a th:href="@{/shop/bait/list.do}" href="./bait.html">◻诱饵</a></li>
-        <li><a th:href="@{/shop/trap/list.do}" href="./trap.html">◻陷阱</a></li>
-        <li><a th:href="@{/shop/cage/list.do}" href="./cage.html">◻鸟笼</a></li>
+        <li><a th:href="@{/shop/bait/items}" href="./bait.html">◻诱饵</a></li>
+        <li><a th:href="@{/shop/trap/items}" href="./trap.html">◻陷阱</a></li>
+        <li><a th:href="@{/shop/cage/items}" href="./cage.html">◻鸟笼</a></li>
         <li>▣巢</li>
-        <li><a th:href="@{/shop/train/list.do}" href="./train.html">◻训练场</a></li>
-        <li><a th:href="@{/shop/prop/list.do}" href="./prop.html">◻道具</a></li>
+        <li><a th:href="@{/shop/train/items}" href="./train.html">◻训练场</a></li>
+        <li><a th:href="@{/shop/prop/items}" href="./prop.html">◻道具</a></li>
     </ul>
     <ul th:if="${type == 'prop'}">
-        <li><a th:href="@{/shop/bait/list.do}" href="./bait.html">◻诱饵</a></li>
-        <li><a th:href="@{/shop/trap/list.do}" href="./trap.html">◻陷阱</a></li>
-        <li><a th:href="@{/shop/cage/list.do}" href="./cage.html">◻鸟笼</a></li>
-        <li><a th:href="@{/shop/nest/list.do}" href="./nest.html">◻巢穴</a></li>
-        <li><a th:href="@{/shop/train/list.do}" href="./train.html">◻训练场</a></li>
+        <li><a th:href="@{/shop/bait/items}" href="./bait.html">◻诱饵</a></li>
+        <li><a th:href="@{/shop/trap/items}" href="./trap.html">◻陷阱</a></li>
+        <li><a th:href="@{/shop/cage/items}" href="./cage.html">◻鸟笼</a></li>
+        <li><a th:href="@{/shop/nest/items}" href="./nest.html">◻巢穴</a></li>
+        <li><a th:href="@{/shop/train/items}" href="./train.html">◻训练场</a></li>
         <li>▣道具</li>
     </ul>
     <ul th:if="${type == 'train'}">
-        <li><a th:href="@{/shop/bait/list.do}" href="./bait.html">◻诱饵</a></li>
-        <li><a th:href="@{/shop/trap/list.do}" href="./trap.html">◻陷阱</a></li>
-        <li><a th:href="@{/shop/cage/list.do}" href="./cage.html">◻鸟笼</a></li>
-        <li><a th:href="@{/shop/nest/list.do}" href="./nest.html">◻巢穴</a></li>
+        <li><a th:href="@{/shop/bait/items}" href="./bait.html">◻诱饵</a></li>
+        <li><a th:href="@{/shop/trap/items}" href="./trap.html">◻陷阱</a></li>
+        <li><a th:href="@{/shop/cage/items}" href="./cage.html">◻鸟笼</a></li>
+        <li><a th:href="@{/shop/nest/items}" href="./nest.html">◻巢穴</a></li>
         <li>▣训练场</li>
-        <li><a th:href="@{/shop/prop/list.do}" href="./prop.html">◻道具</a></li>
+        <li><a th:href="@{/shop/prop/items}" href="./prop.html">◻道具</a></li>
     </ul>
     <ul th:if="${type == 'trap'}">
-        <li><a th:href="@{/shop/bait/list.do}" href="./bait.html">◻诱饵</a></li>
+        <li><a th:href="@{/shop/bait/items}" href="./bait.html">◻诱饵</a></li>
         <li>▣陷阱</li>
-        <li><a th:href="@{/shop/cage/list.do}" href="./cage.html">◻鸟笼</a></li>
-        <li><a th:href="@{/shop/nest/list.do}" href="./nest.html">◻巢穴</a></li>
-        <li><a th:href="@{/shop/train/list.do}" href="./train.html">◻训练场</a></li>
-        <li><a th:href="@{/shop/prop/list.do}" href="./prop.html">◻道具</a></li>
+        <li><a th:href="@{/shop/cage/items}" href="./cage.html">◻鸟笼</a></li>
+        <li><a th:href="@{/shop/nest/items}" href="./nest.html">◻巢穴</a></li>
+        <li><a th:href="@{/shop/train/items}" href="./train.html">◻训练场</a></li>
+        <li><a th:href="@{/shop/prop/items}" href="./prop.html">◻道具</a></li>
     </ul>
 </div>
 <!-- 分页 -->
-<div th:fragment="pagination">
-    <div th:if="${page.pages > 1}">
-        <a th:href="@{${url}(feeType=${feeType}, pageNo=1)}" th:if="${page.current != 1}">首页</a>
-        <a th:href="@{${url}(feeType=${feeType}, pageNo=${page.current - 1})}" th:if="${page.current > 1}">上页</a>
-        <a th:href="@{${url}(feeType=${feeType}, pageNo=${page.current + 1})}" th:if="${page.current < page.pages}">下页</a>
-        <a th:href="@{${url}(feeType=${feeType}, pageNo=${page.pages})}" th:if="${page.current < page.pages}">最后一页</a>
-        <form action="" class="inline-block">
-            <input name="feeType" th:value="${feeType}" type="hidden">
-            第 <input class="mini-input" maxlength="3"name="pageNo" th:value="${page.getCurrent()}" type="text"/> 页 <input class="mini-button" type="submit" value="前往">
-        </form>
-        <br/>
-        <span class="panel" th:text="|(共${page.getTotal()}条数据, 当前第${page.current}/${page.pages}页)|"></span>
-    </div>
-</div>
+<!-- U12：转发到唯一实现，fragment 名 pagination 保持不变 -->
+<div th:fragment="pagination" th:replace="~{fragment/pagination::fee-type-pagination}"></div>
 </body>
 </html>

@@ -1,6 +1,10 @@
 package com.qq2008.game.bird.model.dbo;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 /**
@@ -11,6 +15,9 @@ import java.io.Serializable;
  * @author HugoRun
  * @since 2024-11-17
  */
+@TableName("account")
+@Getter
+@Setter
 public class Account implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -75,115 +82,24 @@ public class Account implements Serializable {
      * 是否已封禁
      */
     private Byte isBan;
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getPlatform() {
-        return platform;
-    }
-
-    public void setPlatform(String platform) {
-        this.platform = platform;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
-    public String getOpenId() {
-        return openId;
-    }
-
-    public void setOpenId(String openId) {
-        this.openId = openId;
-    }
-
-    public Integer getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Integer createTime) {
-        this.createTime = createTime;
-    }
-
-    public Byte getIsAdmin() {
-        return isAdmin;
-    }
-
-    public void setIsAdmin(Byte isAdmin) {
-        this.isAdmin = isAdmin;
-    }
-
-    public Byte getIsBan() {
-        return isBan;
-    }
-
-    public void setIsBan(Byte isBan) {
-        this.isBan = isBan;
-    }
-
+    /**
+     * 刻意不使用 Lombok 的 {@code @Data}：它生成的 toString 会把 password 字段
+     * （本项目是明文存储）的值一起打印出来，一旦有代码记录该对象或抛异常带出上下文，
+     * 密码就会进日志。
+     *
+     * <p>改造前本类手写的 toString 正是这么做的，属于既有的敏感信息泄漏，
+     * 此处一并修复：只输出非敏感字段，密码与两个 token 一律不输出。
+     *
+     * @return 不含密码与token 的对象描述
+     */
     @Override
     public String toString() {
         return "Account{" +
             "userId = " + userId +
             ", platform = " + platform +
             ", username = " + username +
-            ", password = " + password +
             ", nickname = " + nickname +
             ", avatarUrl = " + avatarUrl +
-            ", token = " + token +
-            ", refreshToken = " + refreshToken +
-            ", openId = " + openId +
             ", createTime = " + createTime +
             ", isAdmin = " + isAdmin +
             ", isBan = " + isBan +

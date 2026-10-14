@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  代码生成器占位文件，当前不含任何自定义 SQL。
+  本项目的全部查询走 MyBatis-Plus 的 IService / LambdaQueryWrapper，无需 XML。
+  保留此文件是因为 application.properties 的 mybatis-plus.mapper-locations
+  指向 classpath*:mapper/*.xml，且代码生成器要求每个实体有对应文件；
+  直接删除会让配置指向空目录，也让下次运行 CodeGen 时重新生成，属预期行为。
+-->
 <mapper namespace="com.qq2008.game.bird.mapper.BaseTrainMapper">
 
 </mapper>

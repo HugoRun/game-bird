@@ -2,7 +2,7 @@ package com.qq2008.game.bird.service.impl;
 
 import com.qq2008.game.bird.model.dbo.RoleCage;
 import com.qq2008.game.bird.mapper.RoleCageMapper;
-import com.qq2008.game.bird.service.IRoleCageService;
+import com.qq2008.game.bird.service.RoleCageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2024-11-17
  */
 @Service
-public class RoleCageServiceImpl extends ServiceImpl<RoleCageMapper, RoleCage> implements IRoleCageService {
+public class RoleCageServiceImpl extends ServiceImpl<RoleCageMapper, RoleCage> implements RoleCageService {
 
 }

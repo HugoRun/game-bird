@@ -1,0 +1,64 @@
+name: game-bird
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: game-bird-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?请在 docker/.env 中设置}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-game_bird}
+      MYSQL_USER: gamebird
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?请在 docker/.env 中设置}
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+      - --default-authentication-plugin=mysql_native_password
+    volumes:
+      - db-data:/var/lib/mysql
+      # 首次启动自动导入建表脚本（仅数据卷为空时执行）
+      - ../sql/game_bird.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+    networks:
+      - game-bird-net
+
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: game-bird:local
+    container_name: game-bird-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-game_bird}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: gamebird
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:?请在 docker/.env 中设置}
+      TZ: Asia/Shanghai
+    ports:
+      # 仅绑定本机回环，不暴露到局域网
+      # 容器内监听 80（源码 application.properties 里 server.port=80），
+      # 映射到本机 9090，避免与本机 80 端口冲突
+      - "127.0.0.1:${APP_PORT:-9090}:80"
+    volumes:
+      - app-files:/app/files
+    networks:
+      - game-bird-net
+
+volumes:
+  db-data:
+    name: game-bird-db-data
+  app-files:
+    name: game-bird-app-files
+
+networks:
+  game-bird-net:
+    name: game-bird-net

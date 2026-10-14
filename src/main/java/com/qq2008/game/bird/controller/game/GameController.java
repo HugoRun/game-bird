@@ -3,11 +3,11 @@ package com.qq2008.game.bird.controller.game;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.qq2008.common.annotation.SkipRole;
-import com.qq2008.common.entiy.vo.MessageVO;
+import com.qq2008.common.entity.vo.MessageVO;
 import com.qq2008.common.util.CommonUtils;
 import com.qq2008.game.bird.controller.common.BaseController;
 import com.qq2008.game.bird.data.ConstData;
-import com.qq2008.game.bird.data.GameConfigManager;
+import com.qq2008.game.bird.data.GameConfigGateway;
 import com.qq2008.game.bird.model.dbo.*;
 import com.qq2008.game.bird.model.vo.*;
 import com.qq2008.game.bird.util.MockUtils;
@@ -25,7 +25,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /****
@@ -37,8 +38,12 @@ import java.util.logging.Logger;
 
 @Controller
 public class GameController extends BaseController {
+
+    /** 游戏配置读取入口，由构造器注入。 */
+    @jakarta.annotation.Resource
+    public GameConfigGateway configGateway;
     // 日志句柄
-    Logger logger = Logger.getLogger(GameController.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
     /***
      * 游戏主界面
@@ -46,7 +51,7 @@ public class GameController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping(value = {"/", "/game.do"})
+    @GetMapping(value = {"/", "/game"})
     public String game(HttpSession session, Model model) {
         Role role = getSessionRole(session);
         // 当前角色数量
@@ -74,9 +79,9 @@ public class GameController extends BaseController {
         for (RoleTrap trap : trapList1) {
             RoleTrapVO trapVO = new RoleTrapVO();
             BeanUtils.copyProperties(trap, trapVO);
-            trapVO.setUseTrap(GameConfigManager.getInstance().getBaseTrap(trap.getUseTrapId() == 0 ? ConstData.DEFAULT_TRAP_ID : trap.getUseTrapId()));
+            trapVO.setUseTrap(configGateway.getBaseTrap(trap.getUseTrapId() == 0 ? ConstData.DEFAULT_TRAP_ID : trap.getUseTrapId()));
             if (trap.getCatchBirdId() > 0) {
-                trapVO.setCatchBird(GameConfigManager.getInstance().getBaseBird(trap.getCatchBirdId()));
+                trapVO.setCatchBird(configGateway.getBaseBird(trap.getCatchBirdId()));
             }
             trapList.add(trapVO);
         }
@@ -91,7 +96,7 @@ public class GameController extends BaseController {
         for (RoleBirth trap : birthList1) {
             RoleBirthVO trapVO = new RoleBirthVO();
             BeanUtils.copyProperties(trap, trapVO);
-            trapVO.setUseNest(GameConfigManager.getInstance().getBaseNest(trap.getUseNestId() == 0 ? ConstData.DEFAULT_NEST_ID : trap.getUseNestId()));
+            trapVO.setUseNest(configGateway.getBaseNest(trap.getUseNestId() == 0 ? ConstData.DEFAULT_NEST_ID : trap.getUseNestId()));
             birthList.add(trapVO);
         }
         model.addAttribute("birthList", birthList);
@@ -105,9 +110,9 @@ public class GameController extends BaseController {
         for (RoleTrain trap : trainList1) {
             RoleTrainVO trainVO = new RoleTrainVO();
             BeanUtils.copyProperties(trap, trainVO);
-            trainVO.setUseTrain(GameConfigManager.getInstance().getBaseTrain(trap.getUseTrainId() == 0 ? ConstData.DEFAULT_TRAIN_ID : trap.getUseTrainId()));
+            trainVO.setUseTrain(configGateway.getBaseTrain(trap.getUseTrainId() == 0 ? ConstData.DEFAULT_TRAIN_ID : trap.getUseTrainId()));
             if (trap.getBirdBaseId() > 0) {
-                trainVO.setBaseBird(GameConfigManager.getInstance().getBaseBird(trap.getBirdBaseId()));
+                trainVO.setBaseBird(configGateway.getBaseBird(trap.getBirdBaseId()));
             }
             trainList.add(trainVO);
         }
@@ -134,7 +139,7 @@ public class GameController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/bank.do")
+    @GetMapping("/bank")
     public String pageBank(HttpSession session, Model model) {
         return "role/bank";
     }
@@ -145,17 +150,17 @@ public class GameController extends BaseController {
      * @param model model
      * @return view
      */
-    @PostMapping("/bankIn.do")
+    @PostMapping("/bankIn")
     public String doBankIn(HttpSession session, RedirectAttributes model, @RequestParam(defaultValue = "0") int inNum) {
         Role role = getSessionRole(session);
         // 100金币起存
         if (inNum < 100) {
             model.addFlashAttribute("message", MessageVO.error("100金币起存。"));
-            return redirectTo("bank.do");
+            return redirectTo("bank");
         }
         if (inNum > role.getCoin()) {
             model.addFlashAttribute("message", MessageVO.error("您的现金不足。"));
-            return redirectTo("bank.do");
+            return redirectTo("bank");
         }
         int addBankCoin = inNum * 99 / 100;
         // 更新并保存数据 todo
@@ -164,7 +169,7 @@ public class GameController extends BaseController {
         roleService.saveOrUpdate(role);
         saveSessionRole(session, role);
         model.addFlashAttribute("message", MessageVO.success("存款成功。<br />本次存入现金" + addBankCoin + ", 银行收取了" + (inNum - addBankCoin) + "的手续费"));
-        return redirectTo("bank.do");
+        return redirectTo("bank");
     }
 
     /***
@@ -173,17 +178,17 @@ public class GameController extends BaseController {
      * @param model model
      * @return view
      */
-    @PostMapping("/bankOut.do")
+    @PostMapping("/bankOut")
     public String doBankOut(HttpSession session, RedirectAttributes model, @RequestParam(defaultValue = "0") int outNum) {
         Role role = getSessionRole(session);
         // 检测陷阱信息
         if (outNum > role.getBankCoin()) {
             model.addFlashAttribute("message", MessageVO.error("银行余额不足。"));
-            return redirectTo("bank.do");
+            return redirectTo("bank");
         }
         if (outNum == 0) {
             model.addFlashAttribute("message", MessageVO.error("取款金额错误。"));
-            return redirectTo("bank.do");
+            return redirectTo("bank");
         }
         // 查询已拥有的诱饵数据
         role.setBankCoin(role.getBankCoin() - outNum);
@@ -191,7 +196,7 @@ public class GameController extends BaseController {
         roleService.saveOrUpdate(role);
         saveSessionRole(session, role);
         model.addFlashAttribute("message", MessageVO.success("取款成功。"));
-        return redirectTo("bank.do");
+        return redirectTo("bank");
     }
 
     /***
@@ -200,13 +205,15 @@ public class GameController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping("/field/info.do")
+    @GetMapping("/field/info")
     public String pageFile(HttpSession session, Model model, @RequestParam(defaultValue = "0") int fieldId) {
-        BaseField baseField = GameConfigManager.getInstance().getBaseField(fieldId);
+        BaseField baseField = configGateway.getBaseField(fieldId);
         model.addAttribute("baseField", baseField);
         return "field/fieldInfo";
     }
 
+    // ========== 待实现功能备忘（非死代码，勿删） ==========
+    // 下列条目是作者列出的功能规划清单，没有对应实现，属于产品待办而非废弃代码。
     // 一键下饵
     // 收获 playFinish
     // 选择场地界面 PackSelectTrap
@@ -245,7 +252,23 @@ public class GameController extends BaseController {
     // 更改小鸟性别
     // 重命名小鸟
 
-    @GetMapping("/profile.do")
+    /***
+     * 角色详情页
+     *
+     * <p>★ 本方法位于根路径 {@code /profile}，与 {@link RoleController} 的
+     * {@code /role/profile} 是<b>同一个功能的两条路径</b>，二者都渲染
+     * {@code role/profile} 视图。本类没有类级 {@code @RequestMapping}，所以路径落在根上；
+     * 两者技术上的不冲突，靠的是这一层路径前缀差异。
+     *
+     * <p>之所以不合并成一条：删除其一属于路由行为变更（外部可能已有链接指向它），
+     * 不在本轮「仅去后缀」的授权范围内。<b>后人若要合并，务必同时改掉模板中的
+     * 对应引用</b>，否则会产出死链。
+     *
+     * @param session session
+     * @param model model
+     * @return view
+     */
+    @GetMapping("/profile")
     public String pageProfile(HttpSession session, Model model) {
         return "role/profile";
     }
@@ -258,20 +281,8 @@ public class GameController extends BaseController {
      * @return view
      */
     @SkipRole
-    @GetMapping("/pay.do")
+    @GetMapping("/pay")
     public String pagePay(HttpSession session, Model model) {
-        //        int nowTime = CommonUtils.nowTimestamp();
-        //        Role role = getSessionRole(session);
-        //        String[] chatList = RandomTextData.getRandChatMessageArray();
-        //        for (String s1 : chatList) {
-        //            LogChat chat = new LogChat();
-        //            chat.setId(0L);
-        //            chat.setRoleId(role.getRoleId());
-        //            chat.setMessage(s1);
-        //            chat.setTime((int) (nowTime - Math.random() * 100000));
-        //            chatService.save(chat);
-        //        }
-
         return "vip/pay";
     }
 
@@ -281,7 +292,7 @@ public class GameController extends BaseController {
      * @param model model
      * @return view
      */
-    @GetMapping(value = {"/message.do"})
+    @GetMapping(value = {ConstData.MESSAGE_PATH})
     public String message(HttpSession session, Model model) {
         return "common/message";
     }

@@ -3,7 +3,7 @@ package com.qq2008.game.bird.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qq2008.game.bird.mapper.BaseTitleMapper;
 import com.qq2008.game.bird.model.dbo.BaseTitle;
-import com.qq2008.game.bird.service.IBaseTitleService;
+import com.qq2008.game.bird.service.BaseTitleService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2024-11-17
  */
 @Service
-public class BaseTitleServiceImpl extends ServiceImpl<BaseTitleMapper, BaseTitle> implements IBaseTitleService {
+public class BaseTitleServiceImpl extends ServiceImpl<BaseTitleMapper, BaseTitle> implements BaseTitleService {
 
 }

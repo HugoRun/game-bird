@@ -10,9 +10,9 @@ public class TrapResultVO {
     String nameText;
     // 星级描述，☆☆☆☆☆
     String starText;
-    // 成长描述, 2.78%(0.01~5.00)
+    // 成长描述, 数据源 storage_bird.grow / 100, 形如 10.00%
     String growText;
-    // 克制描述, 196%(1~300)
+    // 克制描述, 数据源 storage_bird.ko / 100, 形如 0.00%
     String koText;
     // 最小重量
     int minWeight;

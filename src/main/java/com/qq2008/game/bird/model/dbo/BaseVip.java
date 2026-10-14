@@ -2,6 +2,9 @@ package com.qq2008.game.bird.model.dbo;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 /**
@@ -13,6 +16,8 @@ import java.io.Serializable;
  * @since 2024-11-17
  */
 @TableName("base_vip")
+@Getter
+@Setter
 public class BaseVip implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -32,37 +37,4 @@ public class BaseVip implements Serializable {
      * 解锁功能描述
      */
     private String info;
-
-    public Integer getLevel() {
-        return level;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
-    public Integer getPay() {
-        return pay;
-    }
-
-    public void setPay(Integer pay) {
-        this.pay = pay;
-    }
-
-    public String getInfo() {
-        return info;
-    }
-
-    public void setInfo(String info) {
-        this.info = info;
-    }
-
-    @Override
-    public String toString() {
-        return "BaseVip{" +
-            "level = " + level +
-            ", pay = " + pay +
-            ", info = " + info +
-        "}";
-    }
 }
