@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * 全局异常处理。
@@ -82,6 +83,30 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(NoHandlerFoundException.class)
     public Object handleNoHandlerFound(NoHandlerFoundException e, HttpServletRequest request) {
+        logger.warn("请求的路径不存在 uri={}", request.getRequestURI());
+        return respond(request, ResultCode.SYSTEM_ERROR, "页面不存在。", HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * 404：路径没匹配到任何 Controller，Spring 转而去找静态资源也没找到。
+     *
+     * <p><b>与上面 {@code NoHandlerFoundException} 的区别</b>：后者只在
+     * {@code DispatcherServlet.throwExceptionIfNoHandlerFound} 为 true 时抛出
+     * （本项目未开启）；Spring Boot 3默认开启静态资源处理，未匹配的路径会落到
+     * {@code ResourceHttpRequestHandler}，由它抛 {@code NoResourceFoundException}。
+     * 因此<b>只处理 NoHandlerFoundException 是无效的</b>—— 兜底的
+     * {@code handleException(Exception)} 会把它吞成 500。
+     *
+     * <p><b>为什么本轮才暴露</b>：全项目去掉 {@code .do} 后缀后，旧链接
+     * （如 {@code /game.do}）全部变成「无Controller 映射」的路径。若不做处理，
+     * 每一个失效书签都会看到 500「系统繁忙」，运维会误判为服务故障。
+     *
+     * @param e       静态资源不存在异常
+     * @param request 当前请求
+     * @return JSON 或 HTML
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public Object handleNoResourceFound(NoResourceFoundException e, HttpServletRequest request) {
         logger.warn("请求的路径不存在 uri={}", request.getRequestURI());
         return respond(request, ResultCode.SYSTEM_ERROR, "页面不存在。", HttpStatus.NOT_FOUND);
     }
