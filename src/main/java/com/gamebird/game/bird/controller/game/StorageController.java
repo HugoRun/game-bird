@@ -73,6 +73,11 @@ public class StorageController extends BaseController {
         storageBirdService.removeById(birdId);
         // 直接累加金钱并落库（BaseController.addRoleCoin 只改内存，这里一并持久化）
         role.setCoin(role.getCoin() + gain);
+        // 同步小鸟数量：排行榜的「小鸟数」维度读的是 role.bird_num，
+        // 出售后必须递减，否则榜单显示与实际持有量脱节（bird_num 是
+        // smallint unsigned，留个下界保护）。
+        int left = (role.getBirdNum() == null ? 0 : role.getBirdNum()) - num;
+        role.setBirdNum((short) Math.max(0, left));
         roleService.updateById(role);
         saveSessionRole(session, role);
         model.addAttribute("message", "出售成功，获得金钱 " + gain + "。");

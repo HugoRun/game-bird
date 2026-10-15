@@ -15,7 +15,7 @@
     <ul class="list1" th:if="${total > 0}">
         <li th:each="b : ${birds}">
             <div class="list1-info">
-                <p th:text="(${baseBirdMap.get(b.birdId)}?.name ?: '未知小鸟') + ' (ID:' + ${b.id} + ')'"></p>
+                <p th:text="${(baseBirdMap.get(b.birdId) != null ? baseBirdMap.get(b.birdId).name : '未知小鸟') + ' (ID:' + b.id + ')'}"></p>
                 <p>性别: <span th:text="${@gameUtils.getBirdSexName(b.sex)}"></span></p>
                 <p>星级: <span th:text="${@gameUtils.getStarName(b.star)}"></span></p>
                 <p>重量: <span th:text="${#numbers.formatDecimal(b.weight/100.0, 1, 2)}"></span> 斤</p>
