@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='小鸟仓库')}"></head>
+<body>
+
+<div class="main">
+    <h2>小鸟仓库</h2>
+    <p th:if="${message}" th:text="${message}" class="text-muted"></p>
+    <p>共计 <span th:text="${total}"></span> 只小鸟</p>
+
+    <div th:if="${total == 0}">
+        <p>仓库空空如也，去捕捉一些小鸟吧。</p>
+    </div>
+
+    <ul class="list1" th:if="${total > 0}">
+        <li th:each="b : ${birds}">
+            <div class="list1-info">
+                <p th:text="(${baseBirdMap.get(b.birdId)}?.name ?: '未知小鸟') + ' (ID:' + ${b.id} + ')'"></p>
+                <p>性别: <span th:text="${@gameUtils.getBirdSexName(b.sex)}"></span></p>
+                <p>星级: <span th:text="${@gameUtils.getStarName(b.star)}"></span></p>
+                <p>重量: <span th:text="${#numbers.formatDecimal(b.weight/100.0, 1, 2)}"></span> 斤</p>
+                <p>等级: <span th:text="${b.level}"></span></p>
+                <p class="btl">
+                    <a href="#" th:href="@{/storage/sell(birdId=${b.id}, num=1)}">出售</a>
+                </p>
+            </div>
+        </li>
+    </ul>
+
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

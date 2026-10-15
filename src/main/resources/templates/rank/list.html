@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='排行榜')}"></head>
+<body>
+
+<div class="main">
+    <h2>排行榜</h2>
+    <p>
+        <a href="#" th:href="@{/rank/list(type='level')}">等级</a> |
+        <a href="#" th:href="@{/rank/list(type='coin')}">金钱</a> |
+        <a href="#" th:href="@{/rank/list(type='love')}">爱心</a> |
+        <a href="#" th:href="@{/rank/list(type='bird')}">小鸟数</a>
+    </p>
+
+    <table class="list1">
+        <thead>
+        <tr>
+            <th>名次</th>
+            <th>角色</th>
+            <th>等级</th>
+            <th>金钱</th>
+            <th>爱心值</th>
+            <th>小鸟数</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="r, stat : ${roles}">
+            <td th:text="${stat.count}"></td>
+            <td th:text="${r.roleName}"></td>
+            <td th:text="${r.level}"></td>
+            <td th:text="${r.coin}"></td>
+            <td th:text="${r.lovePoint}"></td>
+            <td th:text="${r.birdNum}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

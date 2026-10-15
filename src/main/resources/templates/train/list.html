@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='训练场')}"></head>
+<body>
+
+<div class="main">
+    <h2>训练场</h2>
+    <p th:if="${message}" th:text="${message}" class="text-muted"></p>
+
+    <ul class="list1">
+        <li th:each="t : ${trains}">
+            <div class="list1-info">
+                <p th:text="'槽位 ' + ${t.idx}"></p>
+                <p>小鸟配置ID: <span th:text="${t.birdBaseId}"></span></p>
+                <p>训练结束: <span th:text="${@gameUtils.getTimeDiff(t.trainEndTime, now)}"></span></p>
+                <p class="btl">
+                    <a href="#" th:if="${t.trainEndTime > 0 && t.trainEndTime <= now}"
+                       th:href="@{/train/collect(id=${t.id})}">领取成果</a>
+                    <span th:if="${t.trainEndTime == 0 || t.trainEndTime > now}" class="text-muted">训练中</span>
+                </p>
+            </div>
+        </li>
+    </ul>
+
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

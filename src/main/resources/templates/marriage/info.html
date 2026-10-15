@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='教堂')}"></head>
+<body>
+
+<div class="main">
+    <h2>教堂</h2>
+    <p th:if="${message}" th:text="${message}" class="text-muted"></p>
+
+    <p>
+        当前婚姻状态:
+        <span th:switch="${marriageType}">
+            <span th:case="0">未婚</span>
+            <span th:case="1">喜鹊之恋</span>
+            <span th:case="2">鸳鸯之恋</span>
+            <span th:case="3">比翼鸟之恋</span>
+            <span th:case="4">天使之恋</span>
+            <span th:case="*">未知</span>
+        </span>
+    </p>
+
+    <form method="post" th:action="@{/marriage/set}">
+        <p>结为伴侣：</p>
+        <label><input type="radio" name="type" value="1" th:checked="${marriageType==1}"/> 喜鹊之恋</label>
+        <label><input type="radio" name="type" value="2" th:checked="${marriageType==2}"/> 鸳鸯之恋</label>
+        <label><input type="radio" name="type" value="3" th:checked="${marriageType==3}"/> 比翼鸟之恋</label>
+        <label><input type="radio" name="type" value="4" th:checked="${marriageType==4}"/> 天使之恋</label>
+        <p><button type="submit">确认</button></p>
+    </form>
+
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>
