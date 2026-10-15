@@ -208,10 +208,14 @@ public class RoleValueService {
     }
 
     /**
-     * 按累计经验重算等级：从当前等级向后扫描到 199，取满足经验门槛的最大等级。
+     * 按累计经验重算等级：从当前等级向后扫描到 200，取满足经验门槛的最大等级。
      *
      * <p>算法逐字保留自原 {@code BaseController#calcRoleLevel}，唯一改动是配置来源
      * 从静态调用改为注入实例。
+     *
+     * <p>循环上界必须是 {@code i <= 200}（而非 {@code i < 200}）：{@code base_level}
+     * 表配置了等级 200 行（{@code total_exp = 4420697320}），若上界取 199，角色经验
+     * 再多也永远封顶在 199 级，到不了配置的最高等级。
      *
      * @param oldLevel 旧等级（扫描起点）
      * @param totalExp 累计经验
@@ -219,7 +223,7 @@ public class RoleValueService {
      */
     int calcRoleLevel(int oldLevel, long totalExp) {
         int tempLevel = oldLevel;
-        for (int i = oldLevel; i < 200; i++) {
+        for (int i = oldLevel; i <= 200; i++) {
             BaseLevel baseLevel = configManager.getBaseLevel(i);
             if (baseLevel != null && totalExp >= baseLevel.getTotalExp()) {
                 tempLevel = i;

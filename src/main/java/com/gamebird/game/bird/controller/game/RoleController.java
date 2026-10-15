@@ -80,8 +80,13 @@ public class RoleController extends BaseController {
             return ConstData.VIEW_ROLE_CREATE;
         }
         // 角色名长度和铭感词检测 todo
-        // 获取账户信息
+        // 获取账户信息（本方法标注 @SkipRole，不受 RoleAuthInterceptor 保护，
+        // 但理论上仍受 AccountAuthInterceptor 保护；此处显式判空，避免拦截器
+        // 顺序变动或旁路时直接 NPE）
         Account account = (Account) session.getAttribute("account");
+        if (null == account) {
+            return redirectTo("/login");
+        }
         // 检测角色数量
         LambdaQueryWrapper<Role> roleQueryWrapper = new LambdaQueryWrapper<>();
         roleQueryWrapper.eq(Role::getUserId, account.getUserId());
@@ -158,8 +163,11 @@ public class RoleController extends BaseController {
     @SkipRole
     @GetMapping("/login")
     public String getLoginRole(HttpSession session, Model model) {
-        // 获取已登录账号
+        // 获取已登录账号（@SkipRole，显式判空避免 NPE）
         Account account = (Account) session.getAttribute("account");
+        if (null == account) {
+            return redirectTo("/login");
+        }
         // 查询账号关联的角色
         LambdaQueryWrapper<Role> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Role::getUserId, account.getUserId());
