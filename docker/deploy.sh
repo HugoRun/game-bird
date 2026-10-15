@@ -12,6 +12,7 @@
 #   ./deploy.sh logs         # 跟踪 app 日志
 #   ./deploy.sh backup       # 备份数据库到 ../backup_YYYYMMDD.sql
 #   ./deploy.sh verify       # 只验证，不构建（HTTP 探活 + 镜像 ID 核对）
+#   ./deploy.sh offline      # 离线构建（Docker Hub 不可达时用：本地打包 jar + 只换 jar 层）
 #   ./deploy.sh env          # 重新生成 docker/.env（随机密码）
 #   ./deploy.sh reset        # ⚠️  删卷重建，数据全部丢失
 #
@@ -301,6 +302,46 @@ cmd_backup() {
     ok "备份完成：$out ($(du -h "$out" | cut -f1))"
 }
 
+# 离线构建：当 Docker Hub 不可达（多阶段构建需要拉 docker/dockerfile:1 前端镜像与
+# maven/temurin 基础镜像）时，改用「本地 Maven 打包 + 基于已有镜像只替换 jar 层」，
+# 全程不需要联网拉镜像。
+cmd_offline() {
+    require_docker
+    ensure_env
+
+    APP_PORT="$(env_get APP_PORT || echo "$APP_PORT")"
+    BASE_URL="http://127.0.0.1:${APP_PORT}"
+
+    local image="game-bird:local"
+    local jar_rel="../target/game-bird-0.0.1-SNAPSHOT.jar"
+
+    docker image inspect "$image" >/dev/null 2>&1 \
+        || die "离线模式需要基础镜像 ${image} 作为基座（含 JRE/curl/时区/非 root 用户）。请先联网完成一次正常构建。"
+    [ -f "Dockerfile.offline" ] || die "缺少 Dockerfile.offline（离线构建所需的替代 Dockerfile）。"
+
+    step "本地打包 fat jar"
+    # 先离线（依赖已在本地 .m2 缓存时最快）；失败再回退到联网（走阿里云镜像）
+    if ! ( cd .. && mvn -o -q clean package -Pcontainer -DskipTests ); then
+        warn "离线打包失败，回退到联网打包…"
+        ( cd .. && mvn -q clean package -Pcontainer -DskipTests ) || die "Maven 打包失败。"
+    fi
+    [ -s "$jar_rel" ] || die "未找到 fat jar：${jar_rel}"
+    ok "fat jar 就绪（$(du -h "$jar_rel" | cut -f1)）"
+
+    step "基于 ${image} 重建镜像（只替换 jar 层，零联网）"
+    ( cd .. && docker build -q -f docker/Dockerfile.offline -t "$image" . ) >/dev/null \
+        || die "镜像构建失败。"
+    ok "镜像已就绪（IMAGE ID: $(docker images -q "$image" | head -c 12)）"
+
+    step "重建 app 容器"
+    docker compose up -d --no-build --force-recreate app
+    ok "容器已重建"
+
+    wait_healthy
+    verify_http
+    print_summary
+}
+
 cmd_verify() {
     require_docker
     step "仅验证（不构建）"
@@ -356,6 +397,7 @@ main() {
         restart)         cmd_restart "$@" ;;
         status|ps)       cmd_status "$@" ;;
         logs)            cmd_logs "$@" ;;
+        offline)         cmd_offline "$@" ;;
         backup)          cmd_backup "$@" ;;
         verify)          cmd_verify "$@" ;;
         env)             cmd_env "$@" ;;

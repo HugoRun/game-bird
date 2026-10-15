@@ -1,0 +1,20 @@
+# =============================================================================
+# 离线部署用 Dockerfile（Docker Hub 不可达时的替代路径）
+# =============================================================================
+# 背景：正常路径是 Dockerfile 的多阶段构建（maven 编译 → JRE 运行）。
+# 但多阶段构建需要从 Docker Hub 拉取 `docker/dockerfile:1` 前端镜像与
+# maven/temurin 基础镜像；本机到 registry-1.docker.io 不可达时整条路径失效。
+#
+# 本文件改为「复用已有的 game-bird:local 镜像（它已包含 JRE、curl、时区、
+# 非 root 的 spring 用户、HEALTHCHECK 与 ENTRYPOINT），只把本地打好的
+# fat jar 覆盖进去」。因此构建过程零联网。
+#
+# 用法（在项目根目录执行，构建上下文必须是项目根，才能读到 target/）：
+#   mvn -o clean package -Pcontainer -DskipTests      # 先产出 fat jar
+#   docker build -f docker/Dockerfile.offline -t game-bird:local .
+#   cd docker && docker compose up -d --no-build --force-recreate app
+# =============================================================================
+FROM game-bird:local
+
+# 覆盖应用 jar（保留 spring 属主，与基础镜像的 USER spring 一致）
+COPY --chown=spring:spring target/game-bird-0.0.1-SNAPSHOT.jar /app/app.jar

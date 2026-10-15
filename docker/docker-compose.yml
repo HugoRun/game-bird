@@ -17,8 +17,14 @@ services:
       - --default-authentication-plugin=mysql_native_password
     volumes:
       - db-data:/var/lib/mysql
-      # 首次启动自动导入建表脚本（仅数据卷为空时执行）
+      # 首次启动自动导入建表脚本（仅数据卷为空时执行，按文件名顺序执行）
       - ../sql/game_bird.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      # 后补模块的增量表结构（friend/guild、task/board、activity/fight）。
+      # 单独成文件挂载，是为了不修改红线文件 sql/game_bird.sql；
+      # 编号 02/03/04 保证在 01-init.sql 之后执行。
+      - ../sql/extra/friend_guild.sql:/docker-entrypoint-initdb.d/02-extra-friend-guild.sql:ro
+      - ../sql/extra/task_board.sql:/docker-entrypoint-initdb.d/03-extra-task-board.sql:ro
+      - ../sql/extra/act_fight.sql:/docker-entrypoint-initdb.d/04-extra-act-fight.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
