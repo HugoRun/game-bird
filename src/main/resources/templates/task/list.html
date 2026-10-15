@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='任务中心')}"></head>
+<body>
+
+<div class="main">
+    <h2>任务中心</h2>
+    <p th:if="${message}" th:text="${message}" class="text-muted"></p>
+
+    <table class="list1">
+        <thead>
+        <tr>
+            <th>类型</th>
+            <th>状态</th>
+            <th>奖励</th>
+            <th>创建</th>
+            <th>完成</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="t : ${tasks}">
+            <td th:text="${t.taskType == 1 ? '每日登录' : (t.taskType == 2 ? '捕捉小鸟' : (t.taskType == 3 ? '购买道具' : '未知'))}"></td>
+            <td th:text="${t.status == 0 ? '进行中' : (t.status == 1 ? '已完成未领' : (t.status == 2 ? '已领取' : '未知'))}"></td>
+            <td th:text="${t.rewardCoin}"></td>
+            <td th:text="${@gameUtils.getTimeDiff(t.createTime, now)}"></td>
+            <td th:text="${t.finishTime != null && t.finishTime > 0 ? @gameUtils.getTimeDiff(t.finishTime, now) : '-'}"></td>
+            <td>
+                <form th:if="${t.status == 1}" th:action="@{/task/claim}" method="post">
+                    <input type="hidden" name="id" th:value="${t.id}"/>
+                    <button type="submit">领取</button>
+                </form>
+                <span th:if="${t.status != 1}" class="text-muted">-</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

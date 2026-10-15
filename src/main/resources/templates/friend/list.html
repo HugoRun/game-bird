@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='好友')}"></head>
+<body>
+
+<div class="main">
+    <h2>好友</h2>
+    <p th:if="${message}" th:text="${message}" class="text-muted"></p>
+
+    <div class="add-box">
+        <form method="post" th:action="@{/friend/add}" class="form-inline">
+            <input type="text" name="friendRoleId" placeholder="好友角色Id" />
+            <input type="text" name="friendName" placeholder="好友名称" />
+            <button type="submit">添加好友</button>
+        </form>
+    </div>
+
+    <ul class="list1" th:if="${not #lists.isEmpty(friends)}">
+        <li th:each="f : ${friends}">
+            <div class="list1-info">
+                <p th:text="'名称：' + ${f.friendName}"></p>
+                <p th:text="'角色Id：' + ${f.friendRoleId}"></p>
+                <p>添加于：<span th:text="${@gameUtils.getTimeDiff(f.createTime, now)}"></span>前</p>
+                <p class="btl">
+                    <form method="post" th:action="@{/friend/remove}">
+                        <input type="hidden" name="id" th:value="${f.id}" />
+                        <button type="submit" class="link-btn">删除</button>
+                    </form>
+                </p>
+            </div>
+        </li>
+    </ul>
+    <p th:if="${#lists.isEmpty(friends)}" class="text-muted">还没有好友，快去添加吧。</p>
+
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

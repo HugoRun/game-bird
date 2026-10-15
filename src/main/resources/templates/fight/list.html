@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='战斗')}"></head>
+<body>
+
+<div class="main">
+    <h2>战斗</h2>
+    <p th:if="${message}" th:text="${message}" class="text-muted"></p>
+
+    <form th:action="@{/fight/challenge}" method="post">
+        <button type="submit" class="btn btn-primary">发起挑战</button>
+    </form>
+
+    <h3>战斗记录</h3>
+    <ul class="list1" th:if="${!#lists.isEmpty(logs)}">
+        <li th:each="log : ${logs}">
+            <div class="list1-info">
+                <p>对手: <span th:text="${log.opponentName}"></span></p>
+                <p>结果: <span th:text="${log.result == 1 ? '胜利' : '失败'}"></span></p>
+                <p>奖励金钱: <span th:text="${log.rewardCoin}"></span></p>
+                <p>时间: <span th:text="${@gameUtils.getTimeDiff(log.fightTime, now)}"></span></p>
+            </div>
+        </li>
+    </ul>
+    <p th:if="${#lists.isEmpty(logs)}" class="text-muted">暂无战斗记录，点击上方「发起挑战」试试吧！</p>
+
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

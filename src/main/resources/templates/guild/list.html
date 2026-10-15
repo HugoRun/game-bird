@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='公会')}"></head>
+<body>
+
+<div class="main">
+    <h2>公会</h2>
+    <p th:if="${message}" th:text="${message}" class="text-muted"></p>
+
+    <div class="add-box" th:unless="${joined}">
+        <form method="post" th:action="@{/guild/create}" class="form-inline">
+            <input type="text" name="name" placeholder="公会名称" />
+            <button type="submit">创建公会</button>
+        </form>
+    </div>
+
+    <ul class="list1" th:if="${not #lists.isEmpty(guilds)}">
+        <li th:each="g : ${guilds}">
+            <div class="list1-info">
+                <p th:text="'名称：' + ${g.name}"></p>
+                <p th:text="'等级：' + ${g.level}"></p>
+                <p>创建于：<span th:text="${@gameUtils.getTimeDiff(g.createTime, now)}"></span>前</p>
+                <p class="btl">
+                    <form method="post" th:unless="${joined}" th:action="@{/guild/join}">
+                        <input type="hidden" name="id" th:value="${g.id}" />
+                        <button type="submit" class="link-btn">加入</button>
+                    </form>
+                </p>
+            </div>
+        </li>
+    </ul>
+    <p th:if="${#lists.isEmpty(guilds)}" class="text-muted">还没有公会。</p>
+
+    <p class="btl" th:if="${joined}">
+        <form method="post" th:action="@{/guild/leave}">
+            <input type="hidden" name="id" th:value="${myGuildId}" />
+            <button type="submit" class="link-btn">退出公会</button>
+        </form>
+    </p>
+
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>
