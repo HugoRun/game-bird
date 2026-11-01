@@ -19,8 +19,8 @@
             <div><img src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${result.birdBaseId}.gif|}" alt=""></div>
             <div>[[${result.nameText}]]x1</div>
             <div>星级:[[${result.starText}]]([[${result.minWeight/100}]]~[[${result.maxWeight/100}]])</div>
-            <div>成长:[[${result.growText}]] <a th:href="@{/game}">什么是成长?</a></div>
-            <div>克制:[[${result.koText}]] <a th:href="@{/game}">什么是克制?</a></div>
+            <div>成长:[[${result.growText}]] <a th:href="@{/help/birds}">什么是成长?</a></div>
+            <div>克制:[[${result.koText}]] <a th:href="@{/help/birds}">什么是克制?</a></div>
             <div th:if="${result.cageText != null}">[[${result.cageText}]]</div>
             <div th:if="${result.guildText != null}">[[${result.guildText}]]</div>
             <div th:if="${result.homeText != null}">[[${result.homeText}]]</div>

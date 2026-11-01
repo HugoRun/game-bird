@@ -79,10 +79,17 @@ public class StorageController extends BaseController {
             String sceneName = field == null ? "未知栖息地" : field.getName();
             groups.computeIfAbsent(sceneName, k -> new java.util.ArrayList<>()).add(bird);
         }
+        // 每个场景的收集摘要（组名 → 已收集数）
+        java.util.Map<String, Long> groupGot = new java.util.LinkedHashMap<>();
+        for (java.util.Map.Entry<String, List<BaseBird>> e : groups.entrySet()) {
+            long got = e.getValue().stream().filter(b -> collected.contains(b.getId())).count();
+            groupGot.put(e.getKey(), got);
+        }
         model.addAttribute("groups", groups);
+        model.addAttribute("groupGot", groupGot);
         model.addAttribute("collected", collected);
         model.addAttribute("collectedCount", collected.size());
-        model.addAttribute("totalCount", collectionService == null ? 0 : configGateway.getBaseBirdList().size());
+        model.addAttribute("totalCount", configGateway.getBaseBirdList().size());
         return "storage/book";
     }
 
@@ -147,6 +154,7 @@ public class StorageController extends BaseController {
         model.addAttribute("bird", bird);
         model.addAttribute("baseBird", baseBirdService.getById(bird.getBirdId()));
         model.addAttribute("typeNames", Map.of(1, "敏捷", 2, "力量", 3, "魔法", 4, "幻想"));
+        model.addAttribute("cagedBirdId", getCagedBirdId(role.getRoleId()));
         return "storage/birdDetail";
     }
 

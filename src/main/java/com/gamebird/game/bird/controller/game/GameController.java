@@ -295,6 +295,14 @@ public class GameController extends BaseController {
     }
 
     /**
+     * 小鸟百科：星级/成长/克制/体重/配对遗传的规则说明。
+     */
+    @GetMapping("/help/birds")
+    public String helpBirds(Model model) {
+        return "help/birds";
+    }
+
+    /**
      * 场景切换页：列出全部场景，标记当前所在。
      */
     @GetMapping("/game/field")

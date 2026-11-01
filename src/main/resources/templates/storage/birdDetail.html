@@ -3,33 +3,96 @@
 <head th:replace="~{fragment/head::pageHead(title='小鸟详情')}"></head>
 <body>
 
-<div class="main">
-    <div th:if="${bird != null}">
-        <div class="panel bg-blue">
-            <span th:text="${baseBird != null ? baseBird.name : '未知小鸟'}"></span> ·
-            <span th:text="${@gameUtils.getStarName(bird.star)}"></span>
-        </div>
-        <div>
-            <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${bird.birdId}.gif|}">
-            <div th:text="${baseBird != null ? baseBird.descText : ''}"></div>
-            <div>性别:<span th:text="${@gameUtils.getBirdSexName(bird.sex)}"></span>
-                类型:<span th:text="${baseBird != null ? typeNames.get(baseBird.type == null ? 0 : baseBird.type.intValue()) : '未知'}"></span></div>
-            <div>等级:<span th:text="${bird.level}"></span>级（升级还需 <span th:text="${bird.level * 100 - bird.exp}"></span> 经验）</div>
-            <div>体重:<span th:text="${#numbers.formatDecimal(bird.weight/100.0, 1, 2)}"></span>斤
-                （初始 <span th:text="${#numbers.formatDecimal(bird.initWeight/100.0, 1, 2)}"></span>）</div>
-            <div>成长:<span th:text="${bird.grow / 100.0}"></span>%　克制:<span th:text="${bird.ko / 100.0}"></span>%</div>
-            <div>身价:<span th:text="${baseBird != null ? baseBird.price * (bird.weight / 100) : 0}"></span>金币</div>
-            <div th:if="${bird.isLock != null && bird.isLock != 0}" class="text-primary">训练/配对中（已锁定）</div>
-            <p class="btl" th:if="${bird.isLock == null || bird.isLock == 0}">
-                <a th:href="@{/storage/sellConfirm(birdId=${bird.id})}">出售</a>
-                <a th:href="@{/storage/releaseConfirm(birdId=${bird.id})}">放生</a>
-                <a th:href="@{/storage/deploy(birdId=${bird.id})}">设为出战</a>
-            </p>
-            <div><a th:href="@{/storage/list}">返回仓库</a>　<a th:href="@{/trap/birdInfo(birdId=${bird.birdId})}">图鉴资料</a></div>
+<div class="main" th:if="${bird != null}">
+    <!-- 角色卡头部 -->
+    <div class="panel" th:classappend="${bird.star >= 4} ? 'bg-yellow' : 'bg-blue'">
+        <div class="bird-hero">
+            <div class="bird-hero-img">
+                <img alt="" src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${bird.birdId}.gif|}">
+            </div>
+            <div class="bird-hero-info">
+                <div class="bird-hero-name">
+                    <span th:text="${baseBird != null ? baseBird.name : '未知小鸟'}"></span>
+                    <span class="text-darkorange" th:text="${@gameUtils.getStarName(bird.star)}"></span>
+                </div>
+                <div class="bird-hero-sub">
+                    <span th:text="${@gameUtils.getBirdSexName(bird.sex)}"></span> ·
+                    <span th:text="${baseBird != null ? (baseBird.type == 1 ? '敏捷' : (baseBird.type == 2 ? '力量' : (baseBird.type == 3 ? '魔法' : (baseBird.type == 4 ? '幻想' : '?')))) + '系' : '?'}"></span>
+                    ·
+                    <span th:text="${bird.level + ' 级'}"></span>
+                </div>
+                <div class="bird-hero-state">
+                    <span th:if="${bird.isLock == null || bird.isLock == 0}" class="badge badge-ok">空闲</span>
+                    <span th:if="${bird.isLock != null && bird.isLock == 1}" class="badge badge-lock">训练/配对中</span>
+                    <span th:if="${bird.isLock != null && bird.isLock == 2}" class="badge badge-lock">已锁定</span>
+                    <span th:if="${cagedBirdId != null && cagedBirdId == bird.id}" class="badge badge-fight">⚔ 出战中</span>
+                </div>
+            </div>
         </div>
     </div>
-    <div th:replace="~{fragment/navigation::navigation}"></div>
-    <div th:replace="~{fragment/footDate::footDate}"></div>
+
+    <!-- 数值区 -->
+    <div class="panel bg-green">
+        <div class="stat-row">
+            <span class="stat-key">体重</span>
+            <span class="stat-val" th:text="${#numbers.formatDecimal(bird.weight/100.0, 1, 2) + ' 斤'}"></span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-key">身价</span>
+            <span class="stat-val text-darkorange"
+                  th:text="${baseBird != null ? baseBird.price * (bird.weight / 100) + ' 金币' : '-'}"></span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-key">成长</span>
+            <span class="stat-val">
+                <span th:text="${bird.grow / 100.0 + '%'}"></span>
+                <a class="stat-help" th:href="@{/help/birds}">什么是成长?</a>
+            </span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-key">克制</span>
+            <span class="stat-val">
+                <span th:text="${bird.ko / 100.0 + '%'}"></span>
+                <a class="stat-help" th:href="@{/help/birds}">什么是克制?</a>
+            </span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-key">等级经验</span>
+            <span class="stat-val" th:text="${bird.exp + ' / ' + (bird.level * 100)}"></span>
+        </div>
+        <div class="stat-row" th:if="${baseBird != null}">
+            <span class="stat-key">物种体重域</span>
+            <span class="stat-val"
+                  th:text="${baseBird.minWeight / 100.0 + ' ~ ' + baseBird.maxWeight / 100.0 + ' 斤'}"></span>
+        </div>
+    </div>
+
+    <div class="panel bg-yellow" th:if="${baseBird != null}">
+        <div class="text-muted" th:text="${baseBird.descText}"></div>
+    </div>
+
+    <!-- 操作区 -->
+    <div class="panel bg-blue">
+        <div class="bird-actions">
+            <form th:if="${bird.isLock == null || bird.isLock == 0}" th:action="@{/storage/sellConfirm}" method="post">
+                <input type="hidden" name="birdId" th:value="${bird.id}">
+                <input type="submit" value="💰 出售">
+            </form>
+            <form th:if="${bird.isLock == null || bird.isLock == 0}" th:action="@{/storage/releaseConfirm}" method="post">
+                <input type="hidden" name="birdId" th:value="${bird.id}">
+                <input type="submit" value="🕊️ 放生">
+            </form>
+            <form th:if="${cagedBirdId != bird.id}" th:action="@{/storage/deploy}" method="post">
+                <input type="hidden" name="birdId" th:value="${bird.id}">
+                <input type="submit" value="⚔️ 设为出战">
+            </form>
+            <a th:href="@{/storage/list}">返回仓库</a>
+            <a th:href="@{/help/birds}">小鸟百科</a>
+        </div>
+    </div>
+</div>
+<div class="main" th:if="${bird == null}">
+    <div class="panel bg-blue">小鸟不存在。<a th:href="@{/storage/list}">返回仓库</a></div>
 </div>
 </body>
 </html>

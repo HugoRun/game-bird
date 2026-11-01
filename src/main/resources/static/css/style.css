@@ -724,3 +724,157 @@ button.link-btn:hover {
         font-size: 12px;
     }
 }
+
+
+/* ---------------- 鸟详情角色卡 ---------------- */
+
+.bird-hero {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.bird-hero-img img {
+    width: 84px;
+    height: 84px;
+    border-radius: 16px;
+    border: 3px solid var(--c-gold-2);
+    background: #f7fcf6;
+    box-shadow: var(--shadow);
+    box-sizing: border-box;
+}
+
+.bird-hero-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.bird-hero-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--c-forest);
+    margin-bottom: 3px;
+}
+
+.bird-hero-sub {
+    color: var(--c-ink-soft);
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.bird-hero-state {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+}
+
+.badge-ok {
+    background: #e2f5e0;
+    color: #1b5e20;
+    border: 1px solid #bfe3bc;
+}
+
+.badge-lock {
+    background: var(--c-sky-2);
+    color: #01579b;
+    border: 1px solid #90caf9;
+}
+
+.badge-fight {
+    background: var(--c-gold-2);
+    color: #5d4037;
+    border: 1px solid var(--c-gold);
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6px 2px;
+    border-bottom: 1px dashed #dcefe3;
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.stat-key {
+    color: var(--c-ink-soft);
+}
+
+.stat-val {
+    font-weight: 600;
+}
+
+.stat-help {
+    font-size: 12px;
+    margin-left: 6px;
+}
+
+.bird-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.bird-actions form {
+    margin: 0;
+}
+
+/* 图鉴 V2 */
+.book-total {
+    display: inline-block;
+    margin: 0 6px;
+}
+
+.book-progress.thin {
+    height: 7px;
+    margin: 4px 0 8px;
+}
+
+.book-scene {
+    margin-bottom: 6px;
+}
+
+.book-scene-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+}
+
+.book-scene-count {
+    color: var(--c-ink-soft);
+    font-weight: 500;
+}
+
+.book-tile {
+    position: relative;
+}
+
+.book-tile.got {
+    border-color: var(--c-forest-2);
+    background: linear-gradient(160deg, #ffffff, #f2fbef);
+}
+
+.book-got-mark {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    color: #fff;
+    background: var(--c-forest-2);
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    font-size: 11px;
+    text-align: center;
+}
