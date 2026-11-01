@@ -1,4 +1,5 @@
-# syntax=docker/dockerfile:1
+# 语法前端用 BuildKit 内置版（不再拉取 docker/dockerfile:1，
+# Docker Hub 不可达时也能离线构建；本文件未用到高版本语法特性）
 # ---- 构建阶段：Maven 编译 ----
 FROM maven:3.9-eclipse-temurin-17-alpine AS builder
 
