@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.gamebird.game.bird.config.GameConfigGateway;
 import com.gamebird.game.bird.config.GameProperties;
@@ -202,7 +203,7 @@ public class TrapController extends BaseController {
      * @return view
      */
     @PostMapping("/hasten")
-    public String doHasten(HttpSession session, Model model, @RequestParam(defaultValue = "0") int trapId) {
+    public String doHasten(HttpSession session, RedirectAttributes model, @RequestParam(defaultValue = "0") int trapId) {
         Role role = getSessionRole(session);
         RoleTrap slot = trapId <= 0 ? null : trapService.getById(trapId);
         if (slot == null || !role.getRoleId().equals(slot.getRoleId())) {
@@ -227,7 +228,13 @@ public class TrapController extends BaseController {
             cost = 1;
         }
         if (role.getDiamond() == null || role.getDiamond() < cost) {
-            model.addAttribute("message", MessageVO.error("缩短" + minutes + "分钟需要" + cost + "钻石，您的钻石不足。"));
+            // 钻石不足：给出赚钻渠道引导，而不是让玩家卡在死路
+            MessageVO message = MessageVO.error("缩短" + minutes + "分钟需要 " + cost + " 钻石，您的钻石只有 "
+                    + (role.getDiamond() == null ? 0 : role.getDiamond()) + "。");
+            message.addLink(new MessageLink("🗼 去试炼之塔赢钻石", "/fight/tower"));
+            message.addLink(new MessageLink("🎁 每日签到有钻石", "/signin"));
+            message.addLink(new MessageLink("回主页", "/game"));
+            model.addAttribute("message", message);
             return ConstData.VIEW_MESSAGE;
         }
         roleValueService.costRoleDiamond(role, cost);
@@ -235,10 +242,10 @@ public class TrapController extends BaseController {
         trapService.updateById(slot);
         roleService.updateById(role);
         saveSessionRole(session, role);
-        MessageVO message = MessageVO.success("消耗" + cost + "钻石，捕捉提前了约" + minutes + "分钟！");
-        message.addLink(new MessageLink("回主页", "/game"));
-        model.addAttribute("message", message);
-        return ConstData.VIEW_MESSAGE;
+        // 成功后直接回主页，动线一步到位
+        model.addFlashAttribute("message",
+                MessageVO.success("消耗" + cost + "钻石，捕捉提前了约" + minutes + "分钟！"));
+        return redirectTo("/game");
     }
 
     /**

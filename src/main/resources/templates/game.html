@@ -13,9 +13,13 @@
     <div>
         <div class="panel bg-blue">"<span href="#" th:text="|小菜鸟|"></span>" <span href="#" th:text="|${session.sRole.roleName}|"></span> <a href="#" onclick="toggleShow('p1')">收起</a></div>
         <div id="p1">
-            <div>🎖️ 等级:<span th:text="|${session.sRole.level}|"></span>级(20%) <img alt="" class="vip-icon" src="../../static/images/vip/vip_3.png" th:src="|/assets/images/vip/vip_${session.sRole.vip}.png|"/> <a th:href="@{/profile}">详情</a></div>
-            <div>❤️ 爱心:<span th:text="|${session.sRole.lovePoint}|"></span> 金币:<span th:text="|${session.sRole.coin}|"></span> <a th:href="@{/bank}">存款</a></div>
-            <div>鲜花:<span th:text="|${session.sRole.diamond}|"></span> 钻石:<span th:text="|${session.sRole.diamond}|"></span></div>
+            <div>🎖️ 等级:<span th:text="|${session.sRole.level}|"></span>级
+                <span class="text-muted"
+                      th:with="nextLevel=${@gameConfigGateway.getBaseLevel(session.sRole.level + 1)}, cur=${session.sRole.totalExp}, need=${nextLevel != null ? nextLevel.totalExp : null}"
+                      th:text="${need != null && need > cur ? '(' + (cur * 100 / need) + '%)' : '(满级)'}">(20%)</span>
+                <img alt="VIP" class="vip-icon" src="../../static/images/vip/vip_3.png" th:src="|/assets/images/vip/vip_${session.sRole.vip}.png|"/> <a th:href="@{/profile}">详情</a></div>
+            <div>❤️ 爱心:<span th:text="|${session.sRole.lovePoint}|"></span> 💰 金币:<span th:text="|${session.sRole.coin}|"></span> <a th:href="@{/bank}">存款</a></div>
+            <div>💎 钻石:<span th:text="|${session.sRole.diamond}|"></span> <span class="text-muted">（加速/稀缺道具）</span></div>
             <div th:if="${session.sRole.marriageType > 0}">爱人:<span><a href="#" th:text="|这段情、|">详情</a></span></div>
             <div hidden="hidden">徒弟:<span><a href="#" th:text="|丂①花花世界的爱情|">详情</a></span> <span><a href="#" th:text="|丂①花花世界的爱情|">详情</a></span> <span><a href="#" th:text="|丂①花花世界的爱情|">详情</a></span></div>
             <div class="egg-wrapper" hidden="hidden"><img alt="" class="egg" src="../../static/images/egg/1.gif" th:src="@{/assets/images/egg/1.gif}"/>1星金蛋:<a href="#">砸蛋开奖</a></div>
@@ -70,7 +74,7 @@
                     <p>
                         <form th:action="@{/trap/hasten}" method="post" style="display:inline">
                             <input type="hidden" name="trapId" th:value="${trap.id}">
-                            <input type="submit" value="加速">
+                            <input type="submit" value="💎加速(5钻/半小时)">
                         </form>
                     </p>
                 </div>

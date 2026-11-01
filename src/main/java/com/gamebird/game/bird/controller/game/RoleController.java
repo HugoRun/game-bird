@@ -137,7 +137,8 @@ public class RoleController extends BaseController {
         role.setExp(0L);
         role.setTotalExp(0L);
         role.setCoin(10000L);
-        role.setDiamond(0);
+        // 新手启动钻石：首次捕捉（约 1 小时）即可体验钻石加速
+        role.setDiamond(20);
         role.setLovePoint(0L);
         role.setLastLoginTime(nowTime);
         role.setRegTime(nowTime);
