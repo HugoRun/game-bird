@@ -15,6 +15,7 @@ import com.gamebird.game.bird.model.shop.FeeKind;
 import com.gamebird.game.bird.model.shop.PurchaseResult;
 import com.gamebird.game.bird.model.shop.ShopItemView;
 import com.gamebird.game.bird.model.shop.ShopKind;
+import com.gamebird.game.bird.service.impl.QuestService;
 import com.gamebird.game.bird.util.GameUtils;
 
 /**
@@ -48,6 +49,8 @@ public class ShopPurchaseService {
 
     private final RolePackService packService;
 
+    private final QuestService questService;
+
     /**
      * 构造注入。
      *
@@ -59,11 +62,13 @@ public class ShopPurchaseService {
     public ShopPurchaseService(ShopItemAccessors accessors,
                                RoleValueService roleValueService,
                                RoleService roleService,
-                               RolePackService packService) {
+                               RolePackService packService,
+                               QuestService questService) {
         this.accessors = accessors;
         this.roleValueService = roleValueService;
         this.roleService = roleService;
         this.packService = packService;
+        this.questService = questService;
     }
 
     /**
@@ -148,6 +153,11 @@ public class ShopPurchaseService {
         roleService.saveOrUpdate(role);
         packService.saveOrUpdate(pack);
 
+        // 奋进目标：购买 +1（旁路失败不影响购买）
+        try {
+            questService.onEvent(role, QuestService.EV_PURCHASE, 1);
+        } catch (Exception ignored) {
+        }
         // 消息（文案与原实现逐字一致，仅用 record 访问器替代实体 getter）
         String text = "购买成功，您花费" + totalFeePrice
                 + GameUtils.getFeeTypeName(item.feeType())

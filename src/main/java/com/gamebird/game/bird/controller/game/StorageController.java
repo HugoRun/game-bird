@@ -13,6 +13,7 @@ import com.gamebird.game.bird.service.RoleCageService;
 import com.gamebird.game.bird.service.StorageBirdService;
 import com.gamebird.game.bird.service.TaskTriggerService;
 import com.gamebird.game.bird.service.impl.CollectionService;
+import com.gamebird.game.bird.service.impl.QuestService;
 import com.gamebird.game.bird.util.GameUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
@@ -52,6 +53,9 @@ public class StorageController extends BaseController {
 
     @Resource
     public GameEventService gameEventService;
+
+    @Resource
+    public QuestService questService;
 
     @Resource
     public CollectionService collectionService;
@@ -198,6 +202,7 @@ public class StorageController extends BaseController {
             return list(session, model);
         }
         storageBirdService.removeById(birdId);
+        questService.onEvent(role, QuestService.EV_SELL, 1);
         // 直接累加金钱并落库（BaseController.addRoleCoin 只改内存，这里一并持久化）
         role.setCoin(role.getCoin() + gain);
         // 同步小鸟数量：排行榜的「小鸟数」维度读的是 role.bird_num，
@@ -245,6 +250,7 @@ public class StorageController extends BaseController {
             totalGain += sellGain(baseBird, bird);
             storageBirdService.removeById(bird.getId());
         }
+        questService.onEvent(role, QuestService.EV_SELL, birds.size());
         role.setCoin(role.getCoin() + totalGain);
         int left = Math.max(0, (role.getBirdNum() == null ? 0 : role.getBirdNum()) - birds.size());
         role.setBirdNum((short) left);

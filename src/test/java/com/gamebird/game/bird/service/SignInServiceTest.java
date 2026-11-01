@@ -78,6 +78,7 @@ class SignInServiceTest {
         SignInService stub = stubbed(null, null);
         stub.signLogService = signLogService;
         stub.roleService = roleService;
+        stub.questService = mock(com.gamebird.game.bird.service.impl.QuestService.class);
         Role role = role();
         String text = stub.sign(role);
         assertEquals("签到成功！连签1天，获得金币100。", text);
@@ -93,6 +94,7 @@ class SignInServiceTest {
         SignInService stub = stubbed(null, logOf(yesterday, 2));
         stub.signLogService = signLogService;
         stub.roleService = roleService;
+        stub.questService = mock(com.gamebird.game.bird.service.impl.QuestService.class);
         Role role = role();
         String text = stub.sign(role);
         assertEquals("签到成功！连签3天，获得金币300、钻石5。", text);
@@ -106,6 +108,7 @@ class SignInServiceTest {
         SignInService stub = stubbed(null, logOf(yesterday, 6));
         stub.signLogService = signLogService;
         stub.roleService = roleService;
+        stub.questService = mock(com.gamebird.game.bird.service.impl.QuestService.class);
         Role role = role();
         assertEquals("签到成功！连签7天，获得金币700、钻石20。", stub.sign(role));
         assertEquals(700L, role.getCoin());
@@ -114,6 +117,7 @@ class SignInServiceTest {
         SignInService stub2 = stubbed(null, logOf(yesterday, 20));
         stub2.signLogService = signLogService;
         stub2.roleService = roleService;
+        stub2.questService = mock(com.gamebird.game.bird.service.impl.QuestService.class);
         assertEquals("签到成功！连签21天，获得金币700。", stub2.sign(role2));
         assertEquals(700L, role2.getCoin());
         assertEquals(0, role2.getDiamond());
@@ -126,6 +130,7 @@ class SignInServiceTest {
         SignInService stub = stubbed(null, logOf(longAgo, 5));
         stub.signLogService = signLogService;
         stub.roleService = roleService;
+        stub.questService = mock(com.gamebird.game.bird.service.impl.QuestService.class);
         Role role = role();
         assertEquals("签到成功！连签1天，获得金币100。", stub.sign(role));
     }
@@ -137,6 +142,7 @@ class SignInServiceTest {
         SignInService stub = stubbed(logOf(today, 3), logOf(today, 3));
         stub.signLogService = signLogService;
         stub.roleService = roleService;
+        stub.questService = mock(com.gamebird.game.bird.service.impl.QuestService.class);
         Role role = role();
         assertNull(stub.sign(role));
         verify(signLogService, never()).save(any());
@@ -149,6 +155,7 @@ class SignInServiceTest {
         SignInService stub = stubbed(null, null);
         stub.signLogService = signLogService;
         stub.roleService = roleService;
+        stub.questService = mock(com.gamebird.game.bird.service.impl.QuestService.class);
         stub.sign(role());
         ArgumentCaptor<SignLog> captor = ArgumentCaptor.forClass(SignLog.class);
         verify(signLogService).save(captor.capture());

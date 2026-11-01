@@ -146,7 +146,8 @@ class ShopPurchaseServiceTest {
         accessors.setBasePropService(basePropService);
         accessors.bind();
 
-        service = new ShopPurchaseService(accessors, roleValueService, roleService, packService);
+        service = new ShopPurchaseService(accessors, roleValueService, roleService, packService,
+                mock(com.gamebird.game.bird.service.impl.QuestService.class));
     }
 
     // ------------------------------------------------------------------

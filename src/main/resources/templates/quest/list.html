@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='奋进目标')}"></head>
+<body>
+
+<div class="main">
+    <div class="panel bg-blue">
+        奋进目标 · 主线已交付 <span class="text-darkorange" th:text="${mainDone}"></span> / 10 章
+        <a th:href="@{/task/list}">日常任务</a>　<a th:href="@{/game}">回主页</a>
+    </div>
+
+    <!-- 主线 -->
+    <div class="panel bg-green">【主线剧情】猪头大军占领了梦想花园，一路反击吧！</div>
+    <ul class="list1">
+        <li th:each="v : ${views}" th:if="${v.def.chapter == 1}">
+            <div class="list1-icon">
+                <img alt="" class="icon-gray-border" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"
+                     th:style="${v.locked} ? 'filter: grayscale(1); opacity:.5' : ''">
+            </div>
+            <div class="list1-info">
+                <p>
+                    <span th:if="${v.locked}" class="text-muted">🔒 </span>
+                    <span th:class="${v.progress != null && v.progress.status == 1} ? 'text-primary' : ''"
+                          th:text="${v.def.title}"></span>
+                    <span class="text-muted"
+                          th:text="${v.def.rewardCoin > 0 ? '金币+' + v.def.rewardCoin : ''}"></span>
+                    <span class="text-muted" th:if="${v.def.rewardDiamond > 0}"
+                          th:text="'钻石+' + ${v.def.rewardDiamond}"></span>
+                    <span class="text-muted" th:if="${v.def.rewardPropNum > 0}"
+                          th:text="${@gameConfigGateway.getBaseProp(v.def.rewardPropId) != null ? @gameConfigGateway.getBaseProp(v.def.rewardPropId).name + '×' + v.def.rewardPropNum : ''}"></span>
+                </p>
+                <p class="text-muted" th:text="${v.def.descText}"></p>
+                <p th:if="${v.progress != null && v.progress.status < 2}">
+                    进度:<span class="text-darkorange"
+                              th:text="${v.progress.progress + '/' + v.def.targetNum}"></span>
+                    <span th:if="${v.progress.status == 1}" class="text-primary">可交付！</span>
+                </p>
+                <p th:if="${v.progress != null && v.progress.status == 2}" class="text-muted">已交付 ✔</p>
+                <p class="btl" th:if="${!v.locked && v.progress != null && v.progress.status == 1}">
+                    <form th:action="@{/quest/deliver}" method="post" style="display:inline">
+                        <input type="hidden" name="id" th:value="${v.def.id}">
+                        <input type="submit" value="交付奖励">
+                    </form>
+                </p>
+            </div>
+        </li>
+    </ul>
+
+    <!-- 每日 -->
+    <div class="panel bg-yellow">【每日任务】每天零点刷新</div>
+    <ul class="list1">
+        <li th:each="v : ${views}" th:if="${v.def.chapter == 2}">
+            <div class="list1-info">
+                <p>
+                    <span th:class="${v.progress != null && v.progress.status == 1} ? 'text-primary' : ''"
+                          th:text="${v.def.title}"></span>
+                    <span class="text-muted" th:text="${v.def.rewardCoin > 0 ? '金币+' + v.def.rewardCoin : ''}"></span>
+                    <span class="text-muted" th:if="${v.def.rewardDiamond > 0}"
+                          th:text="'钻石+' + ${v.def.rewardDiamond}"></span>
+                </p>
+                <p class="text-muted" th:text="${v.def.descText}"></p>
+                <p>
+                    进度:<span class="text-darkorange"
+                              th:text="${v.progress != null ? v.progress.progress + '/' + v.def.targetNum : '0/' + v.def.targetNum}"></span>
+                </p>
+                <p class="btl" th:if="${v.progress != null && v.progress.status == 1}">
+                    <form th:action="@{/quest/deliver}" method="post" style="display:inline">
+                        <input type="hidden" name="id" th:value="${v.def.id}">
+                        <input type="submit" value="领取奖励">
+                    </form>
+                </p>
+                <p th:if="${v.progress != null && v.progress.status == 2}" class="text-muted">今日已完成 ✔</p>
+            </div>
+        </li>
+    </ul>
+
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

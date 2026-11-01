@@ -29,6 +29,7 @@ import com.gamebird.game.bird.model.dbo.RoleTrap;
 import com.gamebird.game.bird.model.message.MessageLink;
 import com.gamebird.game.bird.model.message.MessageVO;
 import com.gamebird.game.bird.service.GameEventService;
+import com.gamebird.game.bird.service.impl.QuestService;
 import com.gamebird.game.bird.service.TaskTriggerService;
 
 /**
@@ -62,6 +63,10 @@ public class RoleController extends BaseController {
     /** 游戏事件（树林记录/一次性标记）。 */
     @Resource
     public GameEventService gameEventService;
+
+    /** 奋进目标引擎。 */
+    @Resource
+    public QuestService questService;
 
     /** 图鉴（角色页统计）。 */
     @Resource
@@ -207,6 +212,8 @@ public class RoleController extends BaseController {
         taskTriggerService.onLogin(role);
         // 银行每日利息：余额的 0.1%（封顶 1000），每天首次进入游戏发放
         grantDailyInterest(role, session);
+        // 奋进目标：每日登录类事件
+        questService.onEvent(role, QuestService.EV_LOGIN, 1);
         // 更新当前登录角色
         saveSessionRole(session, role);
         return redirectTo("/game");

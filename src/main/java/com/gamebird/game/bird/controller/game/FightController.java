@@ -12,6 +12,7 @@ import com.gamebird.game.bird.model.dbo.RoleCage;
 import com.gamebird.game.bird.model.dbo.StorageBird;
 import com.gamebird.game.bird.service.FightLogService;
 import com.gamebird.game.bird.service.RoleValueService;
+import com.gamebird.game.bird.service.impl.QuestService;
 import com.gamebird.game.bird.service.TaskTriggerService;
 import com.gamebird.game.bird.service.GameEventService;
 import com.gamebird.game.bird.service.RoleCageService;
@@ -67,6 +68,38 @@ public class FightController extends BaseController {
 
     @Resource
     public TaskTriggerService taskTriggerService;
+
+    @Resource
+    public QuestService questService;
+
+    @Resource
+    public com.gamebird.game.bird.service.impl.TowerService towerService;
+
+    /** 试炼之塔页：当前层、历史最高、剩余次数。 */
+    @GetMapping("/tower")
+    public String tower(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        com.gamebird.game.bird.model.dbo.TowerRecord record = towerService.record(role.getRoleId());
+        model.addAttribute("record", record);
+        model.addAttribute("remain", towerService.remainAttempts(record));
+        model.addAttribute("dailyLimit", com.gamebird.game.bird.service.impl.TowerService.DAILY_LIMIT);
+        model.addAttribute("cagedBird", getCagedBird(role.getRoleId()));
+        return "fight/tower";
+    }
+
+    /** 试炼之塔挑战。 */
+    @PostMapping("/tower/challenge")
+    public String towerChallenge(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        String result = towerService.challenge(role);
+        saveSessionRole(session, role);
+        if (result == null) {
+            model.addAttribute("message", "今天的 3 次挑战机会已经用完，明天再来。");
+        } else {
+            model.addAttribute("message", result);
+        }
+        return tower(session, model);
+    }
 
     /** 战斗记录列表：当前角色的战斗记录 + 冷却状态。 */
     @GetMapping(value = {"", "/list"})
@@ -250,6 +283,8 @@ public class FightController extends BaseController {
             }
             taskTriggerService.onFightWinCount(role, countWins(role.getRoleId()));
             taskTriggerService.onWealth(role);
+            questService.onEvent(role, QuestService.EV_FIGHT_WIN, 1);
+            questService.onEvent(role, QuestService.EV_LEVEL, 0);
         } else {
             log.setResult(0);
             log.setRewardCoin(0L);

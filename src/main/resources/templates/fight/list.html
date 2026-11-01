@@ -17,7 +17,8 @@
     </div>
 
     <p>
-        <a th:href="@{/fight/arena}"><button type="button" class="btn btn-primary">前往竞技场（看牌选对手）</button></a>
+        <a th:href="@{/fight/arena}"><button type="button" class="btn btn-primary">竞技场</button></a>
+        <a th:href="@{/fight/tower}"><button type="button" class="btn btn-primary">试炼之塔（PVE）</button></a>
     </p>
     <form th:action="@{/fight/challenge}" method="post" style="margin-top:6px">
         <button type="submit" class="btn btn-primary" th:disabled="${cooldownRemain > 0}">随机挑战</button>

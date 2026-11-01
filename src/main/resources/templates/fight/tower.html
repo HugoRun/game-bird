@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='试炼之塔')}"></head>
+<body>
+
+<div class="main">
+    <div class="panel bg-blue">试炼之塔 <a th:href="@{/fight/list}">返回战斗</a></div>
+    <p class="text-muted">猪头大军盘踞的无尽高塔：每层守卫随层数变强，战胜即登上下一层。每天 3 次挑战机会，奖励随层数提升，第 3/5 层倍数档有钻石。</p>
+
+    <div>
+        <div>当前层数:<span class="text-darkorange" th:text="'B' + ${record.floor} + ' 层'"></span>
+            历史最高:<span th:text="${record.bestFloor > 0 ? 'B' + record.bestFloor + ' 层' : '尚未登顶'}"></span></div>
+        <div>今日剩余挑战:<span class="text-primary" th:text="${remain + '/' + dailyLimit}"></span> 次</div>
+        <div th:if="${cagedBird != null}" class="text-muted">
+            出战小鸟:<span th:text="${@gameConfigGateway.getBaseBird(cagedBird.birdId) != null ? @gameConfigGateway.getBaseBird(cagedBird.birdId).name : '神秘小鸟'}"></span>
+            <span th:text="${cagedBird.level + '级 ' + @gameUtils.getStarName(cagedBird.star)}"></span>
+        </div>
+        <div th:if="${cagedBird == null}" class="text-muted">尚未设置出战小鸟，仅以角色等级应战。</div>
+        <p th:if="${message}" th:text="${message}" class="text-primary"></p>
+        <form th:action="@{/fight/tower/challenge}" method="post" style="margin-top:6px">
+            <button type="submit" class="btn btn-primary" th:disabled="${remain <= 0}"
+                    th:text="'挑战 B' + ${record.floor} + ' 层'"></button>
+            <span class="text-muted" th:if="${remain <= 0}">今日次数已用尽</span>
+        </form>
+    </div>
+
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

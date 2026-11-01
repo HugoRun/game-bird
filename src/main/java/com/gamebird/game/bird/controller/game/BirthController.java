@@ -16,6 +16,7 @@ import com.gamebird.game.bird.service.FriendService;
 import com.gamebird.game.bird.service.TaskTriggerService;
 import com.gamebird.game.bird.service.impl.CollectionService;
 import com.gamebird.game.bird.service.GameEventService;
+import com.gamebird.game.bird.service.impl.QuestService;
 import com.gamebird.game.bird.service.RoleBirthService;
 import com.gamebird.game.bird.util.GameUtils;
 import jakarta.annotation.Resource;
@@ -69,6 +70,9 @@ public class BirthController extends BaseController {
 
     @Resource
     public TaskTriggerService taskTriggerService;
+
+    @Resource
+    public QuestService questService;
 
     /** 孵化场列表。 */
     @GetMapping(value = {"", "/list"})
@@ -396,6 +400,7 @@ public class BirthController extends BaseController {
         // 图鉴与成就：首次收集新物种 / 首只 5 星结晶
         collectionService.record(role.getRoleId(), childBaseId);
         taskTriggerService.onCollect(role, collectionService.countCollected(role.getRoleId()));
+        questService.onEvent(role, QuestService.EV_BIRTH, 1);
         if (star >= 5) {
             taskTriggerService.onFiveStarBirth(role);
         }

@@ -12,6 +12,7 @@ import com.gamebird.game.bird.model.dbo.RolePack;
 import com.gamebird.game.bird.model.dbo.RoleTrain;
 import com.gamebird.game.bird.model.dbo.StorageBird;
 import com.gamebird.game.bird.service.GameEventService;
+import com.gamebird.game.bird.service.impl.QuestService;
 import com.gamebird.game.bird.service.RoleTrainService;
 import com.gamebird.common.util.CommonUtils;
 import com.gamebird.game.bird.util.GameUtils;
@@ -47,6 +48,9 @@ public class TrainController extends BaseController {
 
     @Resource
     public GameEventService gameEventService;
+
+    @Resource
+    public QuestService questService;
 
     /** 训练场列表。 */
     @GetMapping(value = {"", "/list"})
@@ -168,6 +172,7 @@ public class TrainController extends BaseController {
         }
         StringBuilder note = new StringBuilder();
         long reward = settleTrain(role, train, now, false, note);
+        questService.onEvent(role, QuestService.EV_TRAIN, 1);
         model.addAttribute("message", "训练完成！小鸟获得经验 " + reward + "。" + note);
         return list(model, role);
     }

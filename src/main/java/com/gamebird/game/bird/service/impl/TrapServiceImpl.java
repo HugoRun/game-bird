@@ -94,6 +94,9 @@ public class TrapServiceImpl implements TrapService {
     public CollectionService collectionService;
 
     @Resource
+    public QuestService questService;
+
+    @Resource
     public ActivityService activityService;
 
     @Resource
@@ -288,6 +291,10 @@ public class TrapServiceImpl implements TrapService {
             taskTriggerService.onCatch(role);
             taskTriggerService.onLevelUp(role);
             taskTriggerService.onWealth(role);
+            // 奋进目标：捕捉 +1，图鉴/等级快照刷新
+            questService.onEvent(role, QuestService.EV_CATCH, 1);
+            questService.onEvent(role, QuestService.EV_BOOK, 0);
+            questService.onEvent(role, QuestService.EV_LEVEL, 0);
         }
         // 消耗陷阱耐久（默认竹筐 use_trap_id=0 不扣）
         if (slot.getUseTrapId() > 0 && slot.getUseTrapNum() > 0) {

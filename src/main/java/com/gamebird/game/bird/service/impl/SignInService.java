@@ -42,6 +42,9 @@ public class SignInService {
     @Resource
     public RoleService roleService;
 
+    @Resource
+    public QuestService questService;
+
     /** 今天是否已签到。 */
     public boolean isSignedToday(String roleId) {
         return getByDay(roleId, today()) != null;
@@ -91,6 +94,7 @@ public class SignInService {
             role.setDiamond((role.getDiamond() == null ? 0 : role.getDiamond()) + diamond);
         }
         roleService.updateById(role);
+        questService.onEvent(role, QuestService.EV_LOGIN, 1);
         StringBuilder text = new StringBuilder();
         text.append("签到成功！连签").append(continuous).append("天，获得金币").append(coin);
         if (diamond > 0) {
