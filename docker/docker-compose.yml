@@ -26,6 +26,7 @@ services:
       - ../sql/extra/task_board.sql:/docker-entrypoint-initdb.d/03-extra-task-board.sql:ro
       - ../sql/extra/act_fight.sql:/docker-entrypoint-initdb.d/04-extra-act-fight.sql:ro
       - ../sql/extra/sign_log.sql:/docker-entrypoint-initdb.d/05-extra-sign-log.sql:ro
+      - ../sql/extra/alter_account_password.sql:/docker-entrypoint-initdb.d/06-alter-account-password.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
