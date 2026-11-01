@@ -124,9 +124,9 @@ public class TaskTriggerService {
         }
     }
 
-    /** 图鉴收集成就：收集物种数达到 10/30/60/全部分档时发对应档位（自动取最高未领档）。 */
+    /** 图鉴收集成就：收集物种数达到 10/30/60/100 分档时发对应档位（自动取最高未领档）。 */
     public void onCollect(Role role, long collectedKinds) {
-        if (collectedKinds >= 111) {
+        if (collectedKinds >= 100) {
             onAchievement(role, ACHIEVEMENT_BOOK, REWARD_BOOK_ALL);
             return;
         }
