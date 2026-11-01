@@ -135,6 +135,7 @@ public class RoleController extends BaseController {
         role.setFieldId(ConstData.DEFAULT_FIELD_ID);
         role.setLevel(1);
         role.setExp(0L);
+        role.setTotalExp(0L);
         role.setCoin(10000L);
         role.setDiamond(0);
         role.setLovePoint(0L);

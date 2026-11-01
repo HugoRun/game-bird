@@ -47,8 +47,9 @@ public class RoleValueService {
         if (role == null || addExp == null || addExp <= 0) {
             throw new BizException(ResultCode.PARAM_INVALID, "增加的经验值必须大于 0。");
         }
-        role.setExp(role.getExp() + addExp);
-        role.setTotalExp(role.getTotalExp() + addExp);
+        // 会话中的角色对象可能未初始化经验字段（旧存量/建角直连），按 0 兜底
+        role.setExp((role.getExp() == null ? 0L : role.getExp()) + addExp);
+        role.setTotalExp((role.getTotalExp() == null ? 0L : role.getTotalExp()) + addExp);
         role.setLevel(calcRoleLevel(role.getLevel(), role.getTotalExp()));
     }
 
