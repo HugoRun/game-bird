@@ -176,7 +176,11 @@ public class ShopItemAccessors {
         QueryWrapper<T> wrapper = new QueryWrapper<>();
         wrapper.le("lu", level)
                 .eq("is_shopping", 1)
-                .orderByDesc("lu");
+                .orderByDesc("lu")
+                // 唯一排序列兜底：6 张 base 表主键同为 id。此前只按 lu 排序，
+                // 大量并列 lu 的行在不同 offset 下顺序不稳定，分页出现
+                // 「同一商品跨页重复、另一商品丢失」的渲染错乱
+                .orderByAsc("id");
         if (feeType > 0) {
             wrapper.eq("fee_type", feeType);
         }
