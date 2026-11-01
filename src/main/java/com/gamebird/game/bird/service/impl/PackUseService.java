@@ -99,6 +99,9 @@ public class PackUseService {
     @Transactional(rollbackFor = Exception.class)
     public UseResult useTrap(Role role, Integer packId, int trapIdx) {
         RolePack pack = loadOwnedPack(role, packId, ConstData.PACK_TYPE_TRAP);
+        if (pack == null) {
+            return UseResult.fail("陷阱不存在或数量不足。");
+        }
         BaseTrap baseTrap = configGateway.getBaseTrap(pack.getBaseId());
         if (baseTrap == null) {
             return UseResult.fail("陷阱配置错误。");
@@ -125,6 +128,9 @@ public class PackUseService {
     @Transactional(rollbackFor = Exception.class)
     public UseResult useCage(Role role, Integer packId) {
         RolePack pack = loadOwnedPack(role, packId, ConstData.PACK_TYPE_CAGE);
+        if (pack == null) {
+            return UseResult.fail("鸟笼不存在或数量不足。");
+        }
         BaseCage baseCage = configGateway.getBaseCage(pack.getBaseId());
         if (baseCage == null) {
             return UseResult.fail("鸟笼配置错误。");
@@ -146,6 +152,9 @@ public class PackUseService {
     @Transactional(rollbackFor = Exception.class)
     public UseResult useNest(Role role, Integer packId, int birthIdx) {
         RolePack pack = loadOwnedPack(role, packId, ConstData.PACK_TYPE_NEST);
+        if (pack == null) {
+            return UseResult.fail("巢穴不存在或数量不足。");
+        }
         BaseNest baseNest = configGateway.getBaseNest(pack.getBaseId());
         if (baseNest == null) {
             return UseResult.fail("巢穴配置错误。");
@@ -170,6 +179,9 @@ public class PackUseService {
     @Transactional(rollbackFor = Exception.class)
     public UseResult useTrainGround(Role role, Integer packId, int trainIdx) {
         RolePack pack = loadOwnedPack(role, packId, ConstData.PACK_TYPE_TRAIN);
+        if (pack == null) {
+            return UseResult.fail("训练场不存在或数量不足。");
+        }
         BaseTrain baseTrain = configGateway.getBaseTrain(pack.getBaseId());
         if (baseTrain == null) {
             return UseResult.fail("训练场配置错误。");
@@ -205,6 +217,9 @@ public class PackUseService {
     public UseResult useProp(Role role, Integer packId, Integer birdId,
                              Integer trapId, Integer trainId, Integer birthId) {
         RolePack pack = loadOwnedPack(role, packId, ConstData.PACK_TYPE_PROP);
+        if (pack == null) {
+            return UseResult.fail("道具不存在或数量不足。");
+        }
         BaseProp prop = configGateway.getBaseProp(pack.getBaseId());
         if (prop == null) {
             return UseResult.fail("道具配置错误。");
