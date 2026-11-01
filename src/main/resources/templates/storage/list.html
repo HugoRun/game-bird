@@ -39,7 +39,12 @@
             </div>
         </li>
     </ul>
-    <div><a th:href="@{/storage/book}">小鸟图鉴</a></div>
+    <div>
+        <a th:href="@{/storage/book}">小鸟图鉴</a>
+        <form th:action="@{/storage/sellAllConfirm}" method="post" style="display:inline">
+            <input type="submit" value="一键出售（保留锁定鸟）">
+        </form>
+    </div>
 
     <div th:replace="~{fragment/navigation::navigation}"></div>
     <div th:replace="~{fragment/footDate::footDate}"></div>

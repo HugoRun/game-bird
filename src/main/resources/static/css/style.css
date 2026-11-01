@@ -149,6 +149,37 @@ button:focus {
     line-height: 26px;
 }
 
+/* 表格形态的 list1（排行榜/任务中心）：flex 版规则只作用于 ul>li，
+   表格在此前没有任何样式，表现为行列拥挤 */
+table.list1 {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 6px 0;
+}
+
+table.list1 th,
+table.list1 td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #d8e8f4;
+    text-align: left;
+    vertical-align: top;
+    word-break: break-all;
+}
+
+table.list1 thead th {
+    background-color: #eaf5fe;
+    border-bottom: 1px solid #A1CFEC;
+}
+
+table.list1 tbody tr:hover {
+    background-color: #f4faff;
+}
+
+/* 长角色名/长标题防撑破布局 */
+.panel div {
+    word-break: break-all;
+}
+
 /* 图标边框 */
 img.icon-gray-border {
     border: 1px solid dimgray;

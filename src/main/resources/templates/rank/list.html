@@ -24,10 +24,19 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="r, stat : ${roles}">
-            <td th:text="${stat.count}"></td>
-            <td th:text="${r.roleName}"></td>
-            <td th:text="${r.level}"></td>
+        <tr th:each="r, stat : ${roles}"
+            th:style="${r.roleId == session.sRole.roleId} ? 'background-color:#fff7d0' : ''">
+            <td>
+                <span th:if="${stat.count == 1}" class="text-darkorange">①</span>
+                <span th:if="${stat.count == 2}" class="text-primary">②</span>
+                <span th:if="${stat.count == 3}" class="text-primary">③</span>
+                <span th:if="${stat.count > 3}" th:text="${stat.count}"></span>
+            </td>
+            <td>
+                <span th:text="${r.roleName}"></span>
+                <span th:if="${r.roleId == session.sRole.roleId}" class="text-darkorange">（我）</span>
+            </td>
+            <td th:text="${r.level + '级'}"></td>
             <td th:text="${r.coin}"></td>
             <td th:text="${r.lovePoint}"></td>
             <td th:text="${r.birdNum}"></td>

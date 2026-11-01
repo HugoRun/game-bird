@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='一键出售')}"></head>
+<body>
+
+<div class="main">
+    <div>
+        <div class="pic">
+            <img alt="" src="../../static/images/logo/pack.gif" th:src="@{/assets/images/logo/pack.gif}"/>
+        </div>
+        <div class="panel bg-blue">一键出售确认</div>
+        <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+        <div class="npc-talk">
+            <div>将出售仓库里<b>全部未锁定</b>的小鸟，共 <span class="text-darkorange" th:text="${count}"></span> 只，预计进账 <span class="text-darkorange" th:text="${totalGain}"></span> 金币。</div>
+            <div>训练中/配对中的小鸟已被锁定保护，不会卖出；图鉴记录不受影响。</div>
+            <div class="text-muted">想留某只鸟？先取消，去把它设为出战或让它进入训练/配对锁定。</div>
+        </div>
+        <form th:action="@{/storage/sellAll}" method="post" style="margin-top:8px">
+            <input type="submit" value="确认全部出售">
+            <a th:href="@{/storage/list}">再想想</a>
+        </form>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

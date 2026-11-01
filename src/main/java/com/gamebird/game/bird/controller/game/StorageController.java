@@ -211,6 +211,51 @@ public class StorageController extends BaseController {
         return list(session, model);
     }
 
+    /** 一键出售确认页：列出全部未锁定小鸟的只数与总价值。 */
+    @GetMapping("/sellAllConfirm")
+    public String sellAllConfirm(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        List<StorageBird> birds = listBirds(role).stream()
+                .filter(b -> b.getIsLock() == null || b.getIsLock() == 0)
+                .toList();
+        long totalGain = 0;
+        for (StorageBird bird : birds) {
+            BaseBird baseBird = baseBirdService.getById(bird.getBirdId());
+            totalGain += sellGain(baseBird, bird);
+        }
+        model.addAttribute("count", birds.size());
+        model.addAttribute("totalGain", totalGain);
+        return "storage/sellAllConfirm";
+    }
+
+    /** 一键出售：卖出全部未锁定的小鸟（锁定/训练配对中的不动）。 */
+    @PostMapping("/sellAll")
+    public String sellAll(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        List<StorageBird> birds = listBirds(role).stream()
+                .filter(b -> b.getIsLock() == null || b.getIsLock() == 0)
+                .toList();
+        if (birds.isEmpty()) {
+            model.addAttribute("message", "没有可出售的小鸟（训练/配对中的已被锁定保护）。");
+            return list(session, model);
+        }
+        long totalGain = 0;
+        for (StorageBird bird : birds) {
+            BaseBird baseBird = baseBirdService.getById(bird.getBirdId());
+            totalGain += sellGain(baseBird, bird);
+            storageBirdService.removeById(bird.getId());
+        }
+        role.setCoin(role.getCoin() + totalGain);
+        int left = Math.max(0, (role.getBirdNum() == null ? 0 : role.getBirdNum()) - birds.size());
+        role.setBirdNum((short) left);
+        roleService.updateById(role);
+        saveSessionRole(session, role);
+        gameEventService.record(role.getRoleId(),
+                "一口气出售了" + birds.size() + "只小鸟，进账金币" + totalGain + "。");
+        model.addAttribute("message", "一键出售完成：卖出 " + birds.size() + " 只，共获得金币 " + totalGain + "。");
+        return list(session, model);
+    }
+
     /** 设置出战鸟：战斗时代替角色裸等级出战（与装备的鸟笼共同决定加成）。 */
     @PostMapping("/deploy")
     public String deploy(HttpSession session, Model model, @RequestParam Integer birdId) {

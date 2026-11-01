@@ -1,5 +1,9 @@
 -- 任务 / 公告 新表结构（与 game_bird.sql 解耦，单独维护，便于增量导入）。
 -- 使用 CREATE TABLE IF NOT EXISTS，重复执行不会报错。
+-- ★ 必须先声明客户端字符集：初始化管道若按 latin1 解析，下面的中文
+--   INSERT 会存成双重编码乱码（页面上公告栏乱码的根因，已由
+--   fix_board_encoding.sql 在运行库兜底修复）。
+SET NAMES utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `task` (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
