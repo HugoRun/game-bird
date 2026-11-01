@@ -174,8 +174,9 @@ public class ShopItemAccessors {
      */
     public <T> void pageShopItems(Page<T> page, int level, int feeType, IService<T> service) {
         QueryWrapper<T> wrapper = new QueryWrapper<>();
-        wrapper.le("lu", level)
-                .eq("is_shopping", 1)
+        // 全量展示：未达等级的商品由页面置灰并标注解锁等级，
+        // 让玩家看到完整的成长路径（购买仍由服务端 lu 校验兜底）
+        wrapper.eq("is_shopping", 1)
                 // 商店浏览顺序：低等级在前（新手从上往下看）、同等级价格低在前；
                 // id 兜底保证分页稳定（此前无唯一列时同一商品跨页重复）
                 .orderByAsc("lu")

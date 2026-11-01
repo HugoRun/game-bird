@@ -878,3 +878,117 @@ button.link-btn:hover {
     font-size: 11px;
     text-align: center;
 }
+
+
+/* ---------------- 个人中心 ---------------- */
+
+.profile-hero {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.profile-hero .avatar-wrapper {
+    margin: 0;
+}
+
+.profile-hero .avatar-wrapper img {
+    width: 72px;
+    height: 72px;
+    margin: 0;
+}
+
+.profile-hero-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--c-forest);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+}
+
+.profile-sub {
+    font-size: 13px;
+    color: var(--c-ink-soft);
+    margin-bottom: 6px;
+}
+
+.profile-exp-line {
+    font-size: 12px;
+}
+
+.text-love {
+    color: var(--c-love);
+    font-weight: 600;
+}
+
+.asset-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.asset-cell {
+    text-align: center;
+    background: rgba(255, 255, 255, .65);
+    border-radius: var(--radius-sm);
+    padding: 8px 2px;
+}
+
+.asset-num {
+    font-size: 15px;
+    font-weight: 700;
+    color: #5d4037;
+    word-break: break-all;
+}
+
+.asset-key {
+    font-size: 11px;
+    color: var(--c-ink-soft);
+    margin-top: 2px;
+}
+
+.profile-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.profile-actions a {
+    padding: 4px 11px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #e9f7e8, #d5efd4);
+    border: 1px solid #bfe0bd;
+    font-size: 13px;
+}
+
+/* ---------------- 商店锁定态 ---------------- */
+
+.shop-locked {
+    opacity: .62;
+    background: #f4f6f4;
+}
+
+.shop-locked .list1-info p {
+    color: var(--c-ink-soft);
+}
+
+.shop-locked-img {
+    filter: grayscale(1);
+    opacity: .5;
+}
+
+.shop-locked .mini-input,
+.shop-locked input[type="submit"] {
+    filter: grayscale(1);
+    opacity: .6;
+}

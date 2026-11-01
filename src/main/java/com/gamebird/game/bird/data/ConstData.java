@@ -117,7 +117,7 @@ public final class ConstData {
 
     ////////////////// 分页 //////////////////
     // 商店列表每页条数
-    public static final int SHOP_PAGE_SIZE = 5;
+    public static final int SHOP_PAGE_SIZE = 8;
     // 包裹列表每页条数
     public static final int PACK_PAGE_SIZE = 5;
     // 聊天列表每页条数。

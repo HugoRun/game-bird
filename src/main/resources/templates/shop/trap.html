@@ -10,18 +10,20 @@
         </div>
         <div th:if="${page.getTotal() > 0}">
             <ul class="list1">
-                <li th:each="baseTrap, stat : ${page.getRecords()}">
+                <li th:each="baseTrap, stat : ${page.getRecords()}"
+                        th:classappend="${baseTrap.lu > session.sRole.level} ? 'shop-locked' : ''">
                     <div class="list1-icon">
-                        <img alt="" class="icon-gray-border" src="../../static/images/trap/1.gif" th:src="@{|/assets/images/trap/${baseTrap.id}.gif|}">
+                        <img alt="" th:classappend="${baseTrap.lu > session.sRole.level} ? 'shop-locked-img' : '"  src="../../static/images/trap/1.gif" th:src="@{|/assets/images/trap/${baseTrap.id}.gif|}">
                     </div>
                     <div class="list1-info">
-                        <p><a th:href="@{|/shop/trap/detail(id=${baseTrap.id})|}"><span th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${baseTrap.name}">名称</span></a><span th:text="${'|' + baseTrap.lu + '级'}"></span></p></p>
+                        <p><a th:href="@{|/shop/trap/detail(id=${baseTrap.id})|}"><span th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${baseTrap.name}">名称</span></a><span th:text="${'|' + baseTrap.lu + '级'}"></span><span th:if="${baseTrap.lu > session.sRole.level}" class="badge badge-lock">🔒 需${baseTrap.lu}级</span></p></p>
                         <p>功能:<span th:text="${baseTrap.func}"></span></p>
                         <p>价格:<span th:text="${baseTrap.getFeePrice()}"></span><span th:text="${@gameUtils.getFeeTypeName(baseTrap.getFeeType())}"></span></p>
                         <div class="btl">
-                            <form class="inline-block" method="post" th:action="@{/shop/trap/purchase}">
+                            <th:block th:if="${baseTrap.lu <= session.sRole.level}"><form class="inline-block" method="post" th:action="@{/shop/trap/purchase}">
                                 <input name="id" th:value="${baseTrap.id}" type="hidden">
                                 购买:<input class="mini-input" maxlength="3" name="payNum" th:value="1" type="text">份 <input class="mini-button" th:value="确定购买" type="submit"/>
+                                </form></th:block>
                             </form>
                         </div>
                     </div>
