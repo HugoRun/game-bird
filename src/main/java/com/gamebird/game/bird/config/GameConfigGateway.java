@@ -61,6 +61,15 @@ public class GameConfigGateway {
     }
 
     /**
+     * 取全部小鸟配置（试管孵化随机抽取、孵化产出定种等需要遍历的场景使用）。
+     *
+     * @return 小鸟配置列表（缓存快照，只读）
+     */
+    public List<BaseBird> getBaseBirdList() {
+        return configManager.getBaseBirdList();
+    }
+
+    /**
      * 取鸟笼配置。
      *
      * @param id 鸟笼配置 id；可为 null

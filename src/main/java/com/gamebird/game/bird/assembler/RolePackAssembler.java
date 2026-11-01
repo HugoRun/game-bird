@@ -74,6 +74,29 @@ public class RolePackAssembler {
     }
 
     /**
+     * 装配单条包裹记录（按记录自身 typeId 选择填充字段）。
+     *
+     * <p>供「道具目标选择页」等单条展示场景使用；typeId 越界返回 null。
+     *
+     * @param pack 已查出的包裹记录
+     * @return 带配置对象的视图对象
+     */
+    public RolePackVO assembleOne(RolePack pack) {
+        if (pack == null || pack.getTypeId() == null) {
+            return null;
+        }
+        for (PackItemKind kind : PackItemKind.values()) {
+            if (kind.packTypeId().equals(pack.getTypeId())) {
+                RolePackVO view = new RolePackVO();
+                BeanUtils.copyProperties(pack, view);
+                kind.fill(view, configGateway);
+                return view;
+            }
+        }
+        return null;
+    }
+
+    /**
      * 包裹支持的 6 种物品。
      *
      * <p>每个枚举自带「用哪个 {@code PACK_TYPE_*} 查询」与「把哪个配置对象塞进 VO」，

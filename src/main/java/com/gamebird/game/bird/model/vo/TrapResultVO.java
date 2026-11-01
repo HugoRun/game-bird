@@ -27,6 +27,26 @@ public class TrapResultVO {
     // 旧的角色等级
     int oldLevel;
     int newLevel;
+    // 本次是否被小鸟挣脱逃脱（true 时无鸟入仓，只有一半经验安慰奖）
+    boolean escaped;
+    // 鸟笼加成文案，无加成为 null
+    String cageText;
+
+    public boolean isEscaped() {
+        return escaped;
+    }
+
+    public void setEscaped(boolean escaped) {
+        this.escaped = escaped;
+    }
+
+    public String getCageText() {
+        return cageText;
+    }
+
+    public void setCageText(String cageText) {
+        this.cageText = cageText;
+    }
 
     public int getBirdId() {
         return birdId;

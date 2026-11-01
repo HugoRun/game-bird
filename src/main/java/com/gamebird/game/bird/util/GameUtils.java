@@ -153,7 +153,12 @@ public class GameUtils {
      * @return 星级文本
      */
     public static String getStarName(Byte star) {
-        return switch (star) {
+        if (star == null) {
+            return "";
+        }
+        // 负值是「将逃脱」标记（下饵时掷骰，见 TrapServiceImpl），展示时取绝对值
+        byte value = star < 0 ? (byte) -star : star;
+        return switch (value) {
             case 0 -> "☆☆☆☆☆";
             case 1 -> "★☆☆☆☆";
             case 2 -> "★★☆☆☆";

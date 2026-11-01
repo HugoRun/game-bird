@@ -61,6 +61,43 @@ public final class ConstData {
     public static final Byte MARRIAGE_TYPE4 = 4;
 
 
+    ////////////////// 道具效果类型（base_prop.effect_type）/////////////////
+    // 粘性道具：给捕捉中的陷阱涂抹，降低小鸟逃脱概率
+    public static final int PROP_EFFECT_STICKY = 1;
+    // 爱心树：使用后直接获得爱心值
+    public static final int PROP_EFFECT_LOVE = 2;
+    // 基因/配对卡：试管孵化，直接产出一只指定重量比例的小鸟
+    public static final int PROP_EFFECT_GENE = 3;
+    // 玫瑰：求婚信物（喜鹊之恋）
+    public static final int PROP_EFFECT_ROSE = 26;
+    // 对戒：求婚信物（鸳鸯之恋）
+    public static final int PROP_EFFECT_RING = 27;
+    // 改名卡
+    public static final int PROP_EFFECT_RENAME = 152;
+    // 性别卡
+    public static final int PROP_EFFECT_SEX_CARD = 153;
+
+
+    ////////////////// 玩法参数 //////////////////
+    // 训练时长上限（base_train.func 文案「最多4小时」）
+    public static final int TRAIN_DURATION_SECONDS = 4 * 3600;
+    // 孵化基础时长（自家配对），好友配对在此基础上翻倍（协调双方）
+    public static final int BIRTH_DURATION_SECONDS = 2 * 3600;
+    // 小鸟每星逃脱概率（百分比）。星越高越容易挣脱，低星稳定，形成赌点
+    public static final int ESCAPE_PERCENT_PER_STAR = 5;
+    // 粘性道具对逃脱概率的削减百分比
+    public static final int ESCAPE_REDUCE_PERCENT = 50;
+    // 小鸟升级所需经验：level * BIRD_LEVEL_EXP_UNIT
+    public static final int BIRD_LEVEL_EXP_UNIT = 100;
+    // 小鸟成长值随机下限/上限（显示时 /100）
+    public static final int GROW_MIN = 500;
+    public static final int GROW_MAX = 1500;
+    // 小鸟克制值随机上限（显示时 /100）
+    public static final int KO_MAX = 100;
+    // 孵化产出鸟的体重随机上下浮动（相对父母体重均值 ±25%）
+    public static final int BIRTH_WEIGHT_FLOAT_PERCENT = 25;
+
+
     ////////////////// 路由路径常量 //////////////////
     // 维护提示页路径。【RT-5】这一个常量同时是三个地方的值来源，缺一即失效：
     //   1) GameStatusHandlerInterceptor 转发目标（MESSAGE_PATH）

@@ -23,6 +23,18 @@ public class GameProperties {
     /** 包裹总容量（U12 新增：原先是 6 个模板里各写死一个 3000）。 */
     private int packTotalCapacity = 3000;
 
+    /** 小鸟仓库容量上限。超过后收网捕获将被拒绝，提示先出售腾位。 */
+    private int birdStorageCapacity = 50;
+
+    /** 加速单价：每缩短 1 小时等待消耗的钻石数（不足 1 小时按 1 小时计）。 */
+    private int hastenDiamondPerHour = 10;
+
+    /** 训练场自装入起的有效天数，到期后需重新装载（use_train_expire_time）。 */
+    private int trainExpireDays = 7;
+
+    /** 战斗冷却秒数，冷却期内不能再次发起挑战。 */
+    private int fightCooldownSeconds = 300;
+
     public boolean isAllowRegister() {
         return allowRegister;
     }
@@ -37,5 +49,37 @@ public class GameProperties {
 
     public void setPackTotalCapacity(int packTotalCapacity) {
         this.packTotalCapacity = packTotalCapacity;
+    }
+
+    public int getBirdStorageCapacity() {
+        return birdStorageCapacity;
+    }
+
+    public void setBirdStorageCapacity(int birdStorageCapacity) {
+        this.birdStorageCapacity = birdStorageCapacity;
+    }
+
+    public int getHastenDiamondPerHour() {
+        return hastenDiamondPerHour;
+    }
+
+    public void setHastenDiamondPerHour(int hastenDiamondPerHour) {
+        this.hastenDiamondPerHour = hastenDiamondPerHour;
+    }
+
+    public int getTrainExpireDays() {
+        return trainExpireDays;
+    }
+
+    public void setTrainExpireDays(int trainExpireDays) {
+        this.trainExpireDays = trainExpireDays;
+    }
+
+    public int getFightCooldownSeconds() {
+        return fightCooldownSeconds;
+    }
+
+    public void setFightCooldownSeconds(int fightCooldownSeconds) {
+        this.fightCooldownSeconds = fightCooldownSeconds;
     }
 }

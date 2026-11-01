@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='开始训练')}"></head>
+<body>
+
+<div class="main">
+    <div>
+        <div class="pic">
+            <img alt="" src="../../static/images/logo/train.gif" th:src="@{/assets/images/logo/train.gif}"/>
+        </div>
+        <div class="panel bg-blue">
+            [[${slot.idx}]]号槽 · <span th:text="${baseTrain != null ? baseTrain.name : '训练场'}"></span>
+            <span class="text-muted" th:if="${baseTrain != null}" th:text="${baseTrain.minExp + '经验/分钟，最高训练至' + baseTrain.maxLevel + '级'}"></span>
+        </div>
+        <div th:if="${birds.size() == 0}">
+            <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+            <div class="npc-talk">
+                <div>您还没有空闲的小鸟，先去<a th:href="@{/game}">树林</a>里捕几只吧！</div>
+            </div>
+        </div>
+        <div th:if="${birds.size() > 0}">
+            <form th:action="@{/train/start}" method="post">
+                <input type="hidden" name="idx" th:value="${slot.idx}">
+                <p class="text-muted" th:text="|训练时长 ${durationText}，期间小鸟将被锁定。|">训练时长</p>
+                <label style="margin: 10px 0;">
+                    <select name="birdId">
+                        <option th:each="bird : ${birds}" th:value="${bird.id}">
+                            <th:block th:text="|${bird.weight / 100.0}斤的${@gameUtils.getBirdSexName(bird.sex)}${@gameConfigGateway.getBaseBird(bird.birdId) != null ? @gameConfigGateway.getBaseBird(bird.birdId).name : '小鸟'}(${@gameUtils.getStarName(bird.star)}, ${bird.level}级)|">
+                                小鸟
+                            </th:block>
+                        </option>
+                    </select>
+                </label>
+                <p>
+                    <input type="submit" value="开始训练">
+                    <a th:href="@{/train/list}">返回训练场</a>
+                </p>
+            </form>
+        </div>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

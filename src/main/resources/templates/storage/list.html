@@ -14,14 +14,26 @@
 
     <ul class="list1" th:if="${total > 0}">
         <li th:each="b : ${birds}">
+            <div class="list1-icon">
+                <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif"
+                     th:src="@{|/assets/images/bird/${b.birdId}.gif|}">
+            </div>
             <div class="list1-info">
-                <p th:text="${(baseBirdMap.get(b.birdId) != null ? baseBirdMap.get(b.birdId).name : '未知小鸟') + ' (ID:' + b.id + ')'}"></p>
-                <p>性别: <span th:text="${@gameUtils.getBirdSexName(b.sex)}"></span></p>
-                <p>星级: <span th:text="${@gameUtils.getStarName(b.star)}"></span></p>
-                <p>重量: <span th:text="${#numbers.formatDecimal(b.weight/100.0, 1, 2)}"></span> 斤</p>
-                <p>等级: <span th:text="${b.level}"></span></p>
+                <p th:text="${(baseBirdMap.get(b.birdId) != null ? baseBirdMap.get(b.birdId).name : '未知小鸟')} + '(' + ${@gameUtils.getStarName(b.star)} + ')'"></p>
+                <p>
+                    <span th:text="${@gameUtils.getBirdSexName(b.sex)}"></span>
+                    <span th:text="${b.level} + '级'"></span>
+                    <span th:text="${#numbers.formatDecimal(b.weight/100.0, 1, 2)} + '斤'"></span>
+                    <span th:if="${b.isLock != null && b.isLock != 0}" class="text-primary">训练/配对中</span>
+                    <span th:if="${cagedBirdId == b.id}" class="text-darkorange">出战中</span>
+                </p>
                 <p class="btl">
-                    <a href="#" th:href="@{/storage/sell(birdId=${b.id}, num=1)}">出售</a>
+                    <a th:if="${b.isLock == null || b.isLock == 0}" th:href="@{/storage/sellConfirm(birdId=${b.id})}">出售</a>
+                    <form th:if="${cagedBirdId != b.id}" th:action="@{/storage/deploy}" method="post" style="display:inline">
+                        <input type="hidden" name="birdId" th:value="${b.id}">
+                        <input type="submit" value="设为出战">
+                    </form>
+                    <a th:href="@{/trap/birdInfo(birdId=${b.birdId})}">图鉴</a>
                 </p>
             </div>
         </li>

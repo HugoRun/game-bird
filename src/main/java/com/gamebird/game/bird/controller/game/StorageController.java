@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.gamebird.game.bird.controller.common.BaseController;
 import com.gamebird.game.bird.model.dbo.BaseBird;
 import com.gamebird.game.bird.model.dbo.Role;
+import com.gamebird.game.bird.model.dbo.RoleCage;
 import com.gamebird.game.bird.model.dbo.StorageBird;
 import com.gamebird.game.bird.service.BaseBirdService;
+import com.gamebird.game.bird.service.RoleCageService;
 import com.gamebird.game.bird.service.StorageBirdService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
@@ -24,8 +26,8 @@ import java.util.stream.Collectors;
  * 小鸟仓库（storage_bird）。
  *
  * <p>原项目里这是个只有类级 {@code @RequestMapping("/storage")} 的空壳控制器，
- * 导致其前缀下所有路由 404。这里补齐列表与出售逻辑，数据全部来自已存在的
- * {@code storage_bird} 表，无需新增表结构。
+ * 导致其前缀下所有路由 404。现已补齐列表、出售（含确认页）、设置出战鸟；
+ * 训练/配对中的小鸟会被 {@code is_lock} 锁定，禁止出售。
  */
 @RequestMapping("/storage")
 @Controller
@@ -37,20 +39,38 @@ public class StorageController extends BaseController {
     @Resource
     public BaseBirdService baseBirdService;
 
+    @Resource
+    public RoleCageService cageService;
+
     /** 小鸟列表：按重量倒序，方便玩家优先查看重鸟。 */
     @GetMapping(value = {"", "/list"})
     public String list(HttpSession session, Model model) {
         Role role = getSessionRole(session);
-        LambdaQueryWrapper<StorageBird> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(StorageBird::getRoleId, role.getRoleId());
-        queryWrapper.orderByDesc(StorageBird::getWeight);
-        List<StorageBird> birds = storageBirdService.list(queryWrapper);
+        List<StorageBird> birds = listBirds(role);
         Map<Integer, BaseBird> baseBirdMap = baseBirdService.list().stream()
                 .collect(Collectors.toMap(BaseBird::getId, b -> b, (a, b) -> a));
         model.addAttribute("birds", birds);
         model.addAttribute("baseBirdMap", baseBirdMap);
         model.addAttribute("total", birds.size());
+        model.addAttribute("cagedBirdId", getCagedBirdId(role.getRoleId()));
         return "storage/list";
+    }
+
+    /** 出售确认页：展示折算金额，确认后走 POST /storage/sell。 */
+    @GetMapping("/sellConfirm")
+    public String sellConfirm(HttpSession session, Model model, @RequestParam Integer birdId) {
+        Role role = getSessionRole(session);
+        StorageBird bird = storageBirdService.getById(birdId);
+        if (bird == null || !role.getRoleId().equals(bird.getRoleId())) {
+            model.addAttribute("message", "小鸟不存在或不属于当前角色。");
+            return list(session, model);
+        }
+        BaseBird baseBird = baseBirdService.getById(bird.getBirdId());
+        long gain = sellGain(baseBird, bird);
+        model.addAttribute("bird", bird);
+        model.addAttribute("baseBird", baseBird);
+        model.addAttribute("gain", gain);
+        return "storage/sellConfirm";
     }
 
     /** 出售一只小鸟：按 base_bird.price（每斤价格）× 重量(斤) 折算金钱。 */
@@ -63,9 +83,12 @@ public class StorageController extends BaseController {
             model.addAttribute("message", "小鸟不存在或不属于当前角色。");
             return list(session, model);
         }
+        if (bird.getIsLock() != null && bird.getIsLock() != 0) {
+            model.addAttribute("message", "该小鸟正在训练或配对中，不能出售。");
+            return list(session, model);
+        }
         BaseBird baseBird = baseBirdService.getById(bird.getBirdId());
-        long pricePerJin = baseBird == null ? 0 : baseBird.getPrice();
-        long gain = pricePerJin * (bird.getWeight() / 100L) * num;
+        long gain = sellGain(baseBird, bird);
         if (gain <= 0) {
             model.addAttribute("message", "该小鸟无法出售（单价或重量为零）。");
             return list(session, model);
@@ -82,5 +105,64 @@ public class StorageController extends BaseController {
         saveSessionRole(session, role);
         model.addAttribute("message", "出售成功，获得金钱 " + gain + "。");
         return list(session, model);
+    }
+
+    /** 设置出战鸟：战斗时代替角色裸等级出战（与装备的鸟笼共同决定加成）。 */
+    @PostMapping("/deploy")
+    public String deploy(HttpSession session, Model model, @RequestParam Integer birdId) {
+        Role role = getSessionRole(session);
+        StorageBird bird = storageBirdService.getById(birdId);
+        if (bird == null || !role.getRoleId().equals(bird.getRoleId())) {
+            model.addAttribute("message", "小鸟不存在或不属于当前角色。");
+            return list(session, model);
+        }
+        RoleCage cage = getCageSlot(role.getRoleId());
+        cage.setBirdId(bird.getId());
+        cage.setBaseBridId(bird.getBirdId());
+        cageService.saveOrUpdate(cage);
+        model.addAttribute("message", "已把它设为出战小鸟，战斗时它将为你而战。");
+        return list(session, model);
+    }
+
+    // ==================== 私有工具 ====================
+
+    /** 角色仓库小鸟（按重量倒序）。 */
+    private List<StorageBird> listBirds(Role role) {
+        LambdaQueryWrapper<StorageBird> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(StorageBird::getRoleId, role.getRoleId());
+        queryWrapper.orderByDesc(StorageBird::getWeight);
+        return storageBirdService.list(queryWrapper);
+    }
+
+    /** 出售折算：每斤价 × 重量斤。 */
+    private long sellGain(BaseBird baseBird, StorageBird bird) {
+        long pricePerJin = baseBird == null || baseBird.getPrice() == null ? 0 : baseBird.getPrice();
+        return pricePerJin * (bird.getWeight() / 100L);
+    }
+
+    /** 当前出战鸟 id（无鸟笼记录则 0）。 */
+    private Integer getCagedBirdId(String roleId) {
+        RoleCage cage = getCageSlot(roleId);
+        return cage == null || cage.getBirdId() == null ? 0 : cage.getBirdId();
+    }
+
+    /** 出战栏位（role_cage idx=1），无则创建待插入对象。 */
+    private RoleCage getCageSlot(String roleId) {
+        LambdaQueryWrapper<RoleCage> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(RoleCage::getRoleId, roleId);
+        wrapper.eq(RoleCage::getIdx, 1);
+        RoleCage cage = cageService.getOne(wrapper);
+        if (cage != null) {
+            return cage;
+        }
+        RoleCage created = new RoleCage();
+        created.setId(0);
+        created.setRoleId(roleId);
+        created.setIdx(1);
+        created.setBirdId(0);
+        created.setBaseBridId(0);
+        created.setUseCageId(0);
+        created.setUseCageNum0(0);
+        return created;
     }
 }

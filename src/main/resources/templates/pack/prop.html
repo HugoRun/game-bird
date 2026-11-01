@@ -19,7 +19,17 @@
                         <p th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${propVO.baseProp.name}+'×'+${propVO.getNum()}">谷子(25级)</p>
                         <p>功能:<span th:text="${propVO.baseProp.func}"></span></p>
                         <p>数量:<span th:text="${propVO.num}"></span></p>
-                        <p class="btl"><span class="text-muted" title="功能开发中，暂不可用">使用</span>
+                        <p class="btl">
+                            <!-- 需要选择目标（小鸟/陷阱/训练槽/孵化槽）的道具跳目标选择页，其余直接使用 -->
+                            <a th:if="${propVO.baseProp.effectType >= 8 && propVO.baseProp.effectType <= 10
+                                        || (propVO.baseProp.effectType >= 15 && propVO.baseProp.effectType <= 19)}"
+                               th:href="@{/pack/prop/target(packId=${propVO.id})}">选择目标使用</a>
+                            <form th:if="!(${propVO.baseProp.effectType >= 8 && propVO.baseProp.effectType <= 10
+                                        || (propVO.baseProp.effectType >= 15 && propVO.baseProp.effectType <= 19)})"
+                                  th:action="@{/pack/prop/use}" method="post" style="display:inline">
+                                <input type="hidden" name="packId" th:value="${propVO.id}">
+                                <input type="submit" value="使用">
+                            </form>
                     </div>
                 </li>
             </ul>

@@ -17,12 +17,16 @@
         <div th:if="${baitList.size() > 0}">
             <form th:action="@{/trap/useBait}" method="post">
                 <input type="hidden" name="trapId" th:value="${trapId}">
+                <p class="text-muted" th:if="${trapIdx != null}">投入 <span th:text="${trapIdx}">1</span> 号陷阱槽</p>
                 <label style="margin:  10px 0;">
                     <select name="baitId">
                         <option th:each="baitVO, stat : ${baitList}" th:value="${baitVO.id}">
                             <th:block th:text="${baitVO.baseBait.name}+'×'+${baitVO.getNum()}">谷子(25级)</th:block>
                         </option>
                     </select>
+                </label>
+                <label style="display:block; margin: 10px 0;" th:if="${hasSticky}">
+                    <input type="checkbox" name="useSticky" value="true"> 涂抹粘性道具（逃脱概率减半，消耗一张）
                 </label>
                 <input type="submit" th:value="下饵">
             </form>

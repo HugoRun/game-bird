@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='每日签到')}"></head>
+<body>
+
+<div class="main">
+    <div>
+        <div class="pic">
+            <img alt="" src="../../static/images/logo/pack.gif" th:src="@{/assets/images/logo/pack.gif}"/>
+        </div>
+        <div class="panel bg-blue">每日签到</div>
+        <div>
+            <div th:if="${signedToday}">
+                <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+                <div class="npc-talk">
+                    <div>今天已签到，连签<span th:text="${todayLog.continuous}"></span>天，获得金币<span th:text="${todayLog.rewardCoin}"></span><span
+                            th:if="${todayLog.rewardDiamond > 0}">、钻石<span th:text="${todayLog.rewardDiamond}"></span></span>。明天再来！</div>
+                </div>
+            </div>
+            <div th:if="${!signedToday}">
+                <div>当前连签天数:<span class="text-primary" th:text="${continuous}"></span>天</div>
+                <div class="text-muted">奖励规则：金币 100×连签天数（封顶700）；连签第3天赠5钻石，第7天赠20钻石；断签从头计。</div>
+                <form th:action="@{/signin}" method="post" style="margin-top:8px">
+                    <input type="submit" value="立即签到">
+                </form>
+            </div>
+            <div><a th:href="@{/game}">返回游戏</a></div>
+        </div>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

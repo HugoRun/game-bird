@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='出售小鸟')}"></head>
+<body>
+
+<div class="main">
+    <div>
+        <div class="pic">
+            <img alt="" src="../../static/images/logo/pack.gif" th:src="@{/assets/images/logo/pack.gif}"/>
+        </div>
+        <div class="panel bg-blue">出售确认</div>
+        <div th:if="${bird != null}">
+            <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+            <div class="npc-talk">
+                <div>
+                    <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${bird.birdId}.gif|}">
+                    <span th:text="${baseBird != null ? baseBird.name : '未知小鸟'}"></span>
+                    <span th:text="${@gameUtils.getBirdSexName(bird.sex)}"></span>
+                    <span th:text="${@gameUtils.getStarName(bird.star)}"></span>
+                    <span th:text="${#numbers.formatDecimal(bird.weight/100.0, 1, 2)} + '斤'"></span>
+                </div>
+                <div>单价:<span th:text="${baseBird != null ? baseBird.price : 0}"></span>金币/斤，出售可得 <span class="text-darkorange" th:text="${gain}"></span> 金币。</div>
+                <div>卖出去可就回不来了，确定吗？</div>
+            </div>
+            <form th:action="@{/storage/sell}" method="post" style="margin-top:8px">
+                <input type="hidden" name="birdId" th:value="${bird.id}">
+                <input type="hidden" name="num" value="1">
+                <input type="submit" value="确认出售">
+                <a th:href="@{/storage/list}">再想想</a>
+            </form>
+        </div>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

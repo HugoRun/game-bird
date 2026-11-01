@@ -1,22 +1,75 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragment/head::pageHead(title='孵化场')}"></head>
+<head th:replace="~{fragment/head::pageHead(title='爱的巢穴')}"></head>
 <body>
 
 <div class="main">
-    <h2>孵化场</h2>
+    <h2>爱的巢穴</h2>
     <p th:if="${message}" th:text="${message}" class="text-muted"></p>
 
     <ul class="list1">
         <li th:each="b : ${births}">
-            <div class="list1-info">
-                <p th:text="'槽位 ' + ${b.idx}"></p>
-                <p>小鸟配置ID: <span th:text="${b.birdBaseId}"></span></p>
-                <p>孵化结束: <span th:text="${@gameUtils.getTimeDiff(b.birthEndTime, now)}"></span></p>
+            <!-- 空闲：无鸟且无孵化 -->
+            <div class="list1-icon" th:if="${b.birdId == 0}">
+                <img alt="" class="icon-gray-border" src="../../static/images/nest/1.gif"
+                     th:src="@{|/assets/images/nest/${b.useNestId == 0 ? 1 : b.useNestId}.gif|}">
+            </div>
+            <div class="list1-info" th:if="${b.birdId == 0}">
+                <p>[[${b.idx}]]号巢 <span th:text="${@gameConfigGateway.getBaseNest(b.useNestId == 0 ? 1 : b.useNestId) != null ? @gameConfigGateway.getBaseNest(b.useNestId == 0 ? 1 : b.useNestId).name : '干草窝'}"></span>
+                    <span th:if="${b.useNestNum > 0}" th:text="|(剩余${b.useNestNum}次)|"></span>
+                </p>
+                <p>空闲中</p>
                 <p class="btl">
-                    <a href="#" th:if="${b.birthEndTime > 0 && b.birthEndTime <= now}"
-                       th:href="@{/birth/collect(id=${b.id})}">领取成果</a>
-                    <span th:if="${b.birthEndTime == 0 || b.birthEndTime > now}" class="text-muted">孵化中</span>
+                    <a th:href="@{/birth/start(idx=${b.idx})}">开始配对</a>
+                    <a th:href="@{/pack/nest/items}">换巢穴</a>
+                </p>
+            </div>
+
+            <!-- 待确认：本方是被邀请方（孵化未开始且有 match） -->
+            <div class="list1-icon" th:if="${b.birdId > 0 && b.birthEndTime == 0}">
+                <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif"
+                     th:src="@{|/assets/images/bird/${b.birdBaseId}.gif|}">
+            </div>
+            <div class="list1-info" th:if="${b.birdId > 0 && b.birthEndTime == 0}">
+                <p>来自 <span class="text-primary" th:text="${b.matchRoleName}"></span> 的配对邀请</p>
+                <p class="text-muted">确认后开始孵化，产出双方各得一只。</p>
+                <p class="btl">
+                    <form th:action="@{/birth/accept}" method="post" style="display:inline">
+                        <input type="hidden" name="id" th:value="${b.id}">
+                        <input type="submit" value="接受">
+                    </form>
+                    <form th:action="@{/birth/decline}" method="post" style="display:inline">
+                        <input type="hidden" name="id" th:value="${b.id}">
+                        <input type="submit" value="拒绝">
+                    </form>
+                </p>
+            </div>
+
+            <!-- 孵化中 -->
+            <div class="list1-icon" th:if="${b.birdId > 0 && b.birthEndTime > 0 && b.birthEndTime > now}">
+                <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif"
+                     th:src="@{|/assets/images/bird/${b.birdBaseId}.gif|}">
+            </div>
+            <div class="list1-info" th:if="${b.birdId > 0 && b.birthEndTime > 0 && b.birthEndTime > now}">
+                <p>[[${b.idx}]]号巢 <span th:text="${@gameConfigGateway.getBaseBird(b.birdBaseId) != null ? @gameConfigGateway.getBaseBird(b.birdBaseId).name : '小鸟'}"></span> ×
+                    <span th:text="${@gameConfigGateway.getBaseBird(b.matchBirdBaseId) != null ? @gameConfigGateway.getBaseBird(b.matchBirdBaseId).name : '小鸟'}"></span>
+                </p>
+                <p th:if="${b.matchRoleName != null && !b.matchRoleName.isEmpty()}">与 <span th:text="${b.matchRoleName}"></span> 的甜蜜合作</p>
+                <p th:text="${@gameUtils.getTimeDiff(b.birthEndTime, now) + '后完成'}"></p>
+            </div>
+
+            <!-- 孵化完成 -->
+            <div class="list1-icon" th:if="${b.birdId > 0 && b.birthEndTime > 0 && b.birthEndTime <= now}">
+                <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif"
+                     th:src="@{|/assets/images/bird/${b.birdBaseId}.gif|}">
+            </div>
+            <div class="list1-info" th:if="${b.birdId > 0 && b.birthEndTime > 0 && b.birthEndTime <= now}">
+                <p>[[${b.idx}]]号巢 爱情结晶已出生！</p>
+                <p class="btl">
+                    <form th:action="@{/birth/collect}" method="post" style="display:inline">
+                        <input type="hidden" name="id" th:value="${b.id}">
+                        <input type="submit" value="收获">
+                    </form>
                 </p>
             </div>
         </li>

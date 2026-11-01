@@ -22,17 +22,23 @@ import com.gamebird.game.bird.config.GameConfigGateway;
 import com.gamebird.game.bird.controller.common.BaseController;
 import com.gamebird.game.bird.data.ConstData;
 import com.gamebird.game.bird.model.dbo.BaseField;
+import com.gamebird.game.bird.model.dbo.Board;
 import com.gamebird.game.bird.model.dbo.LogChat;
 import com.gamebird.game.bird.model.dbo.Role;
 import com.gamebird.game.bird.model.dbo.RoleBirth;
 import com.gamebird.game.bird.model.dbo.RoleTrain;
 import com.gamebird.game.bird.model.dbo.RoleTrap;
+import com.gamebird.game.bird.model.dbo.Task;
 import com.gamebird.game.bird.model.message.MessageVO;
 import com.gamebird.game.bird.model.vo.ChatMessageVO;
 import com.gamebird.game.bird.model.vo.RoleBirthVO;
 import com.gamebird.game.bird.model.vo.RoleTrainVO;
 import com.gamebird.game.bird.model.vo.RoleTrapVO;
-import com.gamebird.game.bird.util.MockUtils;
+import com.gamebird.game.bird.service.BoardService;
+import com.gamebird.game.bird.service.GameEventService;
+import com.gamebird.game.bird.service.TaskService;
+import com.gamebird.game.bird.service.impl.SignInService;
+import com.gamebird.game.bird.util.GameUtils;
 
 /**
  * 游戏 todo
@@ -47,6 +53,22 @@ public class GameController extends BaseController {
     /** 游戏配置读取入口，由构造器注入。 */
     @Resource
     public GameConfigGateway configGateway;
+
+    /** 公告（主页公告栏数据源）。 */
+    @Resource
+    public BoardService boardService;
+
+    /** 任务（主页任务位数据源）。 */
+    @Resource
+    public TaskService taskService;
+
+    /** 游戏事件（树林记录 / 世界动态数据源）。 */
+    @Resource
+    public GameEventService gameEventService;
+
+    /** 每日签到（主页福利位状态）。 */
+    @Resource
+    public SignInService signInService;
     // 日志句柄
 
     /**
@@ -128,15 +150,33 @@ public class GameController extends BaseController {
         queryWrapper2.last("LIMIT 5");
         List<LogChat> chatMessageList = chatService.list(queryWrapper2);
         model.addAttribute("chatMessageList", chatMessageList);
-        // 树林记录数据
-        Page<ChatMessageVO> treeMessagePage = MockUtils.mockTreeMessageList(7, role);
-        model.addAttribute("treeMessagePage", treeMessagePage);
-        // 世界动态：不在此处算数据。
-        // ★ game.html 的「世界动态」面板（:150）既未接线也不可见——整块 hidden 且
-        // 内容是写死的示例文本，模板侧零读取 globalMessagePage。按「不计算没人读的
-        // 数据」原则，这里不再生成该 mock。要开放该面板需同时做模板接线与真实数据
-        // 查询，属功能开发，详见 README 已知问题。
+        // 树林记录：个人事件流（log_tree 按角色过滤），原 mock 数据源已被真实事件替代
+        model.addAttribute("treeEvents", gameEventService.pageByRole(role.getRoleId(), 1).getRecords());
+        // 世界动态：全服事件流（log_tree 不过滤角色）
+        model.addAttribute("globalEvents", gameEventService.latestGlobal(5));
+        // 主页公告栏：最新一条公告
+        model.addAttribute("latestBoard", boardService.list(
+                new LambdaQueryWrapper<Board>().orderByDesc(Board::getId).last("LIMIT 1")).stream().findFirst().orElse(null));
+        // 主页任务位：进行中/可领取的最新任务
+        model.addAttribute("activeTask", taskService.list(
+                new LambdaQueryWrapper<Task>()
+                        .eq(Task::getRoleId, role.getRoleId())
+                        .in(Task::getStatus, 0, 1)
+                        .orderByDesc(Task::getId)
+                        .last("LIMIT 1")).stream().findFirst().orElse(null));
+        // 福利位：今天是否已签到
+        model.addAttribute("signedToday", signInService.isSignedToday(role.getRoleId()));
         return ConstData.VIEW_GAME;
+    }
+
+    /**
+     * 树林记录页：个人事件流分页（收网/孵化/训练/战斗）。
+     */
+    @GetMapping("/game/tree")
+    public String tree(HttpSession session, Model model, @RequestParam(defaultValue = "1") int pageNo) {
+        Role role = getSessionRole(session);
+        model.addAttribute("eventPage", gameEventService.pageByRole(role.getRoleId(), pageNo));
+        return "game/tree";
     }
 
     /**

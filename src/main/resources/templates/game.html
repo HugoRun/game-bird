@@ -4,10 +4,9 @@
 <body>
 <div class="main">
     <div class="panel bg-green">
-        <div>公告:<img src="../../static/images/icon/guide.gif" th:src="@{/assets/images/icon/guide.gif}"/><span class="text-muted" title="功能开发中，暂不可用">真爱至上</span></div>
-        <div>主线:<i class="task-a"></i><span class="text-muted" title="功能开发中，暂不可用">挑战祥瑞之地</span></div>
-        <div>任务:<i class="task-a"></i><a href="#">愤怒的传奇(未完成)</a></div>
-        <div>福利:<span class="text-muted" title="功能开发中，暂不可用">签到</span>(未签到)</div>
+        <div>公告:<img src="../../static/images/icon/guide.gif" th:src="@{/assets/images/icon/guide.gif}"/><a th:href="@{/board/list}"><span th:if="${latestBoard != null}" th:text="${latestBoard.title}">欢迎来到小鸟情人</span><span th:if="${latestBoard == null}" class="text-muted">暂无公告</span></a></div>
+        <div>任务:<i class="task-a"></i><a th:if="${activeTask != null}" th:href="@{/task/list}"><span th:text="${activeTask.status == 0 ? '进行中' : '可领奖'}"></span>(<span th:text="${activeTask.taskType == 1 ? '每日登录' : (activeTask.taskType == 2 ? '捕捉小鸟' : '购买道具')}"></span>)</a><a th:if="${activeTask == null}" th:href="@{/task/list}">去领任务</a></div>
+        <div>福利:<a th:href="@{/signin}"><span th:if="${signedToday}" class="text-muted">已签到</span><span th:if="${!signedToday}">签到</span></a>(<span th:if="${signedToday}">已完成</span><span th:if="${!signedToday}">未签到</span>)</div>
     </div>
     <div>
         <div class="panel bg-blue">"<span href="#" th:text="|小菜鸟|"></span>" <span href="#" th:text="|${session.sRole.roleName}|"></span> <a href="#" onclick="toggleShow('p1')">收起</a></div>
@@ -48,7 +47,7 @@
                     <img alt="" class="icon-gray-border" src="../../static/images/trap/1.gif" th:src="@{|/assets/images/trap/${trap.useTrap.id}.gif|}">
                 </div>
                 <div class="list1-info" th:if="${trap.baitId == 0}">
-                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><span class="text-muted" title="功能开发中，暂不可用">更换陷阱</span></span></p>
+                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/pack/trap/items}">更换陷阱</a></span></p>
                     <p>空闲中</p>
                     <p><a href="#" th:href="@{/trap/useBait(trapId=${trap.id})}">下饵</a></p>
                 </div>
@@ -60,19 +59,29 @@
                     <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/trap/birdInfo(birdId=${trap.catchBird.id})}" th:text="${trap.catchBird.name}">麻雀</a> <th:block
                             th:text="${@gameUtils.getStarName(trap.catchBirdStar)}"></th:block></span></p>
                     <p><th:block th:text="${@gameUtils.getTimeDiff(trap.catchEndTime, nowTime)}"></th:block>后捕获</p>
-                    <p><span class="text-muted" title="功能开发中，暂不可用">加速</span></p>
+                    <p>
+                        <form th:action="@{/trap/hasten}" method="post" style="display:inline">
+                            <input type="hidden" name="trapId" th:value="${trap.id}">
+                            <input type="submit" value="加速">
+                        </form>
+                    </p>
                 </div>
                 <div class="list1-info" th:if="${trap.baitId > 0 && trap.catchEndTime <= nowTime}">
                     <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/trap/birdInfo(birdId=${trap.catchBird.id})}" th:text="${trap.catchBird.name}">麻雀</a> <th:block
                             th:text="${@gameUtils.getStarName(trap.catchBirdStar)}"></th:block></span></p>
                     <p>已捕获</p>
-                    <p><a href="#" th:href="@{/trap/over(trapId=${trap.id})}">去收网</a></p>
+                    <p>
+                        <form th:action="@{/trap/over}" method="post" style="display:inline">
+                            <input type="hidden" name="trapId" th:value="${trap.id}">
+                            <input type="submit" value="去收网">
+                        </form>
+                    </p>
                 </div>
             </li>
         </ul>
     </div>
     <div th:if="${birthList != null && birthList.size() > 0}">
-        <div class="panel bg-blue">【爱的巢穴】</div>
+        <div class="panel bg-blue">【爱的巢穴】<a th:href="@{/birth/list}">全部</a></div>
         <ul class="list1">
             <li th:each="birth, stat : ${birthList}">
                 <div class="list1-icon" th:if="${birth.birdId == 0}">
@@ -82,77 +91,88 @@
                     <p>
                         [[${birth.useNest.name}]] <span th:if="${birth.useNestId > 0}" th:text="|(剩余${birth.useNestNum}次)|"></span>
                     </p>
-                    <p><a href="#">开始配对</a> <a href="/cage/change">换巢穴</a></p>
+                    <p><a th:href="@{/birth/start(idx=${birth.idx})}">开始配对</a> <a th:href="@{/pack/nest/items}">换巢穴</a></p>
                 </div>
 
-                <div class="list1-icon" th:if="${birth.birdId > 0}">
+                <div class="list1-icon" th:if="${birth.birdId > 0 && birth.birthEndTime == 0}">
                     <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${birth.birdBaseId}.gif|}">
                 </div>
-                <div class="list1-info" th:if="${birth.birdId > 0 && birth.birthEndTime >= nowTime}">
+                <div class="list1-info" th:if="${birth.birdId > 0 && birth.birthEndTime == 0}">
+                    <p>来自 <span class="text-primary" th:text="${birth.matchRoleName}"></span> 的配对邀请</p>
+                    <p><a th:href="@{/birth/list}">去确认</a></p>
+                </div>
+
+                <div class="list1-icon" th:if="${birth.birdId > 0 && birth.birthEndTime > 0 && birth.birthEndTime >= nowTime}">
+                    <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${birth.birdBaseId}.gif|}">
+                </div>
+                <div class="list1-info" th:if="${birth.birdId > 0 && birth.birthEndTime > 0 && birth.birthEndTime >= nowTime}">
                     <p>[[${birth.useNest.name}]] <span class="text-primary" th:text="${birth.baseBird.name}">丹顶鹤</span></p>
                     <p><th:block th:text="${@gameUtils.getTimeDiff(birth.birthEndTime, nowTime)}"></th:block>后完成</p>
-                    <p><a href="#">强化</a> <a href="#">加速</a></p>
+                    <p><a th:href="@{/pack/prop/items}">加速(催产剂)</a></p>
                 </div>
-                <div class="list1-info" th:if="${birth.birdId > 0 && birth.birthEndTime < nowTime}">
-                    <p>[[${birth.useNest.name}]] <span class="text-primary" th:text="${birth.baseBird.name}">丹顶鹤</span></p>
-                    <p><a href="#">收获</a></p>
+                <div class="list1-icon" th:if="${birth.birdId > 0 && birth.birthEndTime > 0 && birth.birthEndTime < nowTime}">
+                    <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${birth.birdBaseId}.gif|}">
+                </div>
+                <div class="list1-info" th:if="${birth.birdId > 0 && birth.birthEndTime > 0 && birth.birthEndTime < nowTime}">
+                    <p>[[${birth.useNest.name}]] <span class="text-primary">爱情结晶已出生</span></p>
+                    <p><a th:href="@{/birth/collect(id=${birth.id})}">收获</a></p>
                 </div>
             </li>
         </ul>
     </div>
     <div th:if="${trainList != null && trainList.size() > 0}">
-        <div class="panel bg-blue">【宠物训练场】</div>
+        <div class="panel bg-blue">【宠物训练场】<a th:href="@{/train/list}">全部</a></div>
         <ul class="list1">
             <li th:each="train, stat : ${trainList}">
                 <div class="list1-icon" th:if="${train.birdId == 0}">
                     <img alt="" class="icon-gray-border" src="../../static/images/train/1.gif" th:src="@{|/assets/images/train/${train.useTrain.id}.gif|}">
                 </div>
                 <div class="list1-info" th:if="${train.birdId == 0}">
-                    <p>[[${train.useTrain.name}]] <th:block th:if="${train.useTrainExpireTime > 0}" th:text="|${@gameUtils.getTimeDiff(train.useTrainExpireTime, nowTime)}后过期|"></th:block> <a href="#">更换场地</a></p>
+                    <p>[[${train.useTrain.name}]] <th:block th:if="${train.useTrainExpireTime > 0}" th:text="|${@gameUtils.getTimeDiff(train.useTrainExpireTime, nowTime)}后过期|"></th:block> <a th:href="@{/pack/train/items}">更换场地</a></p>
                     <p>空闲中</p>
-                    <p><a href="#">开始训练</a></p>
+                    <p><a th:href="@{/train/start(idx=${train.idx})}">开始训练</a></p>
                 </div>
 
                 <div class="list1-icon" th:if="${train.birdId > 0}">
-                    <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${train.birdId}.gif|}">
+                    <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${train.birdBaseId}.gif|}">
                 </div>
                 <div class="list1-info" th:if="${train.birdId > 0 && train.trainEndTime > nowTime}">
                     <p>[[${train.useTrain.name}]] <th:block th:if="${train.useTrainExpireTime > 0}" th:text="|${@gameUtils.getTimeDiff(train.useTrainExpireTime, nowTime)}后过期|"></th:block></p>
-                    <p><span class="text-primary">1级流氓兔</span>已训练<span class="text-darkorange">3</span>分钟</p>
-                    <p><a href="#">加速</a> <a href="#">停止</a></p>
+                    <p><span class="text-primary" th:text="${train.baseBird != null ? train.baseBird.name : '小鸟'}">小鸟</span>训练中</p>
+                    <p><a th:href="@{/train/stop(id=${train.id})}">提前取回</a> <a th:href="@{/pack/prop/items}">加速(加速卡)</a></p>
                 </div>
                 <div class="list1-info" th:if="${train.birdId > 0 && train.trainEndTime <= nowTime}">
-                    <p>[[${train.useTrain.name}]] <th:block th:if="${train.useTrainExpireTime > 0}" th:text="|${@gameUtils.getTimeDiff(train.useTrainExpireTime, nowTime)}后过期|"></th:block></p>
-                    <p><a href="#">重温旧梦</a>的<span class="text-primary">1级流氓兔</span>已训练<span class="text-darkorange">3</span>分钟</p>
-                    <p><a href="#">赶走</a></p>
+                    <p>[[${train.useTrain.name}]] <span class="text-primary">训练完成</span></p>
+                    <p><a th:href="@{/train/collect(id=${train.id})}">领取成果</a></p>
                 </div>
             </li>
         </ul>
     </div>
     <div>
         <div class="panel bg-blue">【世界喊话】<a th:href="@{/chat/list}">我要喊话</a></div>
-        <div th:if="${chatMessageList != null && chatMessageList.size() == 0}">暂未开放</div>
-        <ul th:if="${chatMessageList.size() > 0}">
+        <div th:if="${chatMessageList == null || chatMessageList.size() == 0}">暂无喊话</div>
+        <ul th:if="${chatMessageList != null && chatMessageList.size() > 0}">
             <li th:each="message, stat : ${chatMessageList}">
                 <span th:text='|"${message.titleName}"|'></span> <a href="#" th:text="${message.roleName}">重温旧梦</a>:<span th:text="${message.message}"></span> <span class="text-gray" th:text="|${@gameUtils.getTimeDiff(message.time)}前|"></span>
             </li>
         </ul>
     </div>
-    <div hidden="hidden">
-        <div class="panel bg-blue">【树林记录】<a href="#">全部动态</a></div>
-        <div th:if="${treeMessagePage.getTotal() == 0}">暂未开放</div>
-        <ul>
-            <li th:each="message, stat : ${treeMessagePage.getRecords()}">
-                <span th:utext="${message.message}"></span> <span th:text="|${@gameUtils.getTimeDiff(message.time)}前|"></span>
+    <div>
+        <div class="panel bg-blue">【树林记录】<a th:href="@{/game/tree}">全部动态</a></div>
+        <div th:if="${treeEvents == null || treeEvents.size() == 0}" class="text-muted">还没有动态，去收网或孵化一只小鸟吧。</div>
+        <ul th:if="${treeEvents != null && treeEvents.size() > 0}">
+            <li th:each="event : ${treeEvents}">
+                <span th:utext="${event.message}"></span> <span class="text-gray" th:text="|${@gameUtils.getTimeDiff(event.time)}前|"></span>
             </li>
         </ul>
     </div>
-    <div hidden="hidden">
-        <div class="panel bg-blue">【世界动态】<a href="#">全部动态</a></div>
-        <div>暂未开放</div>
-        <ul>
-            <li>我收获了0.5斤的麻雀一只。09:10:25</li>
-            <li><a href="#">重温旧梦</a> 收获了0.5斤的麻雀一只。09:10:25</li>
+    <div>
+        <div class="panel bg-blue">【世界动态】<a th:href="@{/game/tree}">全部动态</a></div>
+        <div th:if="${globalEvents == null || globalEvents.size() == 0}" class="text-muted">暂未开放</div>
+        <ul th:if="${globalEvents != null && globalEvents.size() > 0}">
+            <li th:each="event : ${globalEvents}">
+                <span th:utext="${event.message}"></span> <span class="text-gray" th:text="|${@gameUtils.getTimeDiff(event.time)}前|"></span>
+            </li>
         </ul>
     </div>
     <div th:replace="~{fragment/navigation::navigation}"></div>

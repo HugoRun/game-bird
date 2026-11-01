@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='开始配对')}"></head>
+<body>
+
+<div class="main">
+    <div>
+        <div class="pic">
+            <img alt="" src="../../static/images/logo/pack.gif" th:src="@{/assets/images/logo/pack.gif}"/>
+        </div>
+        <div class="panel bg-blue">
+            [[${slot.idx}]]号巢 · <span th:text="${@gameConfigGateway.getBaseNest(slot.useNestId) != null ? @gameConfigGateway.getBaseNest(slot.useNestId).name : '干草窝'}"></span>
+        </div>
+
+        <!-- 好友配对：选好友的一只鸟 -->
+        <div th:if="${friendRole != null}">
+            <p>借用 <span class="text-primary" th:text="${friendRole.roleName}"></span> 的小鸟配对：</p>
+            <div th:if="${friendBirds.size() == 0}" class="text-muted">该好友暂时没有空闲的小鸟。</div>
+            <form th:if="${friendBirds.size() > 0}" th:action="@{/birth/start}" method="post">
+                <input type="hidden" name="idx" th:value="${slot.idx}">
+                <input type="hidden" name="friendRoleId" th:value="${friendRole.roleId}">
+                <label style="margin: 10px 0;">
+                    <select name="birdIdA">
+                        <option th:each="bird : ${myBirds}" th:value="${bird.id}"
+                                th:text="|自家:${bird.weight / 100.0}斤${@gameUtils.getBirdSexName(bird.sex)}${@gameConfigGateway.getBaseBird(bird.birdId)?.name ?: '小鸟'}(${@gameUtils.getStarName(bird.star)})|">
+                            自家小鸟
+                        </option>
+                    </select>
+                    <select name="friendBirdId">
+                        <option th:each="bird : ${friendBirds}" th:value="${bird.id}"
+                                th:text="|好友:${bird.weight / 100.0}斤${@gameUtils.getBirdSexName(bird.sex)}${@gameConfigGateway.getBaseBird(bird.birdId)?.name ?: '小鸟'}(${@gameUtils.getStarName(bird.star)})|">
+                            好友小鸟
+                        </option>
+                    </select>
+                </label>
+                <p class="text-muted">邀请会发到对方主页，确认后双方各收获一只爱情结晶。</p>
+                <p>
+                    <input type="submit" value="发送配对邀请">
+                    <a th:href="@{/birth/list}">返回</a>
+                    <a th:href="@{/birth/start(idx=${slot.idx})}">改选自家配对</a>
+                </p>
+            </form>
+        </div>
+
+        <!-- 自家配对：选两只 -->
+        <div th:if="${friendRole == null}">
+            <p th:if="${myBirds.size() < 2}" class="text-muted">至少需要两只空闲的异性小鸟才能配对（或
+                <a th:href="@{/friend/list}">加个好友</a>借用对方的鸟）。</p>
+            <form th:if="${myBirds.size() >= 2}" th:action="@{/birth/start}" method="post">
+                <input type="hidden" name="idx" th:value="${slot.idx}">
+                <label style="margin: 10px 0;">
+                    第一只：
+                    <select name="birdIdA">
+                        <option th:each="bird : ${myBirds}" th:value="${bird.id}"
+                                th:text="|${bird.weight / 100.0}斤${@gameUtils.getBirdSexName(bird.sex)}${@gameConfigGateway.getBaseBird(bird.birdId)?.name ?: '小鸟'}(${@gameUtils.getStarName(bird.star)})|">
+                            小鸟
+                        </option>
+                    </select>
+                </label>
+                <label style="margin: 10px 0;">
+                    第二只：
+                    <select name="birdIdB">
+                        <option th:each="bird : ${myBirds}" th:value="${bird.id}"
+                                th:text="|${bird.weight / 100.0}斤${@gameUtils.getBirdSexName(bird.sex)}${@gameConfigGateway.getBaseBird(bird.birdId)?.name ?: '小鸟'}(${@gameUtils.getStarName(bird.star)})|">
+                            小鸟
+                        </option>
+                    </select>
+                </label>
+                <p class="text-muted">同种产出同种小鸟；异种产出较低阶一方。星级取父母均值上下浮动。</p>
+                <p>
+                    <input type="submit" value="开始配对">
+                    <a th:href="@{/birth/list}">返回</a>
+                </p>
+            </form>
+            <!-- 好友邀请入口 -->
+            <div th:if="${friends != null && friends.size() > 0}" style="margin-top:8px">
+                <p class="text-muted">或借用好友的小鸟：</p>
+                <p th:each="f : ${friends}">
+                    <a th:href="@{/birth/start(idx=${slot.idx}, friend=${f.friendRoleId})}"
+                       th:text="${f.friendName}"></a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

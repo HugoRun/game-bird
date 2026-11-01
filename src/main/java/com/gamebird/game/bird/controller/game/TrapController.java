@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.gamebird.common.util.CommonUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
@@ -14,27 +15,28 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.gamebird.common.util.CommonUtils;
-
 import com.gamebird.game.bird.config.GameConfigGateway;
+import com.gamebird.game.bird.config.GameProperties;
 import com.gamebird.game.bird.controller.common.BaseController;
 import com.gamebird.game.bird.data.ConstData;
-import com.gamebird.game.bird.model.dbo.BaseBait;
 import com.gamebird.game.bird.model.dbo.BaseBird;
-import com.gamebird.game.bird.model.dbo.BaseLevel;
 import com.gamebird.game.bird.model.dbo.Role;
 import com.gamebird.game.bird.model.dbo.RolePack;
 import com.gamebird.game.bird.model.dbo.RoleTrap;
-import com.gamebird.game.bird.model.dbo.StorageBird;
+import com.gamebird.game.bird.model.message.MessageLink;
 import com.gamebird.game.bird.model.message.MessageVO;
 import com.gamebird.game.bird.model.vo.RolePackVO;
 import com.gamebird.game.bird.model.vo.TrapResultVO;
 import com.gamebird.game.bird.service.BirdRaffleService;
-import com.gamebird.game.bird.util.BirdTextUtils;
+import com.gamebird.game.bird.service.TrapService;
 import com.gamebird.game.bird.util.GameUtils;
 
 /**
- * 陷阱相关路由
+ * 陷阱相关路由。
+ *
+ * <p>下饵/收网的业务规则已下沉 {@link TrapService}，本类只做参数接收、
+ * 页面装配与消息渲染。收网由 GET 改为 POST（原为已知设计债：GET 写操作
+ * 会被浏览器预取或刷新重复触发）。
  */
 @Controller
 @RequestMapping("/trap")
@@ -44,42 +46,43 @@ public class TrapController extends BaseController {
     @Resource
     public GameConfigGateway configGateway;
 
-    /** 按权重随机抽鸟。抽离自本类，使算法可脱离 Spring 容器做单元测试。 */
+    /** 按权重随机抽鸟（下饵页展示诱饵可捕捉的鸟时使用）。 */
     @Resource
     public BirdRaffleService birdRaffleService;
 
+    /** 捕捉循环核心业务。 */
+    @Resource
+    public TrapService trapBizService;
+
+    /** 游戏配置（加速单价等）。 */
+    @Resource
+    public GameProperties gameProperties;
+
     /**
-     * 下饵界面
+     * 下饵界面。
+     *
+     * <p>trapId 缺省时自动选第一个可用陷阱槽 —— 包裹诱饵页的「使用」
+     * 不再因漏传槽位而必然报「陷阱错误」。
+     *
      * @param session session
-     * @param model model
-     * @param trapId 陷阱Id
+     * @param model   model
+     * @param trapId  陷阱槽位 id（role_trap.id），0 表示自动选择
      * @return view
      */
     @GetMapping("/useBait")
-    public String pageUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int trapId){
+    public String pageUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int trapId) {
         Role role = getSessionRole(session);
-        // 检测陷阱信息
-        RoleTrap roleTrap = trapService.getById(trapId);
-        if (roleTrap == null || !roleTrap.getRoleId().equals(role.getRoleId())){
-            model.addAttribute("message", MessageVO.error("陷阱错误，请重新选择一个陷阱捕鸟。"));
+        RoleTrap roleTrap = selectUsableSlot(role, trapId);
+        if (roleTrap == null) {
+            model.addAttribute("message", MessageVO.error("没有可用的陷阱，请先更换或购买陷阱。"));
             return ConstData.VIEW_MESSAGE;
         }
-        if (roleTrap.getBaitId() > 0 ){
-            model.addAttribute("message", MessageVO.error("当前陷阱正在捕鸟中。"));
-            return ConstData.VIEW_MESSAGE;
-        }
-        if (roleTrap.getUseTrapId() > 0 && roleTrap.getUseTrapNum() == 0){
-            model.addAttribute("message", MessageVO.error("陷阱已过期，请切换陷阱。"));
-            return ConstData.VIEW_MESSAGE;
-        }
-        model.addAttribute("trapId", trapId);
+        model.addAttribute("trapId", roleTrap.getId());
+        model.addAttribute("trapIdx", roleTrap.getIdx());
+        // 是否携带粘性道具（决定下饵页是否展示「涂抹粘性道具」选项）
+        model.addAttribute("hasSticky", hasStickyProp(role));
         // 查询已拥有的诱饵数据
-        LambdaQueryWrapper<RolePack> baitQueryWrapper = new LambdaQueryWrapper<>();
-        baitQueryWrapper.eq(RolePack::getRoleId, role.getRoleId());
-        baitQueryWrapper.eq(RolePack::getTypeId, ConstData.PACK_TYPE_BAIT);
-        baitQueryWrapper.gt(RolePack::getNum, 0);
-        List<RolePack> packList1 = packService.list(baitQueryWrapper);
-        //
+        List<RolePack> packList1 = listOwnedPack(role, ConstData.PACK_TYPE_BAIT);
         List<RolePackVO> packList = new ArrayList<>();
         for (RolePack item : packList1) {
             RolePackVO roleBaitVO = new RolePackVO();
@@ -92,201 +95,208 @@ public class TrapController extends BaseController {
     }
 
     /**
-     * 下饵
-     * @param session session
-     * @param model model
-     * @param baitId 诱饵Id
-     * @param trapId 陷阱Id
+     * 下饵。
+     *
+     * @param session   session
+     * @param model     model
+     * @param baitId    诱饵包裹记录 id（role_pack.id）
+     * @param trapId    陷阱槽位 id
+     * @param useSticky 是否涂抹粘性道具
      * @return view
      */
     @PostMapping("/useBait")
-    public String doUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int baitId, @RequestParam(defaultValue = "0") int trapId){
+    public String doUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int baitId,
+                            @RequestParam(defaultValue = "0") int trapId,
+                            @RequestParam(defaultValue = "false") boolean useSticky) {
         Role role = getSessionRole(session);
-        // 未选择陷阱
-        RoleTrap roleTrap = trapService.getById(trapId);
-        if (roleTrap == null || !roleTrap.getRoleId().equals(role.getRoleId())){
-            model.addAttribute("message", MessageVO.error("陷阱错误，请重新选择一个陷阱捕鸟。"));
+        try {
+            trapBizService.useBait(role, trapId, baitId, useSticky);
+        } catch (Exception e) {
+            model.addAttribute("message", MessageVO.error(e.getMessage()));
             return ConstData.VIEW_MESSAGE;
         }
-        if (roleTrap.getBaitId() > 0 ){
-            model.addAttribute("message", MessageVO.error("当前陷阱正在捕鸟中。"));
-            return ConstData.VIEW_MESSAGE;
-        }
-        if (roleTrap.getUseTrapId() > 0 && roleTrap.getUseTrapNum() == 0){
-            model.addAttribute("message", MessageVO.error("陷阱已过期，请切换陷阱。"));
-            return ConstData.VIEW_MESSAGE;
-        }
-        //
-        RolePack packBait = packService.getById(baitId);
-        // 诱饵数量不足
-        if (packBait == null || !packBait.getRoleId().equals(role.getRoleId()) || packBait.getNum() == 0){
-            model.addAttribute("message", MessageVO.error("诱饵数量不足"));
-            return ConstData.VIEW_MESSAGE;
-        }
-        BaseBait baseBait = configGateway.getBaseBait(packBait.getBaseId());
-        if (baseBait == null || baseBait.getBirdSet() == null || baseBait.getBirdSet().trim().isEmpty()){
-            model.addAttribute("message", MessageVO.error("诱饵配置错误"));
-            return ConstData.VIEW_MESSAGE;
-        }
-        int nowTime = CommonUtils.nowTime();
-        // 随机小鸟
-        BaseBird baseBird = birdRaffleService.randBird(baseBait.getBirdSet().split(","));
-        if (baseBird == null){
-            model.addAttribute("message", MessageVO.error("诱饵或者小鸟配置错误"));
-            return ConstData.VIEW_MESSAGE;
-        }
-        // 随机性别
-        Byte sex = (byte) (CommonUtils.randNum(1, 100) <= 50 ? 0 : 1);
-        // 随机重量
-        long weight = CommonUtils.randNum(baseBird.getMinWeight(), baseBird.getMaxWeight());
-        // 获取星级
-        Byte star = (byte) (weight / (baseBird.getMaxWeight() / 5));
-        // 更新陷阱信息
-        roleTrap.setBaitId(baitId);
-        roleTrap.setCatchBirdId(baseBird.getId());
-        roleTrap.setCatchBirdSex(sex);
-        roleTrap.setCatchBirdWeight(weight);
-        roleTrap.setCatchBirdStar(star);
-        roleTrap.setCatchTime(nowTime);
-        roleTrap.setCatchEndTime(nowTime + baseBird.getCatchMin() * 60);
-        // 扣除诱饵数量
-        costPackNum(packBait, 1);
-        packService.saveOrUpdate(packBait);
-        // 更新陷阱数据到数据库
-        trapService.saveOrUpdate(roleTrap);
-
+        saveSessionRole(session, role);
         return redirectTo("/game");
     }
 
     /**
-     * 一键下饵界面
+     * 一键下饵：选一份诱饵，自动投入第一个空闲陷阱槽。
+     *
      * @param session session
-     * @param model model
-     * @param baitId 诱饵Id
-     * @param trapId 陷阱Id
+     * @param model   model
+     * @param baitId  诱饵包裹记录 id；0 表示进入选择页
      * @return view
      */
     @GetMapping("/autoUseBait")
-    public String pageAutoUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int baitId, @RequestParam(defaultValue = "0") int trapId){
-
-        return redirectTo("/game");
+    public String pageAutoUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int baitId) {
+        Role role = getSessionRole(session);
+        model.addAttribute("baitId", baitId);
+        model.addAttribute("hasSticky", hasStickyProp(role));
+        List<RolePack> packList1 = listOwnedPack(role, ConstData.PACK_TYPE_BAIT);
+        List<RolePackVO> packList = new ArrayList<>();
+        for (RolePack item : packList1) {
+            RolePackVO roleBaitVO = new RolePackVO();
+            BeanUtils.copyProperties(item, roleBaitVO);
+            roleBaitVO.setBaseBait(configGateway.getBaseBait(roleBaitVO.getBaseId()));
+            packList.add(roleBaitVO);
+        }
+        model.addAttribute("baitList", packList);
+        return "trap/autoBait";
     }
 
     /**
-     * 一键下饵
-     * @param session session
-     * @param model model
-     * @param baitId 诱饵Id
-     * @param trapId 陷阱Id
-     * @return view
+     * 一键下饵提交。
      */
     @PostMapping("/autoUseBait")
-    public String doAutoUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int baitId, @RequestParam(defaultValue = "0") int trapId){
-
-
-        model.addAttribute("message", MessageVO.success(""));
+    public String doAutoUseBait(HttpSession session, Model model, @RequestParam(defaultValue = "0") int baitId,
+                                @RequestParam(defaultValue = "false") boolean useSticky) {
+        Role role = getSessionRole(session);
+        // 找第一个空闲且陷阱可用的槽位
+        RoleTrap target = selectUsableSlot(role, 0);
+        if (target == null) {
+            model.addAttribute("message", MessageVO.error("没有空闲的陷阱槽，请先收网或更换陷阱。"));
+            return ConstData.VIEW_MESSAGE;
+        }
+        try {
+            trapBizService.useBait(role, target.getId(), baitId, useSticky);
+        } catch (Exception e) {
+            model.addAttribute("message", MessageVO.error(e.getMessage()));
+            return ConstData.VIEW_MESSAGE;
+        }
+        saveSessionRole(session, role);
+        MessageVO message = MessageVO.success("一键下饵成功，小鸟上钩后会通知你。");
+        message.addLink(new MessageLink("回主页", "/game"));
+        model.addAttribute("message", message);
         return ConstData.VIEW_MESSAGE;
     }
 
     /**
-     * 收网
-     *
-     * <p>★ 已知设计债（本轮不改）：本方法会写库（消耗陷阱、结算捕获），
-     * 但仍是 {@code @GetMapping}。按 REST 语义，写操作应为 POST。
-     * 本轮**有意不改** —— 改POST 需要同步改造 trap/over 页的触发方式，
-     * 属于路由规范化批次的后续范围，此处仅记录，避免后人误以为是疏漏。
-     * 已知缺陷：GET 收网可被浏览器预取或刷新重复触发。
+     * 收网（POST：原 GET 写操作会因浏览器预取/刷新重复触发）。
      *
      * @param session session
-     * @param model model
-     * @param trapId 陷阱Id
+     * @param model   model
+     * @param trapId  陷阱槽位 id
      * @return view
      */
-    @GetMapping("/over")
-    public String doOver(HttpSession session, Model model, @RequestParam(defaultValue = "0") int trapId){
+    @PostMapping("/over")
+    public String doOver(HttpSession session, Model model, @RequestParam(defaultValue = "0") int trapId) {
         Role role = getSessionRole(session);
-        // 仓库鸟上限 todo
-        // 陷阱未找到或者陷阱不是该角色的
-        RoleTrap roleTrap = trapService.getById(trapId);
-        if (roleTrap == null || !roleTrap.getRoleId().equals(role.getRoleId())){
-            model.addAttribute("message", MessageVO.error("没有该陷阱"));
+        TrapResultVO resultVO;
+        try {
+            resultVO = trapBizService.over(role, trapId);
+        } catch (Exception e) {
+            model.addAttribute("message", MessageVO.error(e.getMessage()));
             return ConstData.VIEW_MESSAGE;
         }
-        // 陷阱处于空闲中
-        if (roleTrap.getBaitId() == 0){
-            model.addAttribute("message", MessageVO.error("当前陷阱正处于空闲中。"));
-            return ConstData.VIEW_MESSAGE;
-        }
-        StorageBird bird = new StorageBird();
-        bird.setId(0);
-        bird.setRoleId(role.getRoleId());
-        bird.setBirdId(roleTrap.getCatchBirdId());
-        bird.setLevel((short) 1);
-        bird.setExp(0L);
-        bird.setTotalExp(0L);
-        bird.setSex(roleTrap.getCatchBirdSex());
-        bird.setWeight(roleTrap.getCatchBirdWeight());
-        bird.setInitWeight(roleTrap.getCatchBirdWeight());
-        bird.setStar(roleTrap.getCatchBirdStar());
-        bird.setGrow((short) 1000); // todo 随机成长值
-        bird.setKo((short) 0); // todo 随机克制值
-        bird.setIsLock((byte) 0);
-        bird.setTime(CommonUtils.nowTime());
-        // 获取小鸟配置
-        BaseBird baseBird = configGateway.getBaseBird(bird.getBirdId());
-        long addExp = baseBird.getCatchExp();
-        // 更新陷阱信息
-        roleTrap.setBaitId(0);
-        roleTrap.setCatchBirdId(0);
-        roleTrap.setCatchBirdSex((byte) 0);
-        roleTrap.setCatchBirdWeight(0L);
-        roleTrap.setCatchBirdStar((byte) 0);
-        roleTrap.setCatchTime(0);
-        roleTrap.setCatchEndTime(0);
-        trapService.saveOrUpdate(roleTrap);
-        // 增加小鸟数据
-        int birdId = storageBirdService.insertStorageBird(bird);
-        // 增加角色经验值
-        int oldLevel = role.getLevel();
-        addRoleExp(role, addExp);
-        roleService.saveOrUpdate(role);
-        // 计算升到下一级所需要的经验值
-        long needExp = 0;
-        BaseLevel baseLevel = configGateway.getBaseLevel(role.getLevel() + 1);
-        if (baseLevel != null){
-            needExp = baseLevel.getTotalExp() - role.getTotalExp();
-        }
-        // 构造结果数据
-        TrapResultVO resultVO = new TrapResultVO();
-        resultVO.setBirdId(birdId);
-        resultVO.setBirdBaseId( baseBird.getId());
-        resultVO.setNameText(bird.getWeight() / 100.0 + "斤的" + GameUtils.getBirdSexName(bird.getSex()) + baseBird.getName());
-        resultVO.setStarText(GameUtils.getStarName(bird.getStar()));
-        resultVO.setGrowText(BirdTextUtils.growText(bird.getGrow()));
-        resultVO.setKoText(BirdTextUtils.koText(bird.getKo()));
-        resultVO.setMinWeight(baseBird.getMinWeight());
-        resultVO.setMaxWeight(baseBird.getMaxWeight());
-        resultVO.setAddExp(addExp);
-        resultVO.setNeedExp(needExp);
-        resultVO.setWishNum(0);
-        resultVO.setOldLevel(oldLevel);
-        resultVO.setNewLevel(role.getLevel());
+        saveSessionRole(session, role);
         model.addAttribute("result", resultVO);
-        // 增加小鸟日志 todo
         return "trap/over";
     }
 
     /**
-     * 小鸟详情
+     * 陷阱加速：消耗钻石把等待时间缩短。
+     *
      * @param session session
-     * @param model model
+     * @param model   model
+     * @param trapId  陷阱槽位 id
      * @return view
      */
+    @PostMapping("/hasten")
+    public String doHasten(HttpSession session, Model model, @RequestParam(defaultValue = "0") int trapId) {
+        Role role = getSessionRole(session);
+        RoleTrap slot = trapId <= 0 ? null : trapService.getById(trapId);
+        if (slot == null || !role.getRoleId().equals(slot.getRoleId())) {
+            model.addAttribute("message", MessageVO.error("没有该陷阱。"));
+            return ConstData.VIEW_MESSAGE;
+        }
+        int now = CommonUtils.nowTime();
+        if (slot.getBaitId() == 0) {
+            model.addAttribute("message", MessageVO.error("当前陷阱正处于空闲中。"));
+            return ConstData.VIEW_MESSAGE;
+        }
+        if (slot.getCatchEndTime() <= now) {
+            model.addAttribute("message", MessageVO.error("小鸟已经落网，直接收网即可。"));
+            return ConstData.VIEW_MESSAGE;
+        }
+        // 剩余时长按小时取整（不足 1 小时按 1 小时计）
+        int remain = slot.getCatchEndTime() - now;
+        int hours = Math.max(1, (remain + 3599) / 3600);
+        int cost = hours * gameProperties.getHastenDiamondPerHour();
+        if (role.getDiamond() < cost) {
+            model.addAttribute("message", MessageVO.error("缩短" + hours + "小时需要" + cost + "钻石，您的钻石不足。"));
+            return ConstData.VIEW_MESSAGE;
+        }
+        roleValueService.costRoleDiamond(role, cost);
+        slot.setCatchEndTime(slot.getCatchEndTime() - Math.min(remain, hours * 3600));
+        trapService.updateById(slot);
+        roleService.updateById(role);
+        saveSessionRole(session, role);
+        MessageVO message = MessageVO.success("消耗" + cost + "钻石，捕捉提前完成！");
+        message.addLink(new MessageLink("回主页", "/game"));
+        model.addAttribute("message", message);
+        return ConstData.VIEW_MESSAGE;
+    }
+
+    /**
+     * 小鸟详情（只读 base_bird 配置）。
+     */
     @GetMapping("/birdInfo")
-    public String pageBirdInfo(HttpSession session, Model model, @RequestParam(defaultValue = "0") int birdId){
+    public String pageBirdInfo(HttpSession session, Model model, @RequestParam(defaultValue = "0") int birdId) {
         BaseBird baseBird = configGateway.getBaseBird(birdId);
         model.addAttribute("baseBird", baseBird);
         return "trap/birdInfo";
     }
 
+    // ==================== 私有工具 ====================
+
+    /**
+     * 选择一个可下饵的陷阱槽：trapId 精确匹配优先；否则取第一个
+     * 空闲（未在下饵）且陷阱耐久可用的槽位。
+     *
+     * @return 可用槽位；无可用的返回 null
+     */
+    private RoleTrap selectUsableSlot(Role role, int trapId) {
+        if (trapId > 0) {
+            RoleTrap slot = trapService.getById(trapId);
+            if (slot != null && role.getRoleId().equals(slot.getRoleId())
+                    && slot.getBaitId() == 0
+                    && (slot.getUseTrapId() == 0 || slot.getUseTrapNum() > 0)) {
+                return slot;
+            }
+            return null;
+        }
+        LambdaQueryWrapper<RoleTrap> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(RoleTrap::getRoleId, role.getRoleId());
+        wrapper.orderByAsc(RoleTrap::getIdx);
+        for (RoleTrap slot : trapService.list(wrapper)) {
+            if (slot.getBaitId() == 0 && (slot.getUseTrapId() == 0 || slot.getUseTrapNum() > 0)) {
+                return slot;
+            }
+        }
+        return null;
+    }
+
+    /** 当前角色是否携带粘性道具（下饵页展示选项用）。 */
+    private boolean hasStickyProp(Role role) {
+        LambdaQueryWrapper<RolePack> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(RolePack::getRoleId, role.getRoleId());
+        wrapper.eq(RolePack::getTypeId, ConstData.PACK_TYPE_PROP);
+        wrapper.gt(RolePack::getNum, 0);
+        for (RolePack pack : packService.list(wrapper)) {
+            var prop = configGateway.getBaseProp(pack.getBaseId());
+            if (prop != null && prop.getEffectType() != null && prop.getEffectType() == ConstData.PROP_EFFECT_STICKY) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 查询当前角色指定类别且数量大于 0 的包裹记录。 */
+    private List<RolePack> listOwnedPack(Role role, byte typeId) {
+        LambdaQueryWrapper<RolePack> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(RolePack::getRoleId, role.getRoleId());
+        wrapper.eq(RolePack::getTypeId, typeId);
+        wrapper.gt(RolePack::getNum, 0);
+        return packService.list(wrapper);
+    }
 }
