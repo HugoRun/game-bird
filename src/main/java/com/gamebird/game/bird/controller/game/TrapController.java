@@ -219,17 +219,15 @@ public class TrapController extends BaseController {
             model.addAttribute("message", MessageVO.error("小鸟已经落网，直接收网即可。"));
             return ConstData.VIEW_MESSAGE;
         }
-        // 加速按 30 分钟粒度计价（每 30 分钟 5 钻），长等待可小额多次
+        // 加速按 30 分钟粒度计价（每 30 分钟 5 钻）；裁剪以秒为单位，
+        // 修复：剩余不足 1 分钟时分钟取整丢余数 → 扣了钻石时间却不变
         int remain = slot.getCatchEndTime() - now;
         int units = Math.max(1, (remain + 1799) / 1800);
-        int minutes = Math.min(remain, units * 1800) / 60;
-        int cost = units * gameProperties.getHastenDiamondPerHour() / 2;
-        if (cost < 1) {
-            cost = 1;
-        }
+        int cost = Math.max(1, units * gameProperties.getHastenDiamondPerHour() / 2);
+        int cutSeconds = Math.min(remain, units * 1800);
         if (role.getDiamond() == null || role.getDiamond() < cost) {
             // 钻石不足：给出赚钻渠道引导，而不是让玩家卡在死路
-            MessageVO message = MessageVO.error("缩短" + minutes + "分钟需要 " + cost + " 钻石，您的钻石只有 "
+            MessageVO message = MessageVO.error("缩短这段等待需要 " + cost + " 钻石，您的钻石只有 "
                     + (role.getDiamond() == null ? 0 : role.getDiamond()) + "。");
             message.addLink(new MessageLink("🗼 去试炼之塔赢钻石", "/fight/tower"));
             message.addLink(new MessageLink("🎁 每日签到有钻石", "/signin"));
@@ -238,13 +236,17 @@ public class TrapController extends BaseController {
             return ConstData.VIEW_MESSAGE;
         }
         roleValueService.costRoleDiamond(role, cost);
-        slot.setCatchEndTime(slot.getCatchEndTime() - minutes * 60);
+        slot.setCatchEndTime(slot.getCatchEndTime() - cutSeconds);
         trapService.updateById(slot);
         roleService.updateById(role);
         saveSessionRole(session, role);
+        // 扣费与生效一致：提示带上实际裁剪时长
+        String cutText = cutSeconds >= 60
+                ? (cutSeconds / 60) + " 分钟"
+                : cutSeconds + " 秒";
         // 成功后直接回主页，动线一步到位
         model.addFlashAttribute("message",
-                MessageVO.success("消耗" + cost + "钻石，捕捉提前了约" + minutes + "分钟！"));
+                MessageVO.success("消耗" + cost + "钻石，捕捉提前了 " + cutText + "！"));
         return redirectTo("/game");
     }
 

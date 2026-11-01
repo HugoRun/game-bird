@@ -15,7 +15,7 @@
             <div class="list1-info">
                 <p>
                     <span class="text-primary" th:text="${f.name}"></span>
-                    <span th:if="${currentFieldId == f.id}" class="text-darkorange">（当前所在）</span>
+                    <span th:if="${currentFieldName == f.name}" class="text-darkorange">（当前所在）</span>
                 </p>
                 <p class="text-muted" th:text="${f.descText}"></p>
                 <p th:if="${currentFieldId != f.id}">

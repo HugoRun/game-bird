@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.gamebird.game.bird.config.GameConfigGateway;
 import com.gamebird.game.bird.controller.common.BaseController;
 import com.gamebird.game.bird.model.dbo.BaseBird;
+import com.gamebird.game.bird.model.dbo.BaseField;
 import com.gamebird.game.bird.model.dbo.Role;
 import com.gamebird.game.bird.model.dbo.RoleCage;
 import com.gamebird.game.bird.model.dbo.StorageBird;
@@ -63,19 +64,25 @@ public class StorageController extends BaseController {
     @Resource
     public TaskTriggerService taskTriggerService;
 
-    /** 图鉴页：全部小鸟配置按场景分组，已收集的高亮。 */
+    /** 图鉴页：按场景分组展示，每组带收集度；未收集显示剪影占位。 */
     @GetMapping("/book")
     public String book(HttpSession session, Model model) {
         Role role = getSessionRole(session);
-        List<BaseBird> allBirds = configGateway.getBaseBirdList().stream()
+        java.util.Set<Integer> collected = new java.util.HashSet<>(collectionService.collectedBirdIds(role.getRoleId()));
+        // 按场景名分组（base_field 奇偶孪生 id 同名），组内按 id 升序
+        java.util.LinkedHashMap<String, List<BaseBird>> groups = new java.util.LinkedHashMap<>();
+        for (BaseBird bird : configGateway.getBaseBirdList().stream()
                 .sorted(java.util.Comparator.comparing(BaseBird::getField, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()))
                         .thenComparing(BaseBird::getId))
-                .toList();
-        java.util.Set<Integer> collected = new java.util.HashSet<>(collectionService.collectedBirdIds(role.getRoleId()));
-        model.addAttribute("allBirds", allBirds);
+                .toList()) {
+            BaseField field = bird.getField() == null ? null : configGateway.getBaseField(bird.getField().intValue());
+            String sceneName = field == null ? "未知栖息地" : field.getName();
+            groups.computeIfAbsent(sceneName, k -> new java.util.ArrayList<>()).add(bird);
+        }
+        model.addAttribute("groups", groups);
         model.addAttribute("collected", collected);
         model.addAttribute("collectedCount", collected.size());
-        model.addAttribute("totalCount", allBirds.size());
+        model.addAttribute("totalCount", collectionService == null ? 0 : configGateway.getBaseBirdList().size());
         return "storage/book";
     }
 

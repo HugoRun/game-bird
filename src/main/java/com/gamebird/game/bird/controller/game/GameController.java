@@ -86,6 +86,10 @@ public class GameController extends BaseController {
     /** 战斗记录（角色页统计）。 */
     @Resource
     public com.gamebird.game.bird.service.FightLogService fightLogService;
+
+    /** 游戏参数（仓库上限）。 */
+    @Resource
+    public com.gamebird.game.bird.config.GameProperties gameProperties;
     // 日志句柄
 
     /**
@@ -186,6 +190,12 @@ public class GameController extends BaseController {
                         .last("LIMIT 1")).stream().findFirst().orElse(null));
         // 福利位：今天是否已签到
         model.addAttribute("signedToday", signInService.isSignedToday(role.getRoleId()));
+        // 仓库余量（满仓时收网会被拒，提前让玩家看到）
+        long warehouseCount = storageBirdService.count(
+                new LambdaQueryWrapper<StorageBird>().eq(StorageBird::getRoleId, role.getRoleId()));
+        model.addAttribute("warehouseCount", warehouseCount);
+        model.addAttribute("warehouseCapacity", gameProperties.getBirdStorageCapacity());
+        model.addAttribute("warehouseFull", warehouseCount >= gameProperties.getBirdStorageCapacity());
         // 诱饵余量（主页空闲陷阱提示）
         long baitTotal = packService.list(new LambdaQueryWrapper<RolePack>()
                 .eq(RolePack::getRoleId, role.getRoleId())
@@ -292,8 +302,16 @@ public class GameController extends BaseController {
     @GetMapping("/game/field")
     public String pageFieldList(HttpSession session, Model model) {
         Role role = getSessionRole(session);
-        model.addAttribute("fields", configGateway.getBaseFieldList());
-        model.addAttribute("currentFieldId", role.getFieldId() == null ? 0 : role.getFieldId());
+        // base_field 每个场景有两个 id（奇数 id 才被鸟/饵引用），按名字去重，
+        // 修复：切换页同一场景渲染两个相同实例
+        java.util.LinkedHashMap<String, BaseField> unique = new java.util.LinkedHashMap<>();
+        for (BaseField f : configGateway.getBaseFieldList()) {
+            unique.putIfAbsent(f.getName() == null ? String.valueOf(f.getId()) : f.getName(), f);
+        }
+        model.addAttribute("fields", unique.values());
+        // 「当前所在」按场景名比较：兼容历史角色落在孪生 id 上的情况
+        BaseField current = configGateway.getBaseField(role.getFieldId() == null ? 0 : role.getFieldId().intValue());
+        model.addAttribute("currentFieldName", current == null ? "" : current.getName());
         return "field/fieldList";
     }
 

@@ -229,8 +229,10 @@ public class TrapServiceImpl implements TrapService {
             long owned = storageBirdService.count(
                     new LambdaQueryWrapper<StorageBird>().eq(StorageBird::getRoleId, role.getRoleId()));
             if (owned >= gameProperties.getBirdStorageCapacity()) {
+                // 仓库满：给出明确去向（此前玩家点收网只见报错、状态不变，体感"按钮无响应"）
                 throw new BizException(ResultCode.PARAM_INVALID,
-                        "小鸟仓库已满（" + gameProperties.getBirdStorageCapacity() + "只），请先出售几只再来收网。");
+                        "小鸟仓库已满（" + owned + "/" + gameProperties.getBirdStorageCapacity()
+                                + "只）。请先到仓库出售或放生几只，再回来收网。");
             }
             // 鸟笼加成：经验笼加经验、重量笼加重量（按 func 文案区分）
             long weight = slot.getCatchBirdWeight();

@@ -615,3 +615,112 @@ button.link-btn:hover {
     font-size: 12px;
     padding: 6px 0 2px;
 }
+
+
+/* ---------------- 图鉴网格 ---------------- */
+
+.book-progress {
+    height: 10px;
+    background: #e8f2e9;
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 6px 0;
+}
+
+.book-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--c-forest-2), var(--c-gold));
+    border-radius: 999px;
+    transition: width .3s ease;
+}
+
+.book-scene-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+}
+
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 8px 0 14px;
+}
+
+.book-tile {
+    background: var(--c-card);
+    border: 1px solid rgba(46, 125, 50, .16);
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.book-tile.none {
+    background: #f3f5f3;
+    opacity: .75;
+}
+
+.book-tile.none .book-tile-img img {
+    filter: grayscale(1) brightness(1.15);
+    opacity: .55;
+}
+
+.book-tile-img img {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+}
+
+.book-tile-name {
+    font-size: 13px;
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.book-tile-sub {
+    font-size: 11px;
+    color: var(--c-ink-soft);
+}
+
+/* ---------------- 移动端适配 ---------------- */
+
+@media (max-width: 420px) {
+    .main {
+        margin: 6px 6px 84px;
+        padding: 8px 8px 12px;
+        border-radius: 16px;
+    }
+
+    .panel {
+        padding: 8px 9px;
+    }
+
+    .list1 li {
+        padding: 8px 6px;
+    }
+
+    .list1 li .list1-icon img {
+        width: 44px;
+        height: 44px;
+    }
+
+    .book-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        max-width: 100%;
+    }
+
+    .panel.gameNav a,
+    .panel.gameNav span {
+        padding: 4px 7px;
+        font-size: 12px;
+    }
+}
