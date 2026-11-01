@@ -13,7 +13,7 @@
                 <li th:each="baseBait, stat : ${page.getRecords()}"
                         th:classappend="${baseBait.lu > session.sRole.level} ? 'shop-locked' : ''">
                     <div class="list1-icon">
-                        <img alt="" th:classappend="${baseBait.lu > session.sRole.level} ? 'shop-locked-img' : '"  src="../../static/images/bait/1.gif" th:src="@{|/assets/images/bait/${baseBait.id}.gif|}">
+                        <img alt="" th:classappend="${baseBait.lu > session.sRole.level} ? 'shop-locked-img' : ''"  src="../../static/images/bait/1.gif" th:src="@{|/assets/images/bait/${baseBait.id}.gif|}">
                     </div>
                     <div class="list1-info">
                         <p><a th:href="@{|/shop/bait/detail(id=${baseBait.id})|}"><span th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${baseBait.name}">名称</span></a><span th:text="${'|' + baseBait.lu + '级'}"></span><span th:if="${baseBait.lu > session.sRole.level}" class="badge badge-lock">🔒 需${baseBait.lu}级</span></p></p>
