@@ -18,8 +18,15 @@
                     <span th:if="${currentFieldName == f.name}" class="text-darkorange">（当前所在）</span>
                 </p>
                 <p class="text-muted" th:text="${f.descText}"></p>
-                <p th:if="${currentFieldId != f.id}">
-                    <form th:action="@{/game/field}" method="post" style="display:inline">
+                <p class="text-muted">
+                    可捕捉:
+                    <th:block th:each="bird, st : ${sceneBirds[f.name]}"><span
+                        th:class="${collected.contains(bird.id)} ? 'text-primary' : ''"
+                        th:text="${bird.name}"></span><span th:if="${!st.last}">、</span></th:block>
+                </p>
+                <p>
+                    <a th:href="@{/field/info(fieldId=${f.id})}">查看详情</a>
+                    <form th:if="${currentFieldName != f.name}" th:action="@{/game/field}" method="post" style="display:inline">
                         <input type="hidden" name="fieldId" th:value="${f.id}">
                         <input type="submit" value="前往">
                     </form>

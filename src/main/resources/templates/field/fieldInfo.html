@@ -1,19 +1,60 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragment/head::pageHead(title='小鸟情人')}"></head>
+<head th:replace="~{fragment/head::pageHead(title='场景详情')}"></head>
 <body>
 
-<div class="main">
-    <ul th:if="${baseField != null }">
-        <li><img alt="" src="../../static/images/field/1.gif" th:src="@{|/assets/images/field/${baseField.id}.gif|}"/></li>
-        <li>[[${baseField.name}]]</li>
-        <li>[[${baseField.descText}]]</li>
+<div class="main" th:if="${baseField != null}">
+    <div class="panel bg-blue">
+        🌳 <span class="text-title" th:text="${baseField.name}"></span>
+        <a th:href="@{/game/field}">切换场景</a>
+    </div>
+    <div class="pic">
+        <img alt="" src="../../static/images/field/1.gif" th:src="@{|/assets/images/field/${baseField.id}.gif|}"/>
+    </div>
+    <div class="panel bg-green">
+        <div class="text-muted" th:text="${baseField.descText}"></div>
+    </div>
+
+    <!-- 可捕捉鸟群 -->
+    <div class="panel bg-blue">🐦 可捕捉的小鸟（<span th:text="${#lists.size(birds)}"></span> 种）</div>
+    <ul class="list1" th:if="${!#lists.isEmpty(birds)}">
+        <li th:each="b : ${birds}">
+            <div class="list1-icon">
+                <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif"
+                     th:src="@{|/assets/images/bird/${b.id}.gif|}">
+            </div>
+            <div class="list1-info">
+                <p>
+                    <span class="text-primary" th:text="${b.name}"></span>
+                    <span class="text-muted"
+                          th:text="${b.type == 1 ? '敏捷' : (b.type == 2 ? '力量' : (b.type == 3 ? '魔法' : '幻想')) + '系'}"></span>
+                </p>
+                <p class="text-muted"
+                   th:text="${b.minWeight / 100.0 + '~' + b.maxWeight / 100.0 + '斤 · 经验' + b.catchExp + ' · 卖价' + b.price + '金币/斤'}"></p>
+            </div>
+        </li>
     </ul>
-    <ul th:if="${baseField == null }">
-        <li>未知的区域</li>
-    </ul>
+    <div th:if="${#lists.isEmpty(birds)}" class="text-muted">该场景暂无可捕捉的小鸟。</div>
+
+    <!-- 可用饵料 -->
+    <div class="panel bg-yellow">🥣 该场景可用的饵料</div>
+    <div class="panel">
+        <div th:if="${#lists.isEmpty(baits)}" class="text-muted">暂无专属饵料，试试通用饵。</div>
+        <div th:each="bait : ${baits}" style="padding:2px 0">
+            <span th:text="${bait.name}"></span>
+            <span class="text-muted"
+                  th:text="|（${bait.lu}级可用 · ${bait.feePrice}${@gameUtils.getFeeTypeName(bait.feeType)}）|"></span>
+            <span class="text-muted" th:text="'捕捉:' + ${@gameUtils.getCatchBirdName(bait.birdSet)}"></span>
+        </div>
+        <div><a th:href="@{/shop/bait/items}">去商店购买饵料</a></div>
+    </div>
+
+    <div><a th:href="@{/game}">返回游戏</a></div>
     <div th:replace="~{fragment/navigation::navigation}"></div>
     <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+<div class="main" th:if="${baseField == null}">
+    <div class="panel bg-blue">未知的区域。<a th:href="@{/game/field}">查看全部场景</a></div>
 </div>
 </body>
 </html>

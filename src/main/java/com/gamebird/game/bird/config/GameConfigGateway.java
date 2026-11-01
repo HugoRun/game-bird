@@ -70,6 +70,15 @@ public class GameConfigGateway {
     }
 
     /**
+     * 取全部饵料配置（场景可捕捉饵料展示等需要遍历的场景使用）。
+     *
+     * @return 饵料配置列表（缓存快照，只读）
+     */
+    public List<BaseBait> getBaseBaitList() {
+        return configManager.getBaseBaitList();
+    }
+
+    /**
      * 取鸟笼配置。
      *
      * @param id 鸟笼配置 id；可为 null

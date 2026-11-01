@@ -21,6 +21,8 @@ import com.gamebird.common.util.CommonUtils;
 import com.gamebird.game.bird.config.GameConfigGateway;
 import com.gamebird.game.bird.controller.common.BaseController;
 import com.gamebird.game.bird.data.ConstData;
+import com.gamebird.game.bird.model.dbo.BaseBait;
+import com.gamebird.game.bird.model.dbo.BaseBird;
 import com.gamebird.game.bird.model.dbo.BaseField;
 import com.gamebird.game.bird.model.dbo.Board;
 import com.gamebird.game.bird.model.dbo.LogChat;
@@ -79,7 +81,7 @@ public class GameController extends BaseController {
     @Resource
     public RoleCageService cageService;
 
-    /** 图鉴（角色页统计）。 */
+    /** 图鉴（角色页统计/场景鸟群高亮）。 */
     @Resource
     public com.gamebird.game.bird.service.impl.CollectionService collectionService;
 
@@ -318,7 +320,25 @@ public class GameController extends BaseController {
         // 「当前所在」按场景名比较：兼容历史角色落在孪生 id 上的情况
         BaseField current = configGateway.getBaseField(role.getFieldId() == null ? 0 : role.getFieldId().intValue());
         model.addAttribute("currentFieldName", current == null ? "" : current.getName());
+        // 每个场景的可捕捉鸟群（按场景名归组；图鉴已收集的高亮）
+        java.util.Set<Integer> collected = new java.util.HashSet<>(collectionService.collectedBirdIds(role.getRoleId()));
+        model.addAttribute("collected", collected);
+        model.addAttribute("sceneBirds", sceneBirdMap());
         return "field/fieldList";
+    }
+
+    /** 场景名 → 该场景可捕捉的小鸟配置列表（按 id 升序）。 */
+    private java.util.Map<String, List<BaseBird>> sceneBirdMap() {
+        java.util.Map<String, List<BaseBird>> map = new java.util.LinkedHashMap<>();
+        for (BaseBird bird : configGateway.getBaseBirdList()) {
+            if (bird.getField() == null || bird.getStatus() == null || bird.getStatus() != 1) {
+                continue;
+            }
+            BaseField field = configGateway.getBaseField(bird.getField().intValue());
+            String name = field == null ? "未知栖息地" : field.getName();
+            map.computeIfAbsent(name, k -> new java.util.ArrayList<>()).add(bird);
+        }
+        return map;
     }
 
     /**
@@ -433,6 +453,26 @@ public class GameController extends BaseController {
     public String pageField(HttpSession session, Model model, @RequestParam(defaultValue = "0") int fieldId) {
         BaseField baseField = configGateway.getBaseField(fieldId);
         model.addAttribute("baseField", baseField);
+        if (baseField != null) {
+            // 该场景可捕捉的小鸟
+            List<BaseBird> birds = new ArrayList<>();
+            for (BaseBird bird : configGateway.getBaseBirdList()) {
+                if (bird.getField() != null && bird.getField().intValue() == baseField.getId()
+                        && bird.getStatus() != null && bird.getStatus() == 1) {
+                    birds.add(bird);
+                }
+            }
+            model.addAttribute("birds", birds);
+            // 该场景可使用的饵料（lb 区域限制匹配）
+            List<BaseBait> baits = new ArrayList<>();
+            for (BaseBait bait : configGateway.getBaseBaitList()) {
+                if (bait.getLb() != null && bait.getLb().intValue() == baseField.getId()
+                        && bait.getStatus() != null && bait.getStatus() == 1) {
+                    baits.add(bait);
+                }
+            }
+            model.addAttribute("baits", baits);
+        }
         return "field/fieldInfo";
     }
 
