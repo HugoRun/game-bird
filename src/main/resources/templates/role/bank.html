@@ -34,7 +34,7 @@
     <div th:if="${message != null}" th:replace="~{fragment/message::message2}"></div>
 
     <div class="l">现金:[[${session.sRole.coin}]]金币</div>
-    <div class="l">存款额度:0 <span class="text-muted" title="功能开发中，暂不可用">提升上限</span></div>
+    <div class="l">存款额度:<span th:text="${session.sRole.bankCoin}"></span> / <span th:text="${bankLimit}"></span> 金币 <span class="text-muted" title="提升上限">（VIP 等级越高额度越大，<a th:href="@{/pay}">了解捐赠</a>）</span></div>
     <div class="l">账户余额:[[${session.sRole.bankCoin}]]金币</div>
     <div class="icon-gray-border">
         <div class="t">存款 (手续费1%，100金币起存)</div>

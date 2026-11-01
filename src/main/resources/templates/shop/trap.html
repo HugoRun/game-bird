@@ -15,7 +15,7 @@
                         <img alt="" class="icon-gray-border" src="../../static/images/trap/1.gif" th:src="@{|/assets/images/trap/${baseTrap.id}.gif|}">
                     </div>
                     <div class="list1-info">
-                        <p th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${baseTrap.name}+'|'+${baseTrap.lu}+'级'">谷子(25级)</p>
+                        <p><a th:href="@{|/shop/trap/detail(id=${baseTrap.id})|}"><span th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${baseTrap.name}">名称</span></a><span th:text="${'|' + baseTrap.lu + '级'}"></span></p>谷子(25级)</p>
                         <p>功能:<span th:text="${baseTrap.func}"></span></p>
                         <p>价格:<span th:text="${baseTrap.getFeePrice()}"></span><span th:text="${@gameUtils.getFeeTypeName(baseTrap.getFeeType())}"></span></p>
                         <div class="btl">

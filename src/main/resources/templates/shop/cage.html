@@ -15,7 +15,7 @@
                         <img alt="" class="icon-gray-border" src="../../static/images/cage/1.gif" th:src="@{|/assets/images/cage/${baseCage.id}.gif|}">
                     </div>
                     <div class="list1-info">
-                        <p th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${baseCage.name}+'|'+${baseCage.lu}+'级'">谷子(25级)</p>
+                        <p><a th:href="@{|/shop/cage/detail(id=${baseCage.id})|}"><span th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${baseCage.name}">名称</span></a><span th:text="${'|' + baseCage.lu + '级'}"></span></p>谷子(25级)</p>
                         <p>功能:<span th:text="${baseCage.func}"></span></p>
                         <p>价格:<span th:text="${baseCage.getFeePrice()}"></span><span th:text="${@gameUtils.getFeeTypeName(baseCage.getFeeType())}"></span></p>
                         <div class="btl">

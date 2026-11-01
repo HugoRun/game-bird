@@ -15,12 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.gamebird.common.annotation.SkipAccount;
 import com.gamebird.common.annotation.SkipRole;
 import com.gamebird.common.util.CommonUtils;
+import com.gamebird.common.util.PasswordHasher;
 import com.gamebird.common.util.UUIDUtils;
 
 import com.gamebird.game.bird.config.GameProperties;
 import com.gamebird.game.bird.controller.common.BaseController;
 import com.gamebird.game.bird.data.ConstData;
 import com.gamebird.game.bird.model.dbo.Account;
+import com.gamebird.game.bird.model.message.MessageLink;
 import com.gamebird.game.bird.model.message.MessageVO;
 import com.gamebird.game.bird.service.AccountService;
 
@@ -82,7 +84,7 @@ public class AccountController extends BaseController {
         accountQueryWrapper.eq(Account::getUsername, username);
         Account account = accountService.getOne(accountQueryWrapper);
         // 账户不存在或者密码错误
-        if (null == account || !passwordMatches(password, account.getPassword())) {
+        if (null == account || !PasswordHasher.matches(password, account.getPassword())) {
             model.addAttribute("message", MessageVO.error("登陆失败,账号或密码错误。"));
             return "account/login";
         }
@@ -90,6 +92,11 @@ public class AccountController extends BaseController {
         if (account.getIsBan() == 1) {
             model.addAttribute("message", MessageVO.error("账号已被封禁"));
             return "account/login";
+        }
+        // 透明升级：存量明文口令验证通过后立即改写为 BCrypt 哈希落库
+        if (!PasswordHasher.isHashed(account.getPassword())) {
+            account.setPassword(PasswordHasher.hash(password));
+            accountService.updateById(account);
         }
         // 存储账户信息到session
         session.setAttribute("account", account);
@@ -170,7 +177,7 @@ public class AccountController extends BaseController {
         // 平台信息
         account.setPlatform("bird");
         account.setUsername(username);
-        account.setPassword(password);
+        account.setPassword(PasswordHasher.hash(password));
         // 基本信息
         account.setAvatarUrl("/assets/images/avatar/d.jpg");
         account.setNickname("无名氏"); //todo 随机用户名
@@ -183,25 +190,59 @@ public class AccountController extends BaseController {
     }
 
     /**
-     * 常量时间比较两个口令。
-     *
-     * <p>原先用 {@code password.equals(stored)}，其短路比较会在首个不等字节处立即返回，
-     * 使响应耗时随「猜对前缀长度」线性变化，可被用于逐字节爆破。这里改用
-     * {@link MessageDigest#isEqual}，其耗时只与长度相关。
-     *
-     * <p><b>注意</b>：本方法只做字节比较，口令在数据库中仍是明文（见
-     * 「不做密码哈希迁移」红线）。它缩小的是时序侧信道，不是明文存储问题。
-     *
-     * @param input    用户提交的明文口令
-     * @param stored   数据库中存储的口令
-     * @return 是否一致
+     * 修改密码界面（需已登录）。
      */
-    private static boolean passwordMatches(String input, String stored) {
-        if (null == input || null == stored) {
-            return false;
+    @SkipRole
+    @GetMapping(value = "/account/password")
+    public String pageChangePassword(HttpSession session, Model model) {
+        Account account = (Account) session.getAttribute("account");
+        if (null == account) {
+            return redirectTo("/login");
         }
-        return MessageDigest.isEqual(
-                input.getBytes(StandardCharsets.UTF_8),
-                stored.getBytes(StandardCharsets.UTF_8));
+        return "account/password";
+    }
+
+    /**
+     * 修改密码：验旧设新，成功后新口令以 BCrypt 哈希落库。
+     */
+    @SkipRole
+    @PostMapping(value = "/account/password")
+    public String doChangePassword(HttpSession session, Model model,
+                                   @RequestParam String oldPassword,
+                                   @RequestParam String newPassword,
+                                   @RequestParam String newPasswordRe) {
+        Account account = (Account) session.getAttribute("account");
+        if (null == account) {
+            return redirectTo("/login");
+        }
+        // 从库中取最新数据，避免 session 里的口令快照过期
+        Account dbAccount = accountService.getById(account.getUserId());
+        if (null == dbAccount || !PasswordHasher.matches(oldPassword, dbAccount.getPassword())) {
+            model.addAttribute("message", MessageVO.error("原密码错误。"));
+            return "account/password";
+        }
+        if (null == newPassword || newPassword.isEmpty()) {
+            model.addAttribute("message", MessageVO.error("新密码不能为空。"));
+            return "account/password";
+        }
+        if (newPassword.length() < 6) {
+            model.addAttribute("message", MessageVO.error("新密码至少 6 位。"));
+            return "account/password";
+        }
+        if (!newPassword.equals(newPasswordRe)) {
+            model.addAttribute("message", MessageVO.error("两次输入的新密码不一致。"));
+            return "account/password";
+        }
+        if (PasswordHasher.matches(newPassword, dbAccount.getPassword())) {
+            model.addAttribute("message", MessageVO.error("新密码不能与原密码相同。"));
+            return "account/password";
+        }
+        dbAccount.setPassword(PasswordHasher.hash(newPassword));
+        accountService.updateById(dbAccount);
+        session.setAttribute("account", dbAccount);
+        MessageVO messageVO = MessageVO.success("密码修改成功，下次登录请使用新密码。");
+        messageVO.addLink(new MessageLink("回主页", "/game"));
+        model.addAttribute("message", messageVO);
+        return ConstData.VIEW_MESSAGE;
     }
 }

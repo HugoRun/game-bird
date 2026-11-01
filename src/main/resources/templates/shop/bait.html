@@ -15,7 +15,7 @@
                         <img alt="" class="icon-gray-border" src="../../static/images/bait/1.gif" th:src="@{|/assets/images/bait/${baseBait.id}.gif|}">
                     </div>
                     <div class="list1-info">
-                        <p th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${baseBait.name}+'|'+${baseBait.lu}+'级'">谷子(25级)</p>
+                        <p><a th:href="@{|/shop/bait/detail(id=${baseBait.id})|}"><span th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${baseBait.name}">名称</span></a><span th:text="${'|' + baseBait.lu + '级'}"></span></p>谷子(25级)</p>
                         <p>捕捉:<span th:text="${@gameUtils.getCatchBirdName(baseBait.getBirdSet())}"></span></p>
                         <p>价格:<span th:text="${baseBait.getFeePrice()}"></span><span th:text="${@gameUtils.getFeeTypeName(baseBait.getFeeType())}"></span></p>
                         <div class="btl">

@@ -187,7 +187,14 @@ public class GameController extends BaseController {
      */
     @GetMapping("/bank")
     public String pageBank(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        model.addAttribute("bankLimit", bankLimit(role));
         return "role/bank";
+    }
+
+    /** 存款上限：10000 × (1 + VIP 等级)。 */
+    private long bankLimit(Role role) {
+        return 10000L * (1 + (role.getVip() == null ? 0 : role.getVip()));
     }
 
     /**
@@ -206,6 +213,12 @@ public class GameController extends BaseController {
         }
         if (inNum > role.getCoin()) {
             model.addFlashAttribute("message", MessageVO.error("您的现金不足。"));
+            return redirectTo("bank");
+        }
+        // 存款上限：10000 × (1 + VIP)，超过则拒绝
+        long limit = bankLimit(role);
+        if (role.getBankCoin() + inNum > limit) {
+            model.addFlashAttribute("message", MessageVO.error("超过存款额度上限（" + limit + "金币），VIP 等级越高额度越大。"));
             return redirectTo("bank");
         }
         int addBankCoin = inNum * 99 / 100;

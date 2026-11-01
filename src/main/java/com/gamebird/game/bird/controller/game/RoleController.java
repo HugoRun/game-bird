@@ -23,10 +23,12 @@ import com.gamebird.game.bird.model.dbo.Account;
 import com.gamebird.game.bird.model.dbo.BaseTitle;
 import com.gamebird.game.bird.model.dbo.Role;
 import com.gamebird.game.bird.model.dbo.RoleBirth;
+import com.gamebird.game.bird.model.dbo.RolePack;
 import com.gamebird.game.bird.model.dbo.RoleTrain;
 import com.gamebird.game.bird.model.dbo.RoleTrap;
 import com.gamebird.game.bird.model.message.MessageLink;
 import com.gamebird.game.bird.model.message.MessageVO;
+import com.gamebird.game.bird.service.TaskTriggerService;
 
 /**
  * 角色
@@ -51,6 +53,10 @@ public class RoleController extends BaseController {
     /** 游戏配置读取入口，由构造器注入。 */
     @Resource
     public GameConfigGateway configGateway;
+
+    /** 任务触发器（每日登录任务）。 */
+    @Resource
+    public TaskTriggerService taskTriggerService;
 
 
     /**
@@ -139,6 +145,9 @@ public class RoleController extends BaseController {
         roleBirth1.setRoleId(role.getRoleId());
         roleBirth1.setIdx(1);
         birthService.save(roleBirth1);
+        // 赠送一张改名卡与一张性别卡（改名/换性别从此需要卡片）
+        grantStarterProp(role.getRoleId(), 152);
+        grantStarterProp(role.getRoleId(), 153);
         //
         MessageLink link = new MessageLink("开始游戏", "/game");
         MessageVO messageVO = MessageVO.success("""
@@ -181,6 +190,8 @@ public class RoleController extends BaseController {
         int nowTime = CommonUtils.nowTime();
         role.setLastLoginTime(nowTime);
         roleService.saveOrUpdate(role);
+        // 每日登录任务触发（当天首次进入创建已完成的登录任务）
+        taskTriggerService.onLogin(role);
         // 更新当前登录角色
         saveSessionRole(session, role);
         return redirectTo("/game");
@@ -334,12 +345,16 @@ public class RoleController extends BaseController {
             model.addAttribute("message", MessageVO.error("该名称已被使用。"));
             return "role/settingResult";
         }
-        // 检测是否存在
+        // 改名需消耗一张改名卡（base_prop 152），建角时赠送一张
+        if (!consumeProp(role, 152, "改名卡")) {
+            model.addAttribute("message", MessageVO.error("改名需要消耗一张改名卡，请到商店购买。"));
+            return "role/settingResult";
+        }
         // 更新并保存数据
         role.setRoleName(roleName);
         roleService.saveOrUpdate(role);
         saveSessionRole(session, role);
-        model.addAttribute("message", MessageVO.success("设置成功。"));
+        model.addAttribute("message", MessageVO.success("设置成功，消耗了一张改名卡。"));
         return "role/settingResult";
     }
 
@@ -368,12 +383,36 @@ public class RoleController extends BaseController {
             model.addAttribute("message", MessageVO.error("性别错误。"));
             return "role/settingResult";
         }
-        // 更新并保存数据 todo
+        // 更换性别需消耗一张性别更改卡（base_prop 153），建角时赠送一张
+        if (!consumeProp(role, 153, "性别更改卡")) {
+            model.addAttribute("message", MessageVO.error("更换性别需要消耗一张性别更改卡，请到商店购买。"));
+            return "role/settingResult";
+        }
         role.setSex(sex);
         roleService.saveOrUpdate(role);
         saveSessionRole(session, role);
-        model.addAttribute("message", MessageVO.success("设置成功。"));
+        model.addAttribute("message", MessageVO.success("设置成功，消耗了一张性别更改卡。"));
         return "role/settingResult";
+    }
+
+    /**
+     * 消耗一张指定道具（改名卡/性别卡等）。
+     *
+     * @return true 表示已扣除；false 表示包裹里没有
+     */
+    private boolean consumeProp(Role role, int basePropId, String displayName) {
+        LambdaQueryWrapper<RolePack> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(RolePack::getRoleId, role.getRoleId());
+        wrapper.eq(RolePack::getTypeId, ConstData.PACK_TYPE_PROP);
+        wrapper.eq(RolePack::getBaseId, basePropId);
+        wrapper.gt(RolePack::getNum, 0);
+        RolePack pack = packService.getOne(wrapper);
+        if (pack == null) {
+            return false;
+        }
+        roleValueService.costPackNum(pack, 1);
+        packService.saveOrUpdate(pack);
+        return true;
     }
 
     /**
@@ -388,6 +427,19 @@ public class RoleController extends BaseController {
         // 注销当前登录账号数据
         session.removeAttribute("account");
         return redirectTo("/login");
+    }
+
+    /**
+     * 建角赠送一张指定道具卡片。
+     */
+    private void grantStarterProp(String roleId, int basePropId) {
+        RolePack pack = new RolePack();
+        pack.setId(0);
+        pack.setRoleId(roleId);
+        pack.setTypeId(ConstData.PACK_TYPE_PROP);
+        pack.setBaseId(basePropId);
+        pack.setNum(1);
+        packService.save(pack);
     }
 
 }

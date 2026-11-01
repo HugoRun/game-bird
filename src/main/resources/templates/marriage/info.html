@@ -11,22 +11,49 @@
         当前婚姻状态:
         <span th:switch="${marriageType}">
             <span th:case="0">未婚</span>
-            <span th:case="1">喜鹊之恋</span>
-            <span th:case="2">鸳鸯之恋</span>
-            <span th:case="3">比翼鸟之恋</span>
-            <span th:case="4">天使之恋</span>
+            <span th:case="1">喜鹊之恋(重量+1%,时间-1%)</span>
+            <span th:case="2">鸳鸯之恋(重量+3%,时间-3%)</span>
+            <span th:case="3">比翼鸟之恋(重量+8%,时间-8%)</span>
+            <span th:case="4">天使之恋(重量+20%,时间-20%)</span>
             <span th:case="*">未知</span>
         </span>
     </p>
 
-    <form method="post" th:action="@{/marriage/set}">
-        <p>结为伴侣：</p>
-        <label><input type="radio" name="type" value="1" th:checked="${marriageType==1}"/> 喜鹊之恋</label>
-        <label><input type="radio" name="type" value="2" th:checked="${marriageType==2}"/> 鸳鸯之恋</label>
-        <label><input type="radio" name="type" value="3" th:checked="${marriageType==3}"/> 比翼鸟之恋</label>
-        <label><input type="radio" name="type" value="4" th:checked="${marriageType==4}"/> 天使之恋</label>
-        <p><button type="submit">确认</button></p>
-    </form>
+    <!-- 求婚 / 升级：消耗对戒 -->
+    <div th:if="${rings != null && rings.size() > 0}">
+        <p class="text-muted">向爱神献上一枚对戒，结为伴侣或升级婚姻（对戒档位需高于当前状态）：</p>
+        <form method="post" th:action="@{/marriage/propose}">
+            <select name="packId">
+                <option th:each="ring : ${rings}" th:value="${ring.id}"
+                        th:text="${@gameConfigGateway.getBaseProp(ring.baseId) != null ? @gameConfigGateway.getBaseProp(ring.baseId).name : '对戒'} + '×' + ${ring.num}">
+                    对戒
+                </option>
+            </select>
+            <p><button type="submit">求婚</button></p>
+        </form>
+    </div>
+    <p th:if="${rings == null || rings.size() == 0}" class="text-muted">求婚需要一枚对戒，去<a th:href="@{/shop/prop/items}">商店</a>看看吧（易拉罐环→喜鹊、白银→鸳鸯、黄金→比翼、钻石→天使）。</p>
+
+    <!-- 玫瑰示好 -->
+    <div th:if="${roses != null && roses.size() > 0}">
+        <p class="text-muted">或者先送自己一束玫瑰，化为爱心：</p>
+        <form method="post" th:action="@{/marriage/rose}">
+            <select name="packId">
+                <option th:each="rose : ${roses}" th:value="${rose.id}"
+                        th:text="${@gameConfigGateway.getBaseProp(rose.baseId) != null ? @gameConfigGateway.getBaseProp(rose.baseId).name : '玫瑰'} + '×' + ${rose.num}">
+                    玫瑰
+                </option>
+            </select>
+            <p><button type="submit">送出玫瑰</button></p>
+        </form>
+    </div>
+
+    <!-- 离婚 -->
+    <div th:if="${marriageType != null && marriageType > 0}" style="margin-top:8px">
+        <form method="post" th:action="@{/marriage/divorce}">
+            <button type="submit">离婚（手续费 1000 金币）</button>
+        </form>
+    </div>
 
     <div th:replace="~{fragment/navigation::navigation}"></div>
     <div th:replace="~{fragment/footDate::footDate}"></div>

@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -236,6 +237,26 @@ public class ShopController extends BaseController {
     }
 
     // ---------- 公共实现 ----------
+
+    /**
+     * 商品详情页：6 类商品共用一个模板，按 kind 选择展示字段。
+     * 此前 6 条 detail 死路由因模板从未存在而被移除，此处以一个通用模板补齐。
+     */
+    @GetMapping(value = "/{kind}/detail")
+    public String detail(HttpSession session, Model model,
+                         @PathVariable("kind") String kind,
+                         @RequestParam(defaultValue = "0") int id) {
+        ShopKind shopKind = ShopKind.ofKey(kind);
+        if (shopKind == null || id <= 0) {
+            model.addAttribute("message", com.gamebird.game.bird.model.message.MessageVO.error("没有该商品哦。"));
+            return ConstData.VIEW_MESSAGE;
+        }
+        Object item = serviceOf(shopKind).getById(id);
+        model.addAttribute("kind", kind);
+        model.addAttribute("kindLabel", shopKind.getLabel());
+        model.addAttribute("item", item);
+        return "shop/detail";
+    }
 
     /**
      * 商店列表的公共实现：查一页在售商品并写入模型。

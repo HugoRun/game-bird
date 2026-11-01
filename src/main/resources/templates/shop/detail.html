@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='商品详情')}"></head>
+<body>
+
+<div class="main">
+    <div>
+        <div class="pic">
+            <img alt="" src="../../static/images/logo/pack.gif" th:src="@{/assets/images/logo/pack.gif}"/>
+        </div>
+        <div class="panel bg-blue">
+            <span th:text="${kindLabel}">商品</span>详情
+        </div>
+
+        <!-- 诱饵 -->
+        <div th:if="${item != null && kind == 'bait'}">
+            <img alt="" class="icon-gray-border" src="../../static/images/bait/1.gif" th:src="@{|/assets/images/bait/${item.id}.gif|}">
+            <div th:text="${item.name}"></div>
+            <div th:text="${item.descText}"></div>
+            <div>价格:<span th:text="${item.feePrice}"></span><span th:text="${@gameUtils.getFeeTypeName(item.feeType)}"></span>　购买等级:<span th:text="${item.lu}"></span>级</div>
+            <div>可捕捉:<span th:text="${@gameUtils.getCatchBirdName(item.birdSet)}"></span></div>
+            <div>经验:<span th:text="${item.exp}"></span>　使用区域:<span th:text="${item.lb > 0 ? '场景'+item.lb : '任意场景'}"></span></div>
+            <form th:action="@{/shop/bait/purchase}" method="post">
+                <input type="hidden" name="id" th:value="${item.id}">
+                购买数量:<input name="payNum" value="1" size="3"> <input type="submit" value="购买">
+            </form>
+        </div>
+
+        <!-- 陷阱 -->
+        <div th:if="${item != null && kind == 'trap'}">
+            <img alt="" class="icon-gray-border" src="../../static/images/trap/1.gif" th:src="@{|/assets/images/trap/${item.id}.gif|}">
+            <div th:text="${item.name}"></div>
+            <div th:text="${item.descText}"></div>
+            <div>价格:<span th:text="${item.feePrice}"></span><span th:text="${@gameUtils.getFeeTypeName(item.feeType)}"></span>　购买等级:<span th:text="${item.lu}"></span>级</div>
+            <div>功能:<span th:text="${item.func}"></span></div>
+            <div>耐久:<span th:text="${item.num}"></span>次</div>
+            <form th:action="@{/shop/trap/purchase}" method="post">
+                <input type="hidden" name="id" th:value="${item.id}">
+                购买数量:<input name="payNum" value="1" size="3"> <input type="submit" value="购买">
+            </form>
+        </div>
+
+        <!-- 鸟笼 -->
+        <div th:if="${item != null && kind == 'cage'}">
+            <img alt="" class="icon-gray-border" src="../../static/images/cage/1.gif" th:src="@{|/assets/images/cage/${item.id}.gif|}">
+            <div th:text="${item.name}"></div>
+            <div th:text="${item.descText}"></div>
+            <div>价格:<span th:text="${item.feePrice}"></span><span th:text="${@gameUtils.getFeeTypeName(item.feeType)}"></span>　购买等级:<span th:text="${item.lu}"></span>级</div>
+            <div>功能:<span th:text="${item.func}"></span></div>
+            <div>耐久:<span th:text="${item.num}"></span>次</div>
+            <form th:action="@{/shop/cage/purchase}" method="post">
+                <input type="hidden" name="id" th:value="${item.id}">
+                购买数量:<input name="payNum" value="1" size="3"> <input type="submit" value="购买">
+            </form>
+        </div>
+
+        <!-- 巢穴 -->
+        <div th:if="${item != null && kind == 'nest'}">
+            <img alt="" class="icon-gray-border" src="../../static/images/nest/1.gif" th:src="@{|/assets/images/nest/${item.id}.gif|}">
+            <div th:text="${item.name}"></div>
+            <div th:text="${item.descText}"></div>
+            <div>价格:<span th:text="${item.feePrice}"></span><span th:text="${@gameUtils.getFeeTypeName(item.feeType)}"></span>　购买等级:<span th:text="${item.lu}"></span>级</div>
+            <div>功能:<span th:text="${item.func}"></span></div>
+            <div>耐久:<span th:text="${item.num}"></span>次</div>
+            <form th:action="@{/shop/nest/purchase}" method="post">
+                <input type="hidden" name="id" th:value="${item.id}">
+                购买数量:<input name="payNum" value="1" size="3"> <input type="submit" value="购买">
+            </form>
+        </div>
+
+        <!-- 训练场 -->
+        <div th:if="${item != null && kind == 'train'}">
+            <img alt="" class="icon-gray-border" src="../../static/images/train/1.gif" th:src="@{|/assets/images/train/${item.id}.gif|}">
+            <div th:text="${item.name}"></div>
+            <div th:text="${item.descText}"></div>
+            <div>价格:<span th:text="${item.feePrice}"></span><span th:text="${@gameUtils.getFeeTypeName(item.feeType)}"></span>　购买等级:<span th:text="${item.lu}"></span>级</div>
+            <div>功能:<span th:text="${item.func}"></span></div>
+            <div>经验效率:<span th:text="${item.minExp}"></span>/分钟　最高训练至<span th:text="${item.maxLevel}"></span>级</div>
+            <form th:action="@{/shop/train/purchase}" method="post">
+                <input type="hidden" name="id" th:value="${item.id}">
+                购买数量:<input name="payNum" value="1" size="3"> <input type="submit" value="购买">
+            </form>
+        </div>
+
+        <!-- 道具 -->
+        <div th:if="${item != null && kind == 'prop'}">
+            <img alt="" class="icon-gray-border" src="../../static/images/prop/1.gif" th:src="@{|/assets/images/prop/${item.id}.gif|}">
+            <div th:text="${item.name}"></div>
+            <div th:text="${item.descText}"></div>
+            <div>价格:<span th:text="${item.feePrice}"></span><span th:text="${@gameUtils.getFeeTypeName(item.feeType)}"></span>　购买等级:<span th:text="${item.lu}"></span>级</div>
+            <div>功能:<span th:text="${item.func}"></span></div>
+            <form th:action="@{/shop/prop/purchase}" method="post">
+                <input type="hidden" name="id" th:value="${item.id}">
+                购买数量:<input name="payNum" value="1" size="3"> <input type="submit" value="购买">
+            </form>
+        </div>
+
+        <div th:if="${item == null}" class="text-muted">商品不存在。</div>
+        <div><a th:href="@{|/shop/${kind}/items|}">返回商店</a>　<a th:href="@{/game}">回主页</a></div>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

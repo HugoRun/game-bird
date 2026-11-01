@@ -1,5 +1,7 @@
 package com.gamebird.game.bird.config.listener;
 
+import com.gamebird.game.bird.service.impl.OnlineCounterService;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSessionEvent;
 import jakarta.servlet.http.HttpSessionListener;
@@ -16,15 +18,21 @@ public class OnlineCounterListener implements HttpSessionListener {
     // 日志句柄
     private static final Logger logger = LoggerFactory.getLogger(OnlineCounterListener.class);
 
+    /** 在线统计（「谁在玩」页数据源）。 */
+    @Resource
+    public OnlineCounterService onlineCounterService;
+
     @Override
     public void sessionCreated(HttpSessionEvent event) {
         HttpSession session = event.getSession();
+        onlineCounterService.register(session);
         logger.info("Session被创建: " + session.getId());
     }
 
     @Override
     public void sessionDestroyed(HttpSessionEvent event) {
         HttpSession session = event.getSession();
+        onlineCounterService.unregister(session);
         logger.info("Session被销毁: " + session.getId());
     }
 }
