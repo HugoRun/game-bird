@@ -5,7 +5,7 @@
 <div class="main">
     <div class="panel bg-green">
         <div>公告:<img src="../../static/images/icon/guide.gif" th:src="@{/assets/images/icon/guide.gif}"/><a th:href="@{/board/list}"><span th:if="${latestBoard != null}" th:text="${latestBoard.title}">欢迎来到小鸟情人</span><span th:if="${latestBoard == null}" class="text-muted">暂无公告</span></a></div>
-        <div>任务:<i class="task-a"></i><a th:if="${activeTask != null}" th:href="@{/task/list}"><span th:text="${activeTask.status == 0 ? '进行中' : '可领奖'}"></span>(<span th:text="${activeTask.taskType == 1 ? '每日登录' : (activeTask.taskType == 2 ? '捕捉小鸟' : '购买道具')}"></span>)</a><a th:if="${activeTask == null}" th:href="@{/task/list}">去领任务</a></div>
+        <div>任务:<i class="task-a"></i><a th:if="${activeTask != null}" th:href="@{/task/list}"><span th:text="${activeTask.status == 0 ? '进行中' : '可领奖'}"></span>(<span th:text="${@gameUtils.getTaskTypeName(activeTask.taskType)}"></span>)</a><a th:if="${activeTask == null}" th:href="@{/task/list}">去领任务</a></div>
         <div>福利:<a th:href="@{/signin}"><span th:if="${signedToday}" class="text-muted">已签到</span><span th:if="${!signedToday}">签到</span></a>(<span th:if="${signedToday}">已完成</span><span th:if="${!signedToday}">未签到</span>)</div>
     </div>
     <div>
@@ -22,14 +22,20 @@
     </div>
     <div>
         <div class="panel bg-blue">
-            【<a href="./myField.html" th:href="@{/field/info(fieldId=${session.sRole.fieldId})}" th:text="${@gameUtils.getFieldName(session.sRole.fieldId)}">彩虹树林</a>】 <a th:href="@{/trap/autoUseBait}">一键下饵</a>
+            【<a href="./myField.html" th:href="@{/field/info(fieldId=${session.sRole.fieldId})}" th:text="${@gameUtils.getFieldName(session.sRole.fieldId)}">彩虹树林</a>】 <a th:href="@{/game/field}">切换场景</a> <a th:href="@{/trap/autoUseBait}">一键下饵</a>
         </div>
         <div>
             <div>
                 <img class="icon-gray-border" src="../../static/images/field/1.gif" th:alt="${@gameUtils.getFieldName(session.sRole.fieldId)}" th:src="|/assets/images/field/${session.sRole.fieldId}.gif|">
                 <a th:href="@{/game}">刷新</a>
             </div>
-            <div hidden="hidden">守卫:5小时后小鸟入侵</div>
+            <div th:if="${invasionActive}">守卫:<span class="text-danger">猪头大军入侵了你的树林！</span>
+                <form th:action="@{/game/defend}" method="post" style="display:inline">
+                    <input type="submit" value="迎战">
+                </form>
+                <span class="text-muted" th:text="${@gameUtils.getTimeDiff(invasionEndTime, nowTime) + '后撤退'}"></span>
+            </div>
+            <div th:unless="${invasionActive}" class="text-muted">守卫:树林平静</div>
             <div hidden="hidden">出征:抢夺敌人财富 <a href="#">出征</a></div>
             <div th:if="${session.sRole.marriageType > 0}">
                 <img src="../../static/images/icon/love.gif" th:alt="婚戒" th:src="@{/assets/images/icon/love.gif}">

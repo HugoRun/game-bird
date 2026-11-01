@@ -28,16 +28,18 @@
                     <span th:if="${cagedBirdId == b.id}" class="text-darkorange">出战中</span>
                 </p>
                 <p class="btl">
+                    <a th:href="@{/storage/bird(birdId=${b.id})}">详情</a>
                     <a th:if="${b.isLock == null || b.isLock == 0}" th:href="@{/storage/sellConfirm(birdId=${b.id})}">出售</a>
+                    <a th:if="${b.isLock == null || b.isLock == 0}" th:href="@{/storage/releaseConfirm(birdId=${b.id})}">放生</a>
                     <form th:if="${cagedBirdId != b.id}" th:action="@{/storage/deploy}" method="post" style="display:inline">
                         <input type="hidden" name="birdId" th:value="${b.id}">
                         <input type="submit" value="设为出战">
                     </form>
-                    <a th:href="@{/trap/birdInfo(birdId=${b.birdId})}">图鉴</a>
                 </p>
             </div>
         </li>
     </ul>
+    <div><a th:href="@{/storage/book}">小鸟图鉴</a></div>
 
     <div th:replace="~{fragment/navigation::navigation}"></div>
     <div th:replace="~{fragment/footDate::footDate}"></div>

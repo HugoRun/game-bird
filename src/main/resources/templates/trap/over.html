@@ -22,6 +22,8 @@
             <div>成长:[[${result.growText}]] <a th:href="@{/game}">什么是成长?</a></div>
             <div>克制:[[${result.koText}]] <a th:href="@{/game}">什么是克制?</a></div>
             <div th:if="${result.cageText != null}">[[${result.cageText}]]</div>
+            <div th:if="${result.homeText != null}">[[${result.homeText}]]</div>
+            <div th:if="${result.bookText != null}" class="text-primary">[[${result.bookText}]] <a th:href="@{/storage/book}">查看图鉴</a></div>
             <div>经验+[[${result.addExp}]]</div>
             <div th:if="${result.newLevel > result.oldLevel}">你升级啦, Lv:[[${result.oldLevel}]]->[[${result.newLevel}]]</div>
             <div>你还差[[${result.needExp}]]点经验就升级了！</div>

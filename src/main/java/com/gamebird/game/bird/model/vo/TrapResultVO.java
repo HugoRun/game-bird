@@ -31,6 +31,10 @@ public class TrapResultVO {
     boolean escaped;
     // 鸟笼加成文案，无加成为 null
     String cageText;
+    // 主场捕捉加成文案，无加成为 null
+    String homeText;
+    // 图鉴新收录文案，非首次收录为 null
+    String bookText;
 
     public boolean isEscaped() {
         return escaped;
@@ -46,6 +50,22 @@ public class TrapResultVO {
 
     public void setCageText(String cageText) {
         this.cageText = cageText;
+    }
+
+    public String getHomeText() {
+        return homeText;
+    }
+
+    public void setHomeText(String homeText) {
+        this.homeText = homeText;
+    }
+
+    public String getBookText() {
+        return bookText;
+    }
+
+    public void setBookText(String bookText) {
+        this.bookText = bookText;
     }
 
     public int getBirdId() {

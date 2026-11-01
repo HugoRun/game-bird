@@ -4,12 +4,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.gamebird.common.entity.BizException;
 import com.gamebird.common.entity.ResultCode;
 import com.gamebird.common.util.CommonUtils;
+
+import java.util.List;
 import com.gamebird.game.bird.config.GameConfigGateway;
 import com.gamebird.game.bird.config.GameProperties;
 import com.gamebird.game.bird.data.ConstData;
 import com.gamebird.game.bird.model.dbo.BaseBait;
 import com.gamebird.game.bird.model.dbo.BaseBird;
 import com.gamebird.game.bird.model.dbo.BaseCage;
+import com.gamebird.game.bird.model.dbo.BaseField;
 import com.gamebird.game.bird.model.dbo.BaseLevel;
 import com.gamebird.game.bird.model.dbo.BaseProp;
 import com.gamebird.game.bird.model.dbo.Role;
@@ -18,7 +21,9 @@ import com.gamebird.game.bird.model.dbo.RolePack;
 import com.gamebird.game.bird.model.dbo.RoleTrap;
 import com.gamebird.game.bird.model.dbo.StorageBird;
 import com.gamebird.game.bird.model.vo.TrapResultVO;
+import com.gamebird.game.bird.service.ActivityService;
 import com.gamebird.game.bird.service.BirdRaffleService;
+import com.gamebird.game.bird.service.impl.CollectionService;
 import com.gamebird.game.bird.service.GameEventService;
 import com.gamebird.game.bird.service.RoleCageService;
 import com.gamebird.game.bird.service.RolePackService;
@@ -83,6 +88,12 @@ public class TrapServiceImpl implements TrapService {
     @Resource
     public TaskTriggerService taskTriggerService;
 
+    @Resource
+    public CollectionService collectionService;
+
+    @Resource
+    public ActivityService activityService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void useBait(Role role, int trapId, int baitPackId, boolean useSticky) {
@@ -102,11 +113,31 @@ public class TrapServiceImpl implements TrapService {
         if (baseBait == null || baseBait.getBirdSet() == null || baseBait.getBirdSet().trim().isEmpty()) {
             throw new BizException(ResultCode.PARAM_INVALID, "诱饵配置错误");
         }
+        // 区域限制生效：lb 指定该饵料只能在一个场景使用（base_bait 数据约定 1/3/5/7/9）
+        if (baseBait.getLb() != null && baseBait.getLb() > 0
+                && role.getFieldId() != null
+                && baseBait.getLb().intValue() != role.getFieldId().intValue()) {
+            BaseField field = configGateway.getBaseField(baseBait.getLb().intValue());
+            throw new BizException(ResultCode.PARAM_INVALID,
+                    "「" + baseBait.getName() + "」只能在【" + (field == null ? "指定场景" : field.getName()) + "】使用，请先切换场景。");
+        }
         BaseBird baseBird = birdRaffleService.randBird(baseBait.getBirdSet().split(","));
         if (baseBird == null) {
             throw new BizException(ResultCode.PARAM_INVALID, "诱饵或者小鸟配置错误");
         }
         int now = CommonUtils.nowTime();
+        boolean activityLucky = false;
+        // 限时活动：活动期间 5% 概率惊现活动限定鸟（base_bird 93-111 中在售的）
+        if (hasLiveActivity(now) && CommonUtils.randNum(1, 100) <= 5) {
+            List<BaseBird> pool = configGateway.getBaseBirdList().stream()
+                    .filter(b -> b.getId() != null && b.getId() >= 93 && b.getId() <= 111
+                            && b.getStatus() != null && b.getStatus() == 1)
+                    .toList();
+            if (!pool.isEmpty()) {
+                baseBird = pool.get(CommonUtils.randNum(0, pool.size() - 1));
+                activityLucky = true;
+            }
+        }
         // 随机重量与星级
         long weight = CommonUtils.randNum(baseBird.getMinWeight(), baseBird.getMaxWeight());
         byte star = (byte) (weight / (baseBird.getMaxWeight() / 5));
@@ -136,6 +167,18 @@ public class TrapServiceImpl implements TrapService {
         // 扣诱饵
         roleValueService.costPackNum(packBait, 1);
         packService.saveOrUpdate(packBait);
+        if (activityLucky) {
+            gameEventService.record(role.getRoleId(),
+                    "活动中好运降临，陷阱里出现了一只稀有的" + baseBird.getName() + "！");
+        }
+    }
+
+    /** 当前是否有进行中的活动（activity.status=1 且在时间窗内）。 */
+    private boolean hasLiveActivity(int now) {
+        return activityService.count(new LambdaQueryWrapper<com.gamebird.game.bird.model.dbo.Activity>()
+                .eq(com.gamebird.game.bird.model.dbo.Activity::getStatus, 1)
+                .le(com.gamebird.game.bird.model.dbo.Activity::getStartTime, now)
+                .ge(com.gamebird.game.bird.model.dbo.Activity::getEndTime, now)) > 0;
     }
 
     @Override
@@ -191,6 +234,12 @@ public class TrapServiceImpl implements TrapService {
             } else if (bonus.percent() > 0) {
                 resultVO.setCageText("「" + bonus.cageName() + "」重量加成+" + bonus.percent() + "%");
             }
+            // 主场捕捉加成：在鸟的归属场景（base_bird.field）收网，经验 +10%
+            if (baseBird.getField() != null && role.getFieldId() != null
+                    && baseBird.getField().intValue() == role.getFieldId().intValue()) {
+                addExp = addExp + addExp / 10;
+                resultVO.setHomeText("主场捕捉，经验加成+10%");
+            }
             // 产出小鸟：成长/克制随机（此前写死 1000/0 的 todo 就此关闭）
             StorageBird bird = new StorageBird();
             bird.setId(0);
@@ -215,10 +264,16 @@ public class TrapServiceImpl implements TrapService {
             resultVO.setKoText(BirdTextUtils.koText(bird.getKo()));
             // 角色持有鸟数 +1（排行榜维度）
             role.setBirdNum((short) Math.max(0, (role.getBirdNum() == null ? 0 : role.getBirdNum()) + 1));
+            // 图鉴收集（首次遇到该物种时记录）
+            if (collectionService.record(role.getRoleId(), baseBird.getId())) {
+                resultVO.setBookText("图鉴新收录：" + baseBird.getName() + "！");
+            }
             // 事件日志与任务推进
             gameEventService.record(role.getRoleId(),
                     "收获了" + resultVO.getNameText() + "，经验+" + addExp);
             taskTriggerService.onCatch(role);
+            taskTriggerService.onLevelUp(role);
+            taskTriggerService.onWealth(role);
         }
         // 消耗陷阱耐久（默认竹筐 use_trap_id=0 不扣）
         if (slot.getUseTrapId() > 0 && slot.getUseTrapNum() > 0) {

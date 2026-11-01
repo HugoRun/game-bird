@@ -13,6 +13,8 @@ import com.gamebird.game.bird.model.dbo.Role;
 import com.gamebird.game.bird.model.dbo.RoleBirth;
 import com.gamebird.game.bird.model.dbo.StorageBird;
 import com.gamebird.game.bird.service.FriendService;
+import com.gamebird.game.bird.service.TaskTriggerService;
+import com.gamebird.game.bird.service.impl.CollectionService;
 import com.gamebird.game.bird.service.GameEventService;
 import com.gamebird.game.bird.service.RoleBirthService;
 import com.gamebird.game.bird.util.GameUtils;
@@ -61,6 +63,12 @@ public class BirthController extends BaseController {
 
     @Resource
     public GameEventService gameEventService;
+
+    @Resource
+    public CollectionService collectionService;
+
+    @Resource
+    public TaskTriggerService taskTriggerService;
 
     /** 孵化场列表。 */
     @GetMapping(value = {"", "/list"})
@@ -385,6 +393,12 @@ public class BirthController extends BaseController {
         storageBirdService.save(child);
         role.setBirdNum((short) Math.max(0, (role.getBirdNum() == null ? 0 : role.getBirdNum()) + 1));
         roleService.updateById(role);
+        // 图鉴与成就：首次收集新物种 / 首只 5 星结晶
+        collectionService.record(role.getRoleId(), childBaseId);
+        taskTriggerService.onCollect(role, collectionService.countCollected(role.getRoleId()));
+        if (star >= 5) {
+            taskTriggerService.onFiveStarBirth(role);
+        }
         // 父母解锁 + 槽位清空 + 巢穴耐久
         lockBird(parentA, false);
         lockBird(parentB, false);

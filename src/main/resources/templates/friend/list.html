@@ -22,9 +22,17 @@
                 <p th:text="'角色Id：' + ${f.friendRoleId}"></p>
                 <p>添加于：<span th:text="${@gameUtils.getTimeDiff(f.createTime, now)}"></span>前</p>
                 <p class="btl">
-                    <form method="post" th:action="@{/friend/remove}">
+                    <form method="post" th:action="@{/friend/remove}" style="display:inline">
                         <input type="hidden" name="id" th:value="${f.id}" />
                         <button type="submit" class="link-btn">删除</button>
+                    </form>
+                    <form th:if="${!#lists.isEmpty(roses)}" method="post" th:action="@{/friend/gift}" style="display:inline">
+                        <input type="hidden" name="id" th:value="${f.id}" />
+                        <select name="packId">
+                            <option th:each="r : ${roses}" th:value="${r.id}"
+                                    th:text="${@gameConfigGateway.getBaseProp(r.baseId) != null ? @gameConfigGateway.getBaseProp(r.baseId).name : '玫瑰'} + '×' + ${r.num}"></option>
+                        </select>
+                        <button type="submit" class="link-btn">赠送玫瑰</button>
                     </form>
                 </p>
             </div>

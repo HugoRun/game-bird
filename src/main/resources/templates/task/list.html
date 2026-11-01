@@ -22,7 +22,7 @@
         </thead>
         <tbody>
         <tr th:each="t : ${tasks}">
-            <td th:text="${t.taskType == 1 ? '每日登录' : (t.taskType == 2 ? '捕捉小鸟' : (t.taskType == 3 ? '购买道具' : '未知'))}"></td>
+            <td th:text="${@gameUtils.getTaskTypeName(t.taskType)}"></td>
             <td th:text="${t.status == 0 ? '进行中' : (t.status == 1 ? '已完成未领' : (t.status == 2 ? '已领取' : '未知'))}"></td>
             <td th:text="${t.rewardCoin}"></td>
             <td th:text="${@gameUtils.getTimeDiff(t.createTime, now)}"></td>

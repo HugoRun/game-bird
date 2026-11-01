@@ -65,4 +65,30 @@ public class GameEventService {
         queryWrapper.last("LIMIT " + Math.max(1, limit));
         return logTreeService.list(queryWrapper);
     }
+
+    /**
+     * 该角色自指定时间起是否产生过指定文案的事件（用于一次性标记，如击退入侵）。
+     */
+    public boolean hasEventSince(String roleId, String message, int sinceTime) {
+        LambdaQueryWrapper<LogTree> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(LogTree::getRoleId, roleId);
+        queryWrapper.eq(LogTree::getMessage, message);
+        queryWrapper.gt(LogTree::getTime, sinceTime);
+        queryWrapper.last("LIMIT 1");
+        return logTreeService.count(queryWrapper) > 0;
+    }
+
+    /** 免战护盾事件的固定文案（写入与识别必须同源，勿改字面量）。 */
+    public static final String SHIELD_MESSAGE = "开启了免战护盾";
+
+    /**
+     * 近一段时间内开启过免战护盾的角色 id 集合（战斗选对手时排除）。
+     * 识别依据是固定文案（见 {@link #SHIELD_MESSAGE}），写入与匹配同源。
+     */
+    public List<String> recentShieldRoleIds(int withinSeconds) {
+        LambdaQueryWrapper<LogTree> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(LogTree::getMessage, SHIELD_MESSAGE);
+        queryWrapper.gt(LogTree::getTime, CommonUtils.nowTime() - Math.max(0, withinSeconds));
+        return logTreeService.list(queryWrapper).stream().map(LogTree::getRoleId).distinct().toList();
+    }
 }

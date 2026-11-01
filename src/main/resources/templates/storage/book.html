@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='小鸟图鉴')}"></head>
+<body>
+
+<div class="main">
+    <div class="panel bg-blue">
+        小鸟图鉴 · 已收集 <span class="text-darkorange" th:text="${collectedCount}"></span> / <span th:text="${totalCount}"></span> 种
+        <a th:href="@{/storage/list}">返回仓库</a>
+    </div>
+    <p class="text-muted">收网、孵化、试管孵化都会收录新物种；集齐 10/30/60/全部物种可在任务中心领取图鉴成就奖励。放生与出售不影响图鉴。</p>
+    <ul class="list1">
+        <li th:each="b : ${allBirds}">
+            <div class="list1-icon">
+                <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif"
+                     th:src="@{|/assets/images/bird/${b.id}.gif|}"
+                     th:style="${!collected.contains(b.id)} ? 'filter: grayscale(1); opacity:.5' : ''">
+            </div>
+            <div class="list1-info">
+                <p>
+                    <span th:if="${collected.contains(b.id)}" class="text-primary" th:text="${b.name}"></span>
+                    <span th:if="${!collected.contains(b.id)}" class="text-muted">？？？</span>
+                    <span class="text-muted" th:text="'场景' + ${b.field} + ' · ' + (${b.type} == 1 ? '敏捷' : (${b.type} == 2 ? '力量' : (${b.type} == 3 ? '魔法' : '幻想')))"></span>
+                </p>
+                <p class="text-muted" th:if="${collected.contains(b.id)}"
+                   th:text="${b.minWeight / 100.0 + '~' + b.maxWeight / 100.0 + '斤 · 经验' + b.catchExp + ' · 卖价' + b.price + '金币/斤'}"></p>
+                <p class="text-muted" th:if="${!collected.contains(b.id)}">尚未收集到这种小鸟</p>
+            </div>
+        </li>
+    </ul>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

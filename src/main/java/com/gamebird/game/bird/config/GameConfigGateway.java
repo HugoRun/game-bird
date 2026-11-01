@@ -90,6 +90,15 @@ public class GameConfigGateway {
     }
 
     /**
+     * 取全部场景配置（场景切换页使用）。
+     *
+     * @return 场景配置列表（缓存快照，只读）
+     */
+    public List<BaseField> getBaseFieldList() {
+        return configManager.getBaseFieldList();
+    }
+
+    /**
      * 取基因配置。
      *
      * @param id 基因配置 id；可为 null

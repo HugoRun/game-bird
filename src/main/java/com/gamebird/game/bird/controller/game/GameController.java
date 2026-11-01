@@ -26,9 +26,13 @@ import com.gamebird.game.bird.model.dbo.Board;
 import com.gamebird.game.bird.model.dbo.LogChat;
 import com.gamebird.game.bird.model.dbo.Role;
 import com.gamebird.game.bird.model.dbo.RoleBirth;
+import com.gamebird.game.bird.model.dbo.RoleCage;
 import com.gamebird.game.bird.model.dbo.RoleTrain;
 import com.gamebird.game.bird.model.dbo.RoleTrap;
+import com.gamebird.game.bird.model.dbo.StorageBird;
 import com.gamebird.game.bird.model.dbo.Task;
+import com.gamebird.game.bird.service.RoleCageService;
+import com.gamebird.game.bird.model.message.MessageLink;
 import com.gamebird.game.bird.model.message.MessageVO;
 import com.gamebird.game.bird.model.vo.ChatMessageVO;
 import com.gamebird.game.bird.model.vo.RoleBirthVO;
@@ -69,6 +73,10 @@ public class GameController extends BaseController {
     /** 每日签到（主页福利位状态）。 */
     @Resource
     public SignInService signInService;
+
+    /** 出战栏位（入侵守卫用）。 */
+    @Resource
+    public RoleCageService cageService;
     // 日志句柄
 
     /**
@@ -166,7 +174,88 @@ public class GameController extends BaseController {
                         .last("LIMIT 1")).stream().findFirst().orElse(null));
         // 福利位：今天是否已签到
         model.addAttribute("signedToday", signInService.isSignedToday(role.getRoleId()));
+        // 小鸟入侵（守卫 PVE）：以 2 小时为窗口做确定性判定，无需定时器。
+        // 同一窗口内每个角色的入侵状态固定；击退后写固定文案事件防重复。
+        int windowIndex = CommonUtils.nowTime() / INVASION_WINDOW_SECONDS;
+        int windowStart = windowIndex * INVASION_WINDOW_SECONDS;
+        boolean invasionActive = Math.abs((role.getRoleId() + "_" + windowIndex).hashCode()) % 10 < INVASION_CHANCE;
+        boolean invasionDefended = gameEventService.hasEventSince(role.getRoleId(),
+                INVASION_DEFENDED_MESSAGE, windowStart);
+        model.addAttribute("invasionActive", invasionActive && !invasionDefended);
+        model.addAttribute("invasionEndTime", windowStart + INVASION_WINDOW_SECONDS);
         return ConstData.VIEW_GAME;
+    }
+
+    /** 入侵窗口时长（2 小时）。 */
+    public static final int INVASION_WINDOW_SECONDS = 2 * 3600;
+    /** 入侵出现概率（按窗口与角色 hash 判定，30%）。 */
+    public static final int INVASION_CHANCE = 3;
+    /** 击退入侵的固定文案（写入与识别必须同源，勿改字面量）。 */
+    public static final String INVASION_DEFENDED_MESSAGE = "击退了猪头大军的入侵";
+
+    /**
+     * 迎战入侵的猪头大军：用出战鸟（或角色裸等级）防守，胜利得金币与钻石。
+     * 同一窗口只能迎战一次（以固定文案事件为凭证）。
+     */
+    @PostMapping("/game/defend")
+    public String defend(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        int now = CommonUtils.nowTime();
+        int windowIndex = now / INVASION_WINDOW_SECONDS;
+        int windowStart = windowIndex * INVASION_WINDOW_SECONDS;
+        boolean invasionActive = Math.abs((role.getRoleId() + "_" + windowIndex).hashCode()) % 10 < INVASION_CHANCE;
+        if (!invasionActive) {
+            model.addAttribute("message", MessageVO.error("现在没有入侵，安心抓鸟吧。"));
+            return ConstData.VIEW_MESSAGE;
+        }
+        if (gameEventService.hasEventSince(role.getRoleId(), INVASION_DEFENDED_MESSAGE, windowStart)) {
+            model.addAttribute("message", MessageVO.warn("本窗口的猪头大军已经被你击退过了。"));
+            return ConstData.VIEW_MESSAGE;
+        }
+        // 双方战力：我方 = 出战鸟 + 角色等级（同战斗公式）；猪头 = 角色等级×10 ± 20%
+        StorageBird myBird = getDefendBird(role.getRoleId());
+        int myPower = (role.getLevel() == null ? 0 : role.getLevel()) * 10;
+        if (myBird != null) {
+            myPower += (myBird.getLevel() == null ? 1 : myBird.getLevel()) * 20
+                    + (myBird.getStar() == null ? 0 : myBird.getStar()) * 50
+                    + (myBird.getGrow() == null ? 0 : myBird.getGrow()) / 10;
+        }
+        int pigPower = Math.max(10, (int) (myPower * (0.8 + CommonUtils.randNum(0, 40) / 100.0)));
+        int winRate = Math.max(15, Math.min(85, myPower * 100 / Math.max(1, myPower + pigPower)));
+        boolean win = CommonUtils.randNum(1, 100) <= winRate;
+        MessageVO message;
+        if (win) {
+            long coin = 50 + (role.getLevel() == null ? 1 : role.getLevel()) * 20L;
+            int diamond = CommonUtils.randNum(3, 10);
+            roleValueService.addRoleCoin(role, coin);
+            roleValueService.addRoleDiamond(role, diamond);
+            roleService.updateById(role);
+            saveSessionRole(session, role);
+            gameEventService.record(role.getRoleId(), INVASION_DEFENDED_MESSAGE
+                    + "，缴获金币" + coin + "、钻石" + diamond + "。");
+            message = MessageVO.success("你率出战鸟击退了猪头大军！（胜率 " + winRate + "%）缴获金币 " + coin
+                    + "、钻石 " + diamond + "。");
+        } else {
+            gameEventService.record(role.getRoleId(), "没能挡住猪头大军，它们抢走了一些诱饵扬长而去。");
+            message = MessageVO.warn("战败了……猪头大军抢走了一些诱饵（无其他损失）。（胜率 " + winRate
+                    + "%）去训练场练练鸟再来复仇吧。");
+        }
+        message.addLink(new MessageLink("回主页", "/game"));
+        model.addAttribute("message", message);
+        return ConstData.VIEW_MESSAGE;
+    }
+
+    /** 防守用的出战鸟（无则空手应战）。 */
+    private StorageBird getDefendBird(String roleId) {
+        LambdaQueryWrapper<RoleCage> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(RoleCage::getRoleId, roleId);
+        wrapper.eq(RoleCage::getIdx, 1);
+        RoleCage cage = cageService.getOne(wrapper);
+        if (cage == null || cage.getBirdId() == null || cage.getBirdId() <= 0) {
+            return null;
+        }
+        StorageBird bird = storageBirdService.getById(cage.getBirdId());
+        return bird != null && roleId.equals(bird.getRoleId()) ? bird : null;
     }
 
     /**
@@ -177,6 +266,40 @@ public class GameController extends BaseController {
         Role role = getSessionRole(session);
         model.addAttribute("eventPage", gameEventService.pageByRole(role.getRoleId(), pageNo));
         return "game/tree";
+    }
+
+    /**
+     * 场景切换页：列出全部场景，标记当前所在。
+     */
+    @GetMapping("/game/field")
+    public String pageFieldList(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        model.addAttribute("fields", configGateway.getBaseFieldList());
+        model.addAttribute("currentFieldId", role.getFieldId() == null ? 0 : role.getFieldId());
+        return "field/fieldList";
+    }
+
+    /**
+     * 切换场景（POST 写操作）。场景决定可用的诱饵区域（base_bait.lb）
+     * 与主场捕捉加成（base_bird.field）。
+     */
+    @PostMapping("/game/field")
+    public String doChangeField(HttpSession session, RedirectAttributes model, @RequestParam(defaultValue = "0") int fieldId) {
+        Role role = getSessionRole(session);
+        BaseField baseField = configGateway.getBaseField(fieldId);
+        if (baseField == null) {
+            model.addFlashAttribute("message", MessageVO.error("没有这个场景。"));
+            return redirectTo("/game/field");
+        }
+        if (baseField.getId() != null && baseField.getId().intValue() == (role.getFieldId() == null ? 0 : role.getFieldId())) {
+            model.addFlashAttribute("message", MessageVO.warn("你已经在这里了。"));
+            return redirectTo("/game/field");
+        }
+        role.setFieldId(baseField.getId().shortValue());
+        roleService.updateById(role);
+        saveSessionRole(session, role);
+        model.addFlashAttribute("message", MessageVO.success("你来到了【" + baseField.getName() + "】。这里的饵料与鸟群和别处不同。"));
+        return redirectTo("/game");
     }
 
     /**

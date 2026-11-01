@@ -170,6 +170,58 @@ public class GameUtils {
     }
 
     /**
+     * 任务/成就类型名称（task.task_type：1-3 日常，4-8 成就）。
+     *
+     * @param taskType 任务类型
+     * @return 展示名
+     */
+    public static String getTaskTypeName(Integer taskType) {
+        if (taskType == null) {
+            return "未知任务";
+        }
+        return switch (taskType) {
+            case 1 -> "每日登录";
+            case 2 -> "捕捉小鸟";
+            case 3 -> "购买道具";
+            case 4 -> "图鉴收集成就";
+            case 5 -> "五星孵蛋成就";
+            case 6 -> "战斗达人成就";
+            case 7 -> "成长升级成就";
+            case 8 -> "富甲一方成就";
+            default -> "神秘任务";
+        };
+    }
+
+    /**
+     * 小鸟类型相克倍率（base_bird.type：1敏捷/2力量/3魔法/4幻想）。
+     *
+     * <p>相克三角：敏捷克魔法、魔法克力量、力量克敏捷（克者 +20%，被克 -15%）；
+     * 幻想系与三系互克（双方各 +10%），同类型不克。
+     *
+     * @param attackerType 进攻方类型
+     * @param defenderType 防守方类型
+     * @return 战力倍率
+     */
+    public static double typeCounterMultiplier(Byte attackerType, Byte defenderType) {
+        if (attackerType == null || defenderType == null) {
+            return 1.0;
+        }
+        int a = attackerType;
+        int d = defenderType;
+        if (a == 4 && d != 4) {
+            return 1.1;
+        }
+        if (d == 4 && a != 4) {
+            return 1.1;
+        }
+        if (a == d) {
+            return 1.0;
+        }
+        boolean counter = (a == 1 && d == 3) || (a == 3 && d == 2) || (a == 2 && d == 1);
+        return counter ? 1.2 : 0.85;
+    }
+
+    /**
      * 获取性称号名称
      * @param titleId 称号Id
      * @return 称号名称

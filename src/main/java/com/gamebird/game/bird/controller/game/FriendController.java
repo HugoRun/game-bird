@@ -4,9 +4,15 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.gamebird.common.util.CommonUtils;
+import com.gamebird.game.bird.config.GameConfigGateway;
 import com.gamebird.game.bird.controller.common.BaseController;
+import com.gamebird.game.bird.data.ConstData;
+import com.gamebird.game.bird.model.dbo.BaseProp;
 import com.gamebird.game.bird.model.dbo.Friend;
+import com.gamebird.game.bird.model.dbo.Role;
+import com.gamebird.game.bird.model.dbo.RolePack;
 import com.gamebird.game.bird.service.FriendService;
+import com.gamebird.game.bird.service.GameEventService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -30,15 +36,32 @@ public class FriendController extends BaseController {
     @Resource
     public FriendService friendService;
 
+    @Resource
+    public GameConfigGateway configGateway;
+
+    @Resource
+    public GameEventService gameEventService;
+
     /** 好友列表。 */
     @GetMapping(value = {"", "/list"})
     public String list(HttpSession session, Model model) {
-        String roleId = getSessionRole(session).getRoleId();
+        Role role = getSessionRole(session);
+        String roleId = role.getRoleId();
         LambdaQueryWrapper<Friend> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Friend::getRoleId, roleId);
         List<Friend> friends = friendService.list(wrapper);
         model.addAttribute("friends", friends);
         model.addAttribute("now", CommonUtils.nowTime());
+        // 包裹里的玫瑰（赠礼表单）
+        LambdaQueryWrapper<RolePack> packWrapper = new LambdaQueryWrapper<>();
+        packWrapper.eq(RolePack::getRoleId, roleId);
+        packWrapper.eq(RolePack::getTypeId, ConstData.PACK_TYPE_PROP);
+        packWrapper.gt(RolePack::getNum, 0);
+        List<RolePack> roses = packService.list(packWrapper).stream().filter(p -> {
+            BaseProp prop = configGateway.getBaseProp(p.getBaseId());
+            return prop != null && prop.getEffectType() != null && prop.getEffectType() == ConstData.PROP_EFFECT_ROSE;
+        }).toList();
+        model.addAttribute("roses", roses);
         return "friend/list";
     }
 
@@ -86,6 +109,49 @@ public class FriendController extends BaseController {
         String name = friend.getFriendName();
         friendService.removeById(id);
         model.addAttribute("message", "已删除好友 " + name + "。");
+        return list(session, model);
+    }
+
+    /** 赠送玫瑰：消耗包裹中的玫瑰，对方获得双倍爱心，双方树林记录各留一笔。 */
+    @PostMapping(value = "/gift")
+    public String gift(HttpSession session, Model model,
+                       @RequestParam Integer id,
+                       @RequestParam Integer packId) {
+        Role role = getSessionRole(session);
+        Friend friend = friendService.getById(id);
+        if (friend == null || !role.getRoleId().equals(friend.getRoleId())) {
+            model.addAttribute("message", "好友记录不存在或不属于当前角色。");
+            return list(session, model);
+        }
+        RolePack pack = packId == null ? null : packService.getById(packId);
+        if (pack == null || !role.getRoleId().equals(pack.getRoleId())
+                || pack.getTypeId() == null || pack.getTypeId() != ConstData.PACK_TYPE_PROP
+                || pack.getNum() == null || pack.getNum() <= 0) {
+            model.addAttribute("message", "请先选择一束玫瑰。");
+            return list(session, model);
+        }
+        BaseProp rose = configGateway.getBaseProp(pack.getBaseId());
+        if (rose == null || rose.getEffectType() == null || rose.getEffectType() != ConstData.PROP_EFFECT_ROSE
+                || rose.getEffectValue() == null) {
+            model.addAttribute("message", "那不是玫瑰，别拿鼻涕糊弄朋友。");
+            return list(session, model);
+        }
+        Role friendRole = roleService.getById(friend.getFriendRoleId());
+        if (friendRole == null) {
+            model.addAttribute("message", "好友的角色已不存在。");
+            return list(session, model);
+        }
+        int love = rose.getEffectValue() * 2;
+        roleValueService.addRoleLovePoint(friendRole, love);
+        roleService.updateById(friendRole);
+        roleValueService.costPackNum(pack, 1);
+        packService.saveOrUpdate(pack);
+        gameEventService.record(role.getRoleId(),
+                "送给 " + friendRole.getRoleName() + " 一束「" + rose.getName() + "」，花香传情。");
+        gameEventService.record(friendRole.getRoleId(),
+                role.getRoleName() + " 送来一束「" + rose.getName() + "」，爱心+" + love + "。");
+        model.addAttribute("message", "已把「" + rose.getName() + "」送给 " + friendRole.getRoleName()
+                + "，对方获得爱心 " + love + "。");
         return list(session, model);
     }
 }

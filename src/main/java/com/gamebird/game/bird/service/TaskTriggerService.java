@@ -35,11 +35,31 @@ public class TaskTriggerService {
     public static final int TASK_CATCH = 2;
     /** 任务类型：购买道具。 */
     public static final int TASK_PURCHASE = 3;
+    /** 成就：图鉴收集（按收集物种数分档）。 */
+    public static final int ACHIEVEMENT_BOOK = 4;
+    /** 成就：首次孵出 5 星小鸟。 */
+    public static final int ACHIEVEMENT_FIVE_STAR = 5;
+    /** 成就：累计战斗胜利 10 场。 */
+    public static final int ACHIEVEMENT_FIGHT_10 = 6;
+    /** 成就：角色达到 10 级。 */
+    public static final int ACHIEVEMENT_LEVEL_10 = 7;
+    /** 成就：持有金币满 10 万。 */
+    public static final int ACHIEVEMENT_RICH = 8;
 
     /** 三类任务的奖励金额（金币）。 */
     public static final long REWARD_LOGIN = 500;
     public static final long REWARD_CATCH = 300;
     public static final long REWARD_PURCHASE = 200;
+    /** 图鉴成就各档奖励（金币）。 */
+    public static final long REWARD_BOOK_10 = 500;
+    public static final long REWARD_BOOK_30 = 1500;
+    public static final long REWARD_BOOK_60 = 4000;
+    public static final long REWARD_BOOK_ALL = 10000;
+    /** 其余成就奖励（金币）。 */
+    public static final long REWARD_FIVE_STAR = 2000;
+    public static final long REWARD_FIGHT_10 = 1000;
+    public static final long REWARD_LEVEL_10 = 1000;
+    public static final long REWARD_RICH = 888;
 
     @Resource
     public TaskService taskService;
@@ -76,6 +96,75 @@ public class TaskTriggerService {
     /** 购买道具：把最早一条进行中的购买任务置为已完成未领。 */
     public void onPurchase(Role role) {
         completeFirst(role, TASK_PURCHASE, REWARD_PURCHASE);
+    }
+
+    /**
+     * 通用成就：该角色尚无此类型成就记录时，创建一条「已完成未领」成就任务。
+     * 幂等——同类型成就只发一次。
+     */
+    public void onAchievement(Role role, int achievementType, long reward) {
+        try {
+            LambdaQueryWrapper<Task> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(Task::getRoleId, role.getRoleId());
+            wrapper.eq(Task::getTaskType, achievementType);
+            if (taskService.count(wrapper) > 0) {
+                return;
+            }
+            Task task = new Task();
+            task.setId(0);
+            task.setRoleId(role.getRoleId());
+            task.setTaskType(achievementType);
+            task.setStatus(1);
+            task.setRewardCoin(reward);
+            task.setCreateTime(CommonUtils.nowTime());
+            task.setFinishTime(CommonUtils.nowTime());
+            taskService.save(task);
+        } catch (Exception ignored) {
+            // 成就旁路失败不影响主流程
+        }
+    }
+
+    /** 图鉴收集成就：收集物种数达到 10/30/60/全部分档时发对应档位（自动取最高未领档）。 */
+    public void onCollect(Role role, long collectedKinds) {
+        if (collectedKinds >= 111) {
+            onAchievement(role, ACHIEVEMENT_BOOK, REWARD_BOOK_ALL);
+            return;
+        }
+        if (collectedKinds >= 60) {
+            onAchievement(role, ACHIEVEMENT_BOOK, REWARD_BOOK_60);
+        }
+        if (collectedKinds >= 30) {
+            onAchievement(role, ACHIEVEMENT_BOOK, REWARD_BOOK_30);
+        }
+        if (collectedKinds >= 10) {
+            onAchievement(role, ACHIEVEMENT_BOOK, REWARD_BOOK_10);
+        }
+    }
+
+    /** 首只 5 星孵化成就。 */
+    public void onFiveStarBirth(Role role) {
+        onAchievement(role, ACHIEVEMENT_FIVE_STAR, REWARD_FIVE_STAR);
+    }
+
+    /** 战斗累计 10 胜成就（由调用方先 count 再传入）。 */
+    public void onFightWinCount(Role role, long totalWins) {
+        if (totalWins >= 10) {
+            onAchievement(role, ACHIEVEMENT_FIGHT_10, REWARD_FIGHT_10);
+        }
+    }
+
+    /** 角色 10 级成就（角色经验结算后检查）。 */
+    public void onLevelUp(Role role) {
+        if (role.getLevel() != null && role.getLevel() >= 10) {
+            onAchievement(role, ACHIEVEMENT_LEVEL_10, REWARD_LEVEL_10);
+        }
+    }
+
+    /** 富豪成就：金币满 10 万（加钱后检查）。 */
+    public void onWealth(Role role) {
+        if (role.getCoin() != null && role.getCoin() >= 100000) {
+            onAchievement(role, ACHIEVEMENT_RICH, REWARD_RICH);
+        }
     }
 
     /**

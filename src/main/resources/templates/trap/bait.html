@@ -21,7 +21,9 @@
                 <label style="margin:  10px 0;">
                     <select name="baitId">
                         <option th:each="baitVO, stat : ${baitList}" th:value="${baitVO.id}">
-                            <th:block th:text="${baitVO.baseBait.name}+'×'+${baitVO.getNum()}">谷子(25级)</th:block>
+                            <th:block th:text="${baitVO.baseBait.name}
+                                + (${baitVO.baseBait.lb > 0} ? '(限' + ${@gameUtils.getFieldName(baitVO.baseBait.lb)} + ')' : '')
+                                + '×' + ${baitVO.getNum()}">谷子(25级)</th:block>
                         </option>
                     </select>
                 </label>

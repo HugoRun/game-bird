@@ -21,6 +21,7 @@ import com.gamebird.game.bird.model.dbo.RoleTrain;
 import com.gamebird.game.bird.model.dbo.RoleTrap;
 import com.gamebird.game.bird.model.dbo.StorageBird;
 import com.gamebird.game.bird.model.vo.UseResult;
+import com.gamebird.game.bird.service.GameEventService;
 import com.gamebird.game.bird.service.RoleBirthService;
 import com.gamebird.game.bird.service.RoleCageService;
 import com.gamebird.game.bird.service.RolePackService;
@@ -82,6 +83,12 @@ public class PackUseService {
 
     @Resource
     public RoleService roleService;
+
+    @Resource
+    public CollectionService collectionService;
+
+    @Resource
+    public GameEventService gameEventService;
 
     // ==================== 陷阱：装入陷阱槽 ====================
 
@@ -270,6 +277,11 @@ public class PackUseService {
                 costPack(pack, 1);
                 return UseResult.ok("「" + prop.getName() + "」让所有陷阱的等待缩短了约" + totalMinutes + "分钟！");
             }
+            case 23 -> { // 免战卡：12 小时内不被他人挑战（以固定文案事件为凭证）
+                gameEventService.record(role.getRoleId(), GameEventService.SHIELD_MESSAGE);
+                costPack(pack, 1);
+                return UseResult.ok("免战护盾已开启，12小时内不会被神秘挑战者盯上。");
+            }
             case 13 -> { // 金条：兑换金币
                 roleValueService.addRoleCoin(role, (long) effectValue);
                 roleService.updateById(role);
@@ -377,6 +389,7 @@ public class PackUseService {
         long weight = Math.max(picked.getMinWeight(), picked.getMaxWeight() * percent / 100);
         StorageBird bird = insertStorageBird(role, picked, randomSex(), weight,
                 CommonUtils.randNum(0, 5).byteValue(), CommonUtils.randNum(ConstData.GROW_MIN, ConstData.GROW_MAX).shortValue());
+        collectionService.record(role.getRoleId(), picked.getId());
         costPack(pack, 1);
         return UseResult.ok("试管孵化成功！获得" + birdText(bird) + "。");
     }

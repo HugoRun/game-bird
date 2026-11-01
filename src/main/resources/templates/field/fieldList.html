@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='场景')}"></head>
+<body>
+
+<div class="main">
+    <div class="panel bg-blue">选择场景 <a th:href="@{/game}">返回</a></div>
+    <p class="text-muted">不同场景可使用的饵料不同（饵料有区域限制），在小鸟的主场捕捉还有经验加成。</p>
+    <ul class="list1">
+        <li th:each="f : ${fields}">
+            <div class="list1-icon">
+                <img alt="" class="icon-gray-border" src="../../static/images/field/1.gif"
+                     th:src="@{|/assets/images/field/${f.id}.gif|}">
+            </div>
+            <div class="list1-info">
+                <p>
+                    <span class="text-primary" th:text="${f.name}"></span>
+                    <span th:if="${currentFieldId == f.id}" class="text-darkorange">（当前所在）</span>
+                </p>
+                <p class="text-muted" th:text="${f.descText}"></p>
+                <p th:if="${currentFieldId != f.id}">
+                    <form th:action="@{/game/field}" method="post" style="display:inline">
+                        <input type="hidden" name="fieldId" th:value="${f.id}">
+                        <input type="submit" value="前往">
+                    </form>
+                </p>
+            </div>
+        </li>
+    </ul>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

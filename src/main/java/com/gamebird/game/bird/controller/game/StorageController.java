@@ -1,14 +1,19 @@
 package com.gamebird.game.bird.controller.game;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.gamebird.game.bird.config.GameConfigGateway;
 import com.gamebird.game.bird.controller.common.BaseController;
 import com.gamebird.game.bird.model.dbo.BaseBird;
 import com.gamebird.game.bird.model.dbo.Role;
 import com.gamebird.game.bird.model.dbo.RoleCage;
 import com.gamebird.game.bird.model.dbo.StorageBird;
 import com.gamebird.game.bird.service.BaseBirdService;
+import com.gamebird.game.bird.service.GameEventService;
 import com.gamebird.game.bird.service.RoleCageService;
 import com.gamebird.game.bird.service.StorageBirdService;
+import com.gamebird.game.bird.service.TaskTriggerService;
+import com.gamebird.game.bird.service.impl.CollectionService;
+import com.gamebird.game.bird.util.GameUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -41,6 +46,105 @@ public class StorageController extends BaseController {
 
     @Resource
     public RoleCageService cageService;
+
+    @Resource
+    public GameConfigGateway configGateway;
+
+    @Resource
+    public GameEventService gameEventService;
+
+    @Resource
+    public CollectionService collectionService;
+
+    @Resource
+    public TaskTriggerService taskTriggerService;
+
+    /** 图鉴页：全部小鸟配置按场景分组，已收集的高亮。 */
+    @GetMapping("/book")
+    public String book(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        List<BaseBird> allBirds = configGateway.getBaseBirdList().stream()
+                .sorted(java.util.Comparator.comparing(BaseBird::getField, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()))
+                        .thenComparing(BaseBird::getId))
+                .toList();
+        java.util.Set<Integer> collected = new java.util.HashSet<>(collectionService.collectedBirdIds(role.getRoleId()));
+        model.addAttribute("allBirds", allBirds);
+        model.addAttribute("collected", collected);
+        model.addAttribute("collectedCount", collected.size());
+        model.addAttribute("totalCount", allBirds.size());
+        return "storage/book";
+    }
+
+    /** 放生确认页：返还爱心，锁定鸟不可放生。 */
+    @GetMapping("/releaseConfirm")
+    public String releaseConfirm(HttpSession session, Model model, @RequestParam Integer birdId) {
+        Role role = getSessionRole(session);
+        StorageBird bird = storageBirdService.getById(birdId);
+        if (bird == null || !role.getRoleId().equals(bird.getRoleId())) {
+            model.addAttribute("message", "小鸟不存在或不属于当前角色。");
+            return list(session, model);
+        }
+        if (bird.getIsLock() != null && bird.getIsLock() != 0) {
+            model.addAttribute("message", "该小鸟正在训练或配对中，不能放生。");
+            return list(session, model);
+        }
+        BaseBird baseBird = baseBirdService.getById(bird.getBirdId());
+        model.addAttribute("bird", bird);
+        model.addAttribute("baseBird", baseBird);
+        model.addAttribute("loveBack", releaseLove(bird));
+        return "storage/releaseConfirm";
+    }
+
+    /** 放生：返还爱心（星级×50 + 重量/200），写事件。 */
+    @PostMapping("/release")
+    public String release(HttpSession session, Model model, @RequestParam Integer birdId) {
+        Role role = getSessionRole(session);
+        StorageBird bird = storageBirdService.getById(birdId);
+        if (bird == null || !role.getRoleId().equals(bird.getRoleId())) {
+            model.addAttribute("message", "小鸟不存在或不属于当前角色。");
+            return list(session, model);
+        }
+        if (bird.getIsLock() != null && bird.getIsLock() != 0) {
+            model.addAttribute("message", "该小鸟正在训练或配对中，不能放生。");
+            return list(session, model);
+        }
+        BaseBird baseBird = baseBirdService.getById(bird.getBirdId());
+        long love = releaseLove(bird);
+        storageBirdService.removeById(birdId);
+        role.setLovePoint((role.getLovePoint() == null ? 0L : role.getLovePoint()) + love);
+        int left = (role.getBirdNum() == null ? 0 : role.getBirdNum()) - 1;
+        role.setBirdNum((short) Math.max(0, left));
+        roleService.updateById(role);
+        saveSessionRole(session, role);
+        String name = baseBird == null ? "小鸟" : baseBird.getName();
+        gameEventService.record(role.getRoleId(),
+                "把" + bird.getWeight() / 100.0 + "斤的" + GameUtils.getBirdSexName(bird.getSex()) + name
+                        + "放归了树林，天空多了一声鸟鸣（爱心+" + love + "）。");
+        model.addAttribute("message", "放生成功，获得爱心 " + love + "。图鉴记录保留。");
+        return list(session, model);
+    }
+
+    /** 鸟详情页：我方小鸟的完整数值。 */
+    @GetMapping("/bird")
+    public String birdDetail(HttpSession session, Model model, @RequestParam Integer birdId) {
+        Role role = getSessionRole(session);
+        StorageBird bird = storageBirdService.getById(birdId);
+        if (bird == null || !role.getRoleId().equals(bird.getRoleId())) {
+            model.addAttribute("message", "小鸟不存在或不属于当前角色。");
+            return list(session, model);
+        }
+        model.addAttribute("bird", bird);
+        model.addAttribute("baseBird", baseBirdService.getById(bird.getBirdId()));
+        model.addAttribute("typeNames", Map.of(1, "敏捷", 2, "力量", 3, "魔法", 4, "幻想"));
+        return "storage/birdDetail";
+    }
+
+    /** 放生返还的爱心。 */
+    private long releaseLove(StorageBird bird) {
+        int star = bird.getStar() == null ? 0 : bird.getStar();
+        long weight = bird.getWeight() == null ? 0 : bird.getWeight();
+        return Math.max(10, star * 50L + weight / 200);
+    }
 
     /** 小鸟列表：按重量倒序，方便玩家优先查看重鸟。 */
     @GetMapping(value = {"", "/list"})
