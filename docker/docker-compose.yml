@@ -30,6 +30,7 @@ services:
       - ../sql/extra/fix_board_encoding.sql:/docker-entrypoint-initdb.d/07-fix-board-encoding.sql:ro
       - ../sql/extra/new_birds_baits_props.sql:/docker-entrypoint-initdb.d/08-new-birds-baits-props.sql:ro
       - ../sql/extra/quest_tower.sql:/docker-entrypoint-initdb.d/09-quest-tower.sql:ro
+      - ../sql/extra/fix_activity_encoding.sql:/docker-entrypoint-initdb.d/10-fix-activity-encoding.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
