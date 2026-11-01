@@ -23,9 +23,6 @@ public class GameProperties {
     /** 包裹总容量（U12 新增：原先是 6 个模板里各写死一个 3000）。 */
     private int packTotalCapacity = 3000;
 
-    /** 小鸟仓库容量上限。超过后收网捕获将被拒绝，提示先出售腾位。 */
-    private int birdStorageCapacity = 50;
-
     /** 加速单价：每缩短 1 小时等待消耗的钻石数（不足 1 小时按 1 小时计）。 */
     private int hastenDiamondPerHour = 10;
 
@@ -49,14 +46,6 @@ public class GameProperties {
 
     public void setPackTotalCapacity(int packTotalCapacity) {
         this.packTotalCapacity = packTotalCapacity;
-    }
-
-    public int getBirdStorageCapacity() {
-        return birdStorageCapacity;
-    }
-
-    public void setBirdStorageCapacity(int birdStorageCapacity) {
-        this.birdStorageCapacity = birdStorageCapacity;
     }
 
     public int getHastenDiamondPerHour() {

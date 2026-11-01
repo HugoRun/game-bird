@@ -190,12 +190,10 @@ public class GameController extends BaseController {
                         .last("LIMIT 1")).stream().findFirst().orElse(null));
         // 福利位：今天是否已签到
         model.addAttribute("signedToday", signInService.isSignedToday(role.getRoleId()));
-        // 仓库余量（满仓时收网会被拒，提前让玩家看到）
+        // 仓库数量（无上限，仅展示）
         long warehouseCount = storageBirdService.count(
                 new LambdaQueryWrapper<StorageBird>().eq(StorageBird::getRoleId, role.getRoleId()));
         model.addAttribute("warehouseCount", warehouseCount);
-        model.addAttribute("warehouseCapacity", gameProperties.getBirdStorageCapacity());
-        model.addAttribute("warehouseFull", warehouseCount >= gameProperties.getBirdStorageCapacity());
         // 诱饵余量（主页空闲陷阱提示）
         long baitTotal = packService.list(new LambdaQueryWrapper<RolePack>()
                 .eq(RolePack::getRoleId, role.getRoleId())

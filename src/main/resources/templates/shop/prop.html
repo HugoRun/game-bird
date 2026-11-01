@@ -15,7 +15,7 @@
                         <img alt="" class="icon-gray-border" src="../../static/images/PROP/1.gif" th:src="@{|/assets/images/PROP/${baseProp.id}.gif|}">
                     </div>
                     <div class="list1-info">
-                        <p><a th:href="@{|/shop/prop/detail(id=${baseProp.id})|}"><span th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${baseProp.name}">名称</span></a><span th:text="${'|' + baseProp.lu + '级'}"></span></p>谷子(25级)</p>
+                        <p><a th:href="@{|/shop/prop/detail(id=${baseProp.id})|}"><span th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${baseProp.name}">名称</span></a><span th:text="${'|' + baseProp.lu + '级'}"></span></p></p>
                         <p>功能:<span th:text="${baseProp.func}"></span></p>
                         <p>价格:<span th:text="${baseProp.getFeePrice()}"></span><span th:text="${@gameUtils.getFeeTypeName(baseProp.getFeeType())}"></span></p>
                         <div class="btl">

@@ -133,10 +133,9 @@
         </ul>
     </div>
     <div th:if="${trainList != null && trainList.size() > 0}">
-        <div class="panel" th:classappend="${warehouseFull} ? 'bg-yellow' : 'bg-blue'">
-            🏠 仓库 <span th:text="${warehouseCount + '/' + warehouseCapacity}"></span>
-            <a th:if="${warehouseFull}" class="text-danger" th:href="@{/storage/list}">已满！去出售腾位，否则无法收网</a>
-            <a th:if="${!warehouseFull}" th:href="@{/storage/list}">全部</a>
+        <div class="panel bg-blue">
+            🏠 仓库 <span class="text-darkorange" th:text="${warehouseCount}"></span> 只
+            <a th:href="@{/storage/list}">全部</a>
         </div>
         <div class="panel bg-blue">🎓【宠物训练场】<a th:href="@{/train/list}">全部</a></div>
         <ul class="list1">

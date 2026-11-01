@@ -46,7 +46,6 @@ class TrapServiceImplTest {
         service = new TrapServiceImpl();
         configGateway = mock(GameConfigGateway.class);
         gameProperties = new GameProperties();
-        gameProperties.setBirdStorageCapacity(50);
         trapService = mock(RoleTrapService.class);
         storageBirdService = mock(StorageBirdService.class);
         roleService = mock(RoleService.class);
@@ -125,20 +124,23 @@ class TrapServiceImplTest {
     }
 
     @Test
-    @DisplayName("仓库已满：拒绝收网并保留捕捉状态（抛业务异常）")
-    void storageFullRejected() {
+    @DisplayName("仓库上限已取消：持有量再大也照常收网")
+    void storageLimitRemoved() {
         when(trapService.getById(9)).thenReturn(slot((byte) 2));
         when(configGateway.getBaseBird(1)).thenReturn(baseBird());
-        when(storageBirdService.count(any())).thenReturn(50L);
+        when(configGateway.getBaseLevel(any())).thenReturn(null);
+        when(storageBirdService.count(any())).thenReturn(5000L);
+        when(cageService.getOne(any())).thenReturn(null);
+        org.mockito.Mockito.doAnswer(invocation -> {
+            com.gamebird.game.bird.model.dbo.StorageBird bird = invocation.getArgument(0);
+            bird.setId(78);
+            return true;
+        }).when(storageBirdService).save(any());
 
-        try {
-            service.over(role(), 9);
-            fail("应当抛出仓库已满的业务异常");
-        } catch (BizException e) {
-            assertTrue(e.getMessage().contains("仓库已满"));
-        }
-        // 槽位未被清空：玩家出售后还能回来收
-        verify(trapService, never()).updateById(any());
+        TrapResultVO result = service.over(role(), 9);
+        assertFalse(result.isEscaped());
+        assertTrue(result.getBirdId() > 0);
+        verify(trapService).updateById(any());
     }
 
     @Test

@@ -15,7 +15,7 @@
                         <img alt="" class="icon-gray-border" src="../../static/images/nest/1.gif" th:src="@{|/assets/images/nest/${baseNest.id}.gif|}">
                     </div>
                     <div class="list1-info">
-                        <p><a th:href="@{|/shop/nest/detail(id=${baseNest.id})|}"><span th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${baseNest.name}">名称</span></a><span th:text="${'|' + baseNest.lu + '级'}"></span></p>谷子(25级)</p>
+                        <p><a th:href="@{|/shop/nest/detail(id=${baseNest.id})|}"><span th:text="${stat.count + (page.current - 1) * page.getSize() }+'.'+${baseNest.name}">名称</span></a><span th:text="${'|' + baseNest.lu + '级'}"></span></p></p>
                         <p>功能:<span th:text="${baseNest.func}"></span></p>
                         <p>价格:<span th:text="${baseNest.getFeePrice()}"></span><span th:text="${@gameUtils.getFeeTypeName(baseNest.getFeeType())}"></span></p>
                         <div class="btl">

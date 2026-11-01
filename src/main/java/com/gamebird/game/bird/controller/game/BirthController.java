@@ -350,13 +350,6 @@ public class BirthController extends BaseController {
             model.addAttribute("message", "配对数据异常，槽位已重置。");
             return list(model, role);
         }
-        // 仓库容量
-        long owned = storageBirdService.count(new LambdaQueryWrapper<StorageBird>()
-                .eq(StorageBird::getRoleId, role.getRoleId()));
-        if (owned >= gameProperties.getBirdStorageCapacity()) {
-            model.addAttribute("message", "小鸟仓库已满，请先出售几只再来收获。");
-            return list(model, role);
-        }
         // 产出规则
         BaseBird configA = configGateway.getBaseBird(parentA.getBirdId());
         BaseBird configB = configGateway.getBaseBird(parentB.getBirdId());
