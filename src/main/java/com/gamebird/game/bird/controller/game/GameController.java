@@ -140,6 +140,9 @@ public class GameController extends BaseController {
             RoleBirthVO trapVO = new RoleBirthVO();
             BeanUtils.copyProperties(trap, trapVO);
             trapVO.setUseNest(configGateway.getBaseNest(trap.getUseNestId() == 0 ? ConstData.DEFAULT_NEST_ID : trap.getUseNestId()));
+            if (trap.getBirdBaseId() > 0) {
+                trapVO.setBaseBird(configGateway.getBaseBird(trap.getBirdBaseId()));
+            }
             birthList.add(trapVO);
         }
         model.addAttribute("birthList", birthList);
