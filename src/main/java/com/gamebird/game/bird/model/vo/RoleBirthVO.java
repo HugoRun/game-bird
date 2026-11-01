@@ -1,5 +1,6 @@
 package com.gamebird.game.bird.model.vo;
 
+import com.gamebird.game.bird.model.dbo.BaseBird;
 import com.gamebird.game.bird.model.dbo.BaseNest;
 import com.gamebird.game.bird.model.dbo.BaseTrap;
 import com.gamebird.game.bird.model.dbo.RoleBirth;
@@ -12,7 +13,7 @@ public class RoleBirthVO extends RoleBirth {
     // 当前使用巢穴
     private BaseNest useNest = null;
     // 当前孵化的小鸟配置
-    private BaseTrap baseBird = null;
+    private BaseBird baseBird = null;
 
     public BaseNest getUseNest() {
         return useNest;
@@ -22,11 +23,11 @@ public class RoleBirthVO extends RoleBirth {
         this.useNest = useNest;
     }
 
-    public BaseTrap getBaseBird() {
+    public BaseBird getBaseBird() {
         return baseBird;
     }
 
-    public void setBaseBird(BaseTrap baseBird) {
+    public void setBaseBird(BaseBird baseBird) {
         this.baseBird = baseBird;
     }
 }
