@@ -226,7 +226,11 @@ public class GameUtils {
      * @param titleId 称号Id
      * @return 称号名称
      */
-    public String getTitleName(int titleId) {
+    public String getTitleName(Integer titleId) {
+        if (titleId == null || titleId <= 0) {
+            // 未设置称号（建角后 titleId 为 null）返回空，而不是抛 500
+            return "无";
+        }
         BaseTitle title = configGateway.getBaseTitle(titleId);
         if (title == null)
             return "";
