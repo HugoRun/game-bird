@@ -170,6 +170,29 @@ public class GameUtils {
     }
 
     /**
+     * 任务/成就的达成条件说明（任务中心展示，让玩家知道奖励从哪来）。
+     *
+     * @param taskType 任务类型
+     * @return 说明文案
+     */
+    public static String getTaskTypeDesc(Integer taskType) {
+        if (taskType == null) {
+            return "";
+        }
+        return switch (taskType) {
+            case 1 -> "每天首次进入游戏自动完成";
+            case 2 -> "成功收网一只小鸟后完成";
+            case 3 -> "在商店购买任意道具后完成";
+            case 4 -> "图鉴每收集满 10/30/60/全部物种各可领一档";
+            case 5 -> "首次孵出 5 星小鸟";
+            case 6 -> "累计战斗胜利 10 场";
+            case 7 -> "角色等级达到 10 级";
+            case 8 -> "持有金币满 10 万";
+            default -> "";
+        };
+    }
+
+    /**
      * 任务/成就类型名称（task.task_type：1-3 日常，4-8 成就）。
      *
      * @param taskType 任务类型

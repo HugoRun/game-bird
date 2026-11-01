@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.gamebird.common.util.CommonUtils;
 import com.gamebird.game.bird.controller.common.BaseController;
 import com.gamebird.game.bird.model.dbo.Role;
+import com.gamebird.game.bird.data.ConstData;
 import com.gamebird.game.bird.model.dbo.Task;
+import com.gamebird.game.bird.model.message.MessageVO;
 import com.gamebird.game.bird.service.TaskService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
@@ -62,7 +64,11 @@ public class TaskController extends BaseController {
         saveSessionRole(session, role);
         task.setStatus(2);
         taskService.updateById(task);
-        model.addAttribute("message", "领取成功，获得金钱 " + reward + "。");
-        return list(session, model);
+        String taskName = com.gamebird.game.bird.util.GameUtils.getTaskTypeName(task.getTaskType());
+        MessageVO message = MessageVO.success("领取成功！「" + taskName + "」奖励 " + reward + " 金币已到账。");
+        message.addLink(new com.gamebird.game.bird.model.message.MessageLink("回任务中心", "/task/list"));
+        message.addLink(new com.gamebird.game.bird.model.message.MessageLink("回主页", "/game"));
+        model.addAttribute("message", message);
+        return ConstData.VIEW_MESSAGE;
     }
 }

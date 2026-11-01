@@ -12,27 +12,34 @@
     <table class="list1">
         <thead>
         <tr>
-            <th>类型</th>
+            <th>类型/说明</th>
             <th>状态</th>
             <th>奖励</th>
-            <th>创建</th>
-            <th>完成</th>
+            <th>时间</th>
             <th>操作</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="t : ${tasks}">
-            <td th:text="${@gameUtils.getTaskTypeName(t.taskType)}"></td>
-            <td th:text="${t.status == 0 ? '进行中' : (t.status == 1 ? '已完成未领' : (t.status == 2 ? '已领取' : '未知'))}"></td>
-            <td th:text="${t.rewardCoin}"></td>
-            <td th:text="${@gameUtils.getTimeDiff(t.createTime, now)}"></td>
-            <td th:text="${t.finishTime != null && t.finishTime > 0 ? @gameUtils.getTimeDiff(t.finishTime, now) : '-'}"></td>
+            <td>
+                <span th:class="${t.status == 1 ? 'text-primary' : ''}" th:text="${@gameUtils.getTaskTypeName(t.taskType)}"></span><br/>
+                <span class="text-muted" th:text="${@gameUtils.getTaskTypeDesc(t.taskType)}"></span>
+            </td>
+            <td th:text="${t.status == 0 ? '进行中' : (t.status == 1 ? '可领取' : (t.status == 2 ? '已领取' : '未知'))}"></td>
+            <td><span class="text-darkorange" th:text="${t.rewardCoin}"></span> 金币</td>
+            <td>
+                <span th:text="${@gameUtils.getTimeDiff(t.createTime, now) + '前创建'}"></span><br/>
+                <span th:if="${t.finishTime != null && t.finishTime > 0}"
+                      th:text="${@gameUtils.getTimeDiff(t.finishTime, now) + '前达成'}"></span>
+                <span th:if="${t.finishTime == null || t.finishTime <= 0}" class="text-muted">未达成</span>
+            </td>
             <td>
                 <form th:if="${t.status == 1}" th:action="@{/task/claim}" method="post">
                     <input type="hidden" name="id" th:value="${t.id}"/>
-                    <button type="submit">领取</button>
+                    <button type="submit">领取奖励</button>
                 </form>
-                <span th:if="${t.status != 1}" class="text-muted">-</span>
+                <span th:if="${t.status == 0}" class="text-muted">去完成任务</span>
+                <span th:if="${t.status == 2}" class="text-muted">已到账</span>
             </td>
         </tr>
         </tbody>
