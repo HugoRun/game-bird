@@ -6,7 +6,7 @@
 <div class="main">
     <!-- 概览面板 -->
     <div class="panel bg-blue">
-        小鸟仓库 · 共 <span class="text-darkorange" th:text="${total}"></span> 只
+        🏠 小鸟仓库 · 共 <span class="text-darkorange" th:text="${total}"></span> 只
         <span class="text-muted" th:if="${q != null && !q.isEmpty()}"
               th:text="'（搜索「' + ${q} + '」命中 ' + ${filteredCount} + ' 只）'"></span>
         <span class="text-muted">· 总身价 <span class="text-darkorange" th:text="${totalValue}"></span> 金币</span>

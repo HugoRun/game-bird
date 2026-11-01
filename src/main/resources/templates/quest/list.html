@@ -5,12 +5,12 @@
 
 <div class="main">
     <div class="panel bg-blue">
-        奋进目标 · 主线已交付 <span class="text-darkorange" th:text="${mainDone}"></span> / 10 章
+        🎯 奋进目标 · 主线已交付 <span class="text-darkorange" th:text="${mainDone}"></span> / 10 章
         <a th:href="@{/task/list}">日常任务</a>　<a th:href="@{/game}">回主页</a>
     </div>
 
     <!-- 主线 -->
-    <div class="panel bg-green">【主线剧情】猪头大军占领了梦想花园，一路反击吧！</div>
+    <div class="panel bg-green">📜【主线剧情】猪头大军占领了梦想花园，一路反击吧！</div>
     <ul class="list1">
         <li th:each="v : ${views}" th:if="${v.def.chapter == 1}">
             <div class="list1-icon">
@@ -47,7 +47,7 @@
     </ul>
 
     <!-- 每日 -->
-    <div class="panel bg-yellow">【每日任务】每天零点刷新</div>
+    <div class="panel bg-yellow">☀️【每日任务】每天零点刷新</div>
     <ul class="list1">
         <li th:each="v : ${views}" th:if="${v.def.chapter == 2}">
             <div class="list1-info">

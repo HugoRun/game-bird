@@ -4,17 +4,17 @@
 <body>
 <div class="main">
     <div class="panel bg-green">
-        <div>公告:<img src="../../static/images/icon/guide.gif" th:src="@{/assets/images/icon/guide.gif}"/><a th:href="@{/board/list}"><span th:if="${latestBoard != null}"
+        <div>📣 公告:<img src="../../static/images/icon/guide.gif" th:src="@{/assets/images/icon/guide.gif}"/><a th:href="@{/board/list}"><span th:if="${latestBoard != null}"
               style="display:inline-block;max-width:75%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom"
               th:text="${latestBoard.title}">欢迎来到小鸟情人</span><span th:if="${latestBoard == null}" class="text-muted">暂无公告</span></a></div>
-        <div>任务:<i class="task-a"></i><a th:href="@{/quest/list}" class="text-darkorange">奋进目标</a> | <a th:if="${activeTask != null}" th:href="@{/task/list}"><span th:text="${activeTask.status == 0 ? '进行中' : '可领奖'}"></span>(<span th:text="${@gameUtils.getTaskTypeName(activeTask.taskType)}"></span>)</a><a th:if="${activeTask == null}" th:href="@{/task/list}">去领任务</a></div>
-        <div>福利:<a th:href="@{/signin}"><span th:if="${signedToday}" class="text-muted">已签到</span><span th:if="${!signedToday}">签到</span></a>(<span th:if="${signedToday}">已完成</span><span th:if="${!signedToday}">未签到</span>)</div>
+        <div>📋 任务:<i class="task-a"></i><a th:href="@{/quest/list}" class="text-darkorange">奋进目标</a> | <a th:if="${activeTask != null}" th:href="@{/task/list}"><span th:text="${activeTask.status == 0 ? '进行中' : '可领奖'}"></span>(<span th:text="${@gameUtils.getTaskTypeName(activeTask.taskType)}"></span>)</a><a th:if="${activeTask == null}" th:href="@{/task/list}">去领任务</a></div>
+        <div>🎁 福利:<a th:href="@{/signin}"><span th:if="${signedToday}" class="text-muted">已签到</span><span th:if="${!signedToday}">签到</span></a>(<span th:if="${signedToday}">已完成</span><span th:if="${!signedToday}">未签到</span>)</div>
     </div>
     <div>
         <div class="panel bg-blue">"<span href="#" th:text="|小菜鸟|"></span>" <span href="#" th:text="|${session.sRole.roleName}|"></span> <a href="#" onclick="toggleShow('p1')">收起</a></div>
         <div id="p1">
-            <div>等级:<span th:text="|${session.sRole.level}|"></span>级(20%) <img alt="" class="vip-icon" src="../../static/images/vip/vip_3.png" th:src="|/assets/images/vip/vip_${session.sRole.vip}.png|"/> <a th:href="@{/profile}">详情</a></div>
-            <div>爱心:<span th:text="|${session.sRole.lovePoint}|"></span> 金币:<span th:text="|${session.sRole.coin}|"></span> <a th:href="@{/bank}">存款</a></div>
+            <div>🎖️ 等级:<span th:text="|${session.sRole.level}|"></span>级(20%) <img alt="" class="vip-icon" src="../../static/images/vip/vip_3.png" th:src="|/assets/images/vip/vip_${session.sRole.vip}.png|"/> <a th:href="@{/profile}">详情</a></div>
+            <div>❤️ 爱心:<span th:text="|${session.sRole.lovePoint}|"></span> 金币:<span th:text="|${session.sRole.coin}|"></span> <a th:href="@{/bank}">存款</a></div>
             <div>鲜花:<span th:text="|${session.sRole.diamond}|"></span> 钻石:<span th:text="|${session.sRole.diamond}|"></span></div>
             <div th:if="${session.sRole.marriageType > 0}">爱人:<span><a href="#" th:text="|这段情、|">详情</a></span></div>
             <div hidden="hidden">徒弟:<span><a href="#" th:text="|丂①花花世界的爱情|">详情</a></span> <span><a href="#" th:text="|丂①花花世界的爱情|">详情</a></span> <span><a href="#" th:text="|丂①花花世界的爱情|">详情</a></span></div>
@@ -24,7 +24,7 @@
     </div>
     <div>
         <div class="panel bg-blue">
-            【<a href="./myField.html" th:href="@{/field/info(fieldId=${session.sRole.fieldId})}" th:text="${@gameUtils.getFieldName(session.sRole.fieldId)}">彩虹树林</a>】 <a th:href="@{/game/field}">切换场景</a> <a th:href="@{/trap/autoUseBait}">一键下饵</a>
+            🌳 【<a href="./myField.html" th:href="@{/field/info(fieldId=${session.sRole.fieldId})}" th:text="${@gameUtils.getFieldName(session.sRole.fieldId)}">彩虹树林</a>】 <a th:href="@{/game/field}">切换场景</a> <a th:href="@{/trap/autoUseBait}">一键下饵</a>
         </div>
         <div>
             <div>
@@ -89,7 +89,7 @@
         </ul>
     </div>
     <div th:if="${birthList != null && birthList.size() > 0}">
-        <div class="panel bg-blue">【爱的巢穴】<a th:href="@{/birth/list}">全部</a></div>
+        <div class="panel bg-blue">💞【爱的巢穴】<a th:href="@{/birth/list}">全部</a></div>
         <ul class="list1">
             <li th:each="birth, stat : ${birthList}">
                 <div class="list1-icon" th:if="${birth.birdId == 0}">
@@ -129,7 +129,7 @@
         </ul>
     </div>
     <div th:if="${trainList != null && trainList.size() > 0}">
-        <div class="panel bg-blue">【宠物训练场】<a th:href="@{/train/list}">全部</a></div>
+        <div class="panel bg-blue">🎓【宠物训练场】<a th:href="@{/train/list}">全部</a></div>
         <ul class="list1">
             <li th:each="train, stat : ${trainList}">
                 <div class="list1-icon" th:if="${train.birdId == 0}">
@@ -157,7 +157,7 @@
         </ul>
     </div>
     <div>
-        <div class="panel bg-blue">【世界喊话】<a th:href="@{/chat/list}">我要喊话</a></div>
+        <div class="panel bg-blue">💬【世界喊话】<a th:href="@{/chat/list}">我要喊话</a></div>
         <div th:if="${chatMessageList == null || chatMessageList.size() == 0}">暂无喊话</div>
         <ul th:if="${chatMessageList != null && chatMessageList.size() > 0}">
             <li th:each="message, stat : ${chatMessageList}">
@@ -166,7 +166,7 @@
         </ul>
     </div>
     <div>
-        <div class="panel bg-blue">【树林记录】<a th:href="@{/game/tree}">全部动态</a></div>
+        <div class="panel bg-blue">🌲【树林记录】<a th:href="@{/game/tree}">全部动态</a></div>
         <div th:if="${treeEvents == null || treeEvents.size() == 0}" class="text-muted">还没有动态，去收网或孵化一只小鸟吧。</div>
         <ul th:if="${treeEvents != null && treeEvents.size() > 0}">
             <li th:each="event : ${treeEvents}">
@@ -175,7 +175,7 @@
         </ul>
     </div>
     <div>
-        <div class="panel bg-blue">【世界动态】<a th:href="@{/game/tree}">全部动态</a></div>
+        <div class="panel bg-blue">🌍【世界动态】<a th:href="@{/game/tree}">全部动态</a></div>
         <div th:if="${globalEvents == null || globalEvents.size() == 0}" class="text-muted">暂未开放</div>
         <ul th:if="${globalEvents != null && globalEvents.size() > 0}">
             <li th:each="event : ${globalEvents}">
