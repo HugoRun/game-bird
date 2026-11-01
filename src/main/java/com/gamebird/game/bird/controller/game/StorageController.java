@@ -86,11 +86,11 @@ public class StorageController extends BaseController {
         StorageBird bird = storageBirdService.getById(birdId);
         if (bird == null || !role.getRoleId().equals(bird.getRoleId())) {
             model.addAttribute("message", "小鸟不存在或不属于当前角色。");
-            return list(session, model);
+            return list(session, model, "weight", null);
         }
         if (bird.getIsLock() != null && bird.getIsLock() != 0) {
             model.addAttribute("message", "该小鸟正在训练或配对中，不能放生。");
-            return list(session, model);
+            return list(session, model, "weight", null);
         }
         BaseBird baseBird = baseBirdService.getById(bird.getBirdId());
         model.addAttribute("bird", bird);
@@ -106,11 +106,11 @@ public class StorageController extends BaseController {
         StorageBird bird = storageBirdService.getById(birdId);
         if (bird == null || !role.getRoleId().equals(bird.getRoleId())) {
             model.addAttribute("message", "小鸟不存在或不属于当前角色。");
-            return list(session, model);
+            return list(session, model, "weight", null);
         }
         if (bird.getIsLock() != null && bird.getIsLock() != 0) {
             model.addAttribute("message", "该小鸟正在训练或配对中，不能放生。");
-            return list(session, model);
+            return list(session, model, "weight", null);
         }
         BaseBird baseBird = baseBirdService.getById(bird.getBirdId());
         long love = releaseLove(bird);
@@ -125,7 +125,7 @@ public class StorageController extends BaseController {
                 "把" + bird.getWeight() / 100.0 + "斤的" + GameUtils.getBirdSexName(bird.getSex()) + name
                         + "放归了树林，天空多了一声鸟鸣（爱心+" + love + "）。");
         model.addAttribute("message", "放生成功，获得爱心 " + love + "。图鉴记录保留。");
-        return list(session, model);
+        return list(session, model, "weight", null);
     }
 
     /** 鸟详情页：我方小鸟的完整数值。 */
@@ -135,7 +135,7 @@ public class StorageController extends BaseController {
         StorageBird bird = storageBirdService.getById(birdId);
         if (bird == null || !role.getRoleId().equals(bird.getRoleId())) {
             model.addAttribute("message", "小鸟不存在或不属于当前角色。");
-            return list(session, model);
+            return list(session, model, "weight", null);
         }
         model.addAttribute("bird", bird);
         model.addAttribute("baseBird", baseBirdService.getById(bird.getBirdId()));
@@ -150,16 +150,57 @@ public class StorageController extends BaseController {
         return Math.max(10, star * 50L + weight / 200);
     }
 
-    /** 小鸟列表：按重量倒序，方便玩家优先查看重鸟。 */
+    /**
+     * 小鸟列表：支持排序（weight/level/star/time/price）与物种关键词搜索。
+     * 数据量小（上限 50），排序在内存完成，身价排序依赖配置表联算。
+     */
     @GetMapping(value = {"", "/list"})
-    public String list(HttpSession session, Model model) {
+    public String list(HttpSession session, Model model,
+                       @RequestParam(defaultValue = "weight") String sort,
+                       @RequestParam(required = false) String q) {
         Role role = getSessionRole(session);
-        List<StorageBird> birds = listBirds(role);
+        List<StorageBird> all = listBirds(role);
         Map<Integer, BaseBird> baseBirdMap = baseBirdService.list().stream()
                 .collect(Collectors.toMap(BaseBird::getId, b -> b, (a, b) -> a));
+        // 仓库总值（不受筛选影响）
+        long totalValue = 0;
+        for (StorageBird bird : all) {
+            totalValue += sellGain(baseBirdMap.get(bird.getBirdId()), bird);
+        }
+        // 搜索：按物种名包含关键词
+        String keyword = q == null ? "" : q.trim();
+        List<StorageBird> birds = all;
+        if (!keyword.isEmpty()) {
+            birds = all.stream().filter(b -> {
+                BaseBird cfg = baseBirdMap.get(b.getBirdId());
+                return cfg != null && cfg.getName() != null && cfg.getName().contains(keyword);
+            }).toList();
+        }
+        // 排序
+        java.util.Comparator<StorageBird> byWeight = java.util.Comparator.comparing(
+                StorageBird::getWeight, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())).reversed();
+        switch (sort == null ? "weight" : sort) {
+            case "level" -> birds = birds.stream().sorted(java.util.Comparator
+                    .comparing(StorageBird::getLevel, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()))
+                    .reversed().thenComparing(byWeight)).toList();
+            case "star" -> birds = birds.stream().sorted(java.util.Comparator
+                    .comparing(StorageBird::getStar, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()))
+                    .reversed().thenComparing(byWeight)).toList();
+            case "time" -> birds = birds.stream().sorted(java.util.Comparator
+                    .comparing(StorageBird::getTime, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()))
+                    .reversed()).toList();
+            case "price" -> birds = birds.stream().sorted(java.util.Comparator
+                    .comparing((StorageBird b) -> sellGain(baseBirdMap.get(b.getBirdId()), b)).reversed()
+                    .thenComparing(byWeight)).toList();
+            default -> birds = birds.stream().sorted(byWeight).toList();
+        }
         model.addAttribute("birds", birds);
         model.addAttribute("baseBirdMap", baseBirdMap);
-        model.addAttribute("total", birds.size());
+        model.addAttribute("total", all.size());
+        model.addAttribute("filteredCount", birds.size());
+        model.addAttribute("totalValue", totalValue);
+        model.addAttribute("sort", sort == null ? "weight" : sort);
+        model.addAttribute("q", keyword);
         model.addAttribute("cagedBirdId", getCagedBirdId(role.getRoleId()));
         return "storage/list";
     }
@@ -171,7 +212,7 @@ public class StorageController extends BaseController {
         StorageBird bird = storageBirdService.getById(birdId);
         if (bird == null || !role.getRoleId().equals(bird.getRoleId())) {
             model.addAttribute("message", "小鸟不存在或不属于当前角色。");
-            return list(session, model);
+            return list(session, model, "weight", null);
         }
         BaseBird baseBird = baseBirdService.getById(bird.getBirdId());
         long gain = sellGain(baseBird, bird);
@@ -189,17 +230,17 @@ public class StorageController extends BaseController {
         StorageBird bird = storageBirdService.getById(birdId);
         if (null == bird || !role.getRoleId().equals(bird.getRoleId())) {
             model.addAttribute("message", "小鸟不存在或不属于当前角色。");
-            return list(session, model);
+            return list(session, model, "weight", null);
         }
         if (bird.getIsLock() != null && bird.getIsLock() != 0) {
             model.addAttribute("message", "该小鸟正在训练或配对中，不能出售。");
-            return list(session, model);
+            return list(session, model, "weight", null);
         }
         BaseBird baseBird = baseBirdService.getById(bird.getBirdId());
         long gain = sellGain(baseBird, bird);
         if (gain <= 0) {
             model.addAttribute("message", "该小鸟无法出售（单价或重量为零）。");
-            return list(session, model);
+            return list(session, model, "weight", null);
         }
         storageBirdService.removeById(birdId);
         questService.onEvent(role, QuestService.EV_SELL, 1);
@@ -213,7 +254,7 @@ public class StorageController extends BaseController {
         roleService.updateById(role);
         saveSessionRole(session, role);
         model.addAttribute("message", "出售成功，获得金钱 " + gain + "。");
-        return list(session, model);
+        return list(session, model, "weight", null);
     }
 
     /** 一键出售确认页：列出全部未锁定小鸟的只数与总价值。 */
@@ -242,7 +283,7 @@ public class StorageController extends BaseController {
                 .toList();
         if (birds.isEmpty()) {
             model.addAttribute("message", "没有可出售的小鸟（训练/配对中的已被锁定保护）。");
-            return list(session, model);
+            return list(session, model, "weight", null);
         }
         long totalGain = 0;
         for (StorageBird bird : birds) {
@@ -259,7 +300,7 @@ public class StorageController extends BaseController {
         gameEventService.record(role.getRoleId(),
                 "一口气出售了" + birds.size() + "只小鸟，进账金币" + totalGain + "。");
         model.addAttribute("message", "一键出售完成：卖出 " + birds.size() + " 只，共获得金币 " + totalGain + "。");
-        return list(session, model);
+        return list(session, model, "weight", null);
     }
 
     /** 设置出战鸟：战斗时代替角色裸等级出战（与装备的鸟笼共同决定加成）。 */
@@ -269,14 +310,14 @@ public class StorageController extends BaseController {
         StorageBird bird = storageBirdService.getById(birdId);
         if (bird == null || !role.getRoleId().equals(bird.getRoleId())) {
             model.addAttribute("message", "小鸟不存在或不属于当前角色。");
-            return list(session, model);
+            return list(session, model, "weight", null);
         }
         RoleCage cage = getCageSlot(role.getRoleId());
         cage.setBirdId(bird.getId());
         cage.setBaseBridId(bird.getBirdId());
         cageService.saveOrUpdate(cage);
         model.addAttribute("message", "已把它设为出战小鸟，战斗时它将为你而战。");
-        return list(session, model);
+        return list(session, model, "weight", null);
     }
 
     // ==================== 私有工具 ====================

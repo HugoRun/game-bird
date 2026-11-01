@@ -4,28 +4,70 @@
 <body>
 
 <div class="main">
-    <h2>小鸟仓库</h2>
+    <!-- 概览面板 -->
+    <div class="panel bg-blue">
+        小鸟仓库 · 共 <span class="text-darkorange" th:text="${total}"></span> 只
+        <span class="text-muted" th:if="${q != null && !q.isEmpty()}"
+              th:text="'（搜索「' + ${q} + '」命中 ' + ${filteredCount} + ' 只）'"></span>
+        <span class="text-muted">· 总身价 <span class="text-darkorange" th:text="${totalValue}"></span> 金币</span>
+    </div>
     <p th:if="${message}" th:text="${message}" class="text-muted"></p>
-    <p>共计 <span th:text="${total}"></span> 只小鸟</p>
 
-    <div th:if="${total == 0}">
-        <p>仓库空空如也，去捕捉一些小鸟吧。</p>
+    <!-- 工具栏：排序 + 搜索 -->
+    <div class="panel bg-green">
+        <div>
+            排序:
+            <a th:href="@{/storage/list(sort='weight', q=${q})}"
+               th:style="${sort == 'weight'} ? 'font-weight:bold;color:#b8860b' : ''">重量</a> |
+            <a th:href="@{/storage/list(sort='level', q=${q})}"
+               th:style="${sort == 'level'} ? 'font-weight:bold;color:#b8860b' : ''">等级</a> |
+            <a th:href="@{/storage/list(sort='star', q=${q})}"
+               th:style="${sort == 'star'} ? 'font-weight:bold;color:#b8860b' : ''">星级</a> |
+            <a th:href="@{/storage/list(sort='price', q=${q})}"
+               th:style="${sort == 'price'} ? 'font-weight:bold;color:#b8860b' : ''">身价</a> |
+            <a th:href="@{/storage/list(sort='time', q=${q})}"
+               th:style="${sort == 'time'} ? 'font-weight:bold;color:#b8860b' : ''">最新</a>
+        </div>
+        <form method="get" th:action="@{/storage/list}" style="margin-top:4px">
+            <input type="hidden" name="sort" th:value="${sort}">
+            <input type="text" name="q" th:value="${q}" placeholder="按物种名搜索，如：麻雀 / 凤凰" style="width:200px">
+            <input type="submit" value="搜索">
+            <a th:if="${q != null && !q.isEmpty()}" th:href="@{/storage/list(sort=${sort})}">清除</a>
+        </form>
     </div>
 
-    <ul class="list1" th:if="${total > 0}">
+    <div th:if="${filteredCount == 0}">
+        <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+        <div class="npc-talk">
+            <div th:if="${total == 0}">仓库空空如也，去<a th:href="@{/game}">树林</a>里捕几只小鸟吧！</div>
+            <div th:if="${total > 0}">没有匹配「<span th:text="${q}"></span>」的小鸟，换个关键词试试。</div>
+        </div>
+    </div>
+
+    <ul class="list1" th:if="${filteredCount > 0}">
         <li th:each="b : ${birds}">
             <div class="list1-icon">
                 <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif"
                      th:src="@{|/assets/images/bird/${b.birdId}.gif|}">
             </div>
             <div class="list1-info">
-                <p th:text="${(baseBirdMap.get(b.birdId) != null ? baseBirdMap.get(b.birdId).name : '未知小鸟')} + '(' + ${@gameUtils.getStarName(b.star)} + ')'"></p>
                 <p>
-                    <span th:text="${@gameUtils.getBirdSexName(b.sex)}"></span>
-                    <span th:text="${b.level} + '级'"></span>
+                    <a th:href="@{/storage/bird(birdId=${b.id})}">
+                        <span th:text="${baseBirdMap.get(b.birdId) != null ? baseBirdMap.get(b.birdId).name : '未知小鸟'}"></span>
+                    </a>
+                    <span th:text="${@gameUtils.getStarName(b.star)}"></span>
+                    <span class="text-muted" th:text="${@gameUtils.getBirdSexName(b.sex)}"></span>
+                </p>
+                <p>
+                    <span th:text="${b.level + '级'}"></span>
                     <span th:text="${#numbers.formatDecimal(b.weight/100.0, 1, 2)} + '斤'"></span>
-                    <span th:if="${b.isLock != null && b.isLock != 0}" class="text-primary">训练/配对中</span>
-                    <span th:if="${cagedBirdId == b.id}" class="text-darkorange">出战中</span>
+                    <span class="text-darkorange"
+                          th:text="${baseBirdMap.get(b.birdId) != null ? baseBirdMap.get(b.birdId).price * (b.weight / 100) : 0}"></span>
+                    <span class="text-muted">金币身价</span>
+                </p>
+                <p>
+                    <span th:if="${b.isLock != null && b.isLock != 0}" class="text-primary">🔒 训练/配对中</span>
+                    <span th:if="${cagedBirdId == b.id}" class="text-darkorange">⚔ 出战中</span>
                 </p>
                 <p class="btl">
                     <a th:href="@{/storage/bird(birdId=${b.id})}">详情</a>
@@ -39,6 +81,7 @@
             </div>
         </li>
     </ul>
+
     <div>
         <a th:href="@{/storage/book}">小鸟图鉴</a>
         <form th:action="@{/storage/sellAllConfirm}" method="post" style="display:inline">
