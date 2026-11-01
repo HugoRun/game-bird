@@ -303,6 +303,228 @@ public class StorageController extends BaseController {
         return list(session, model, "weight", null);
     }
 
+    // 手动锁定的字段值（训练/配对用 1，手动锁定用 2，两者都受出售/放生保护）
+    public static final int LOCK_MANUAL = 2;
+
+    /** 手动锁定/解锁：训练（is_lock=1）中的鸟不能手动解锁。 */
+    @PostMapping("/lock")
+    public String lock(HttpSession session, Model model, @RequestParam Integer birdId,
+                       @RequestParam(defaultValue = "1") int lock) {
+        Role role = getSessionRole(session);
+        StorageBird bird = storageBirdService.getById(birdId);
+        if (bird == null || !role.getRoleId().equals(bird.getRoleId())) {
+            model.addAttribute("message", "小鸟不存在或不属于当前角色。");
+            return list(session, model, "weight", null);
+        }
+        if (lock == 1) {
+            if (bird.getIsLock() != null && bird.getIsLock() != 0) {
+                model.addAttribute("message", "该小鸟已在锁定状态。");
+                return list(session, model, "weight", null);
+            }
+            bird.setIsLock((byte) LOCK_MANUAL);
+            storageBirdService.updateById(bird);
+            model.addAttribute("message", "已锁定，出售/放生/一键操作都不会再动它。");
+        } else {
+            if (bird.getIsLock() == null || bird.getIsLock() != LOCK_MANUAL) {
+                model.addAttribute("message", "训练/配对中的锁定不能手动解除，等它完成吧。");
+                return list(session, model, "weight", null);
+            }
+            bird.setIsLock((byte) 0);
+            storageBirdService.updateById(bird);
+            model.addAttribute("message", "已解锁。");
+        }
+        return list(session, model, "weight", null);
+    }
+
+    /** 一键放生确认页：列出全部未锁定小鸟的只数与返还爱心。 */
+    @GetMapping("/releaseAllConfirm")
+    public String releaseAllConfirm(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        List<StorageBird> birds = listBirds(role).stream()
+                .filter(b -> b.getIsLock() == null || b.getIsLock() == 0)
+                .toList();
+        long totalLove = 0;
+        for (StorageBird bird : birds) {
+            totalLove += releaseLove(bird);
+        }
+        model.addAttribute("count", birds.size());
+        model.addAttribute("totalLove", totalLove);
+        return "storage/releaseAllConfirm";
+    }
+
+    /** 一键放生：放归全部未锁定的小鸟，返还爱心。 */
+    @PostMapping("/releaseAll")
+    public String releaseAll(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        List<StorageBird> birds = listBirds(role).stream()
+                .filter(b -> b.getIsLock() == null || b.getIsLock() == 0)
+                .toList();
+        if (birds.isEmpty()) {
+            model.addAttribute("message", "没有可放生的小鸟（训练/配对中的已被锁定保护）。");
+            return list(session, model, "weight", null);
+        }
+        long totalLove = 0;
+        for (StorageBird bird : birds) {
+            totalLove += releaseLove(bird);
+            storageBirdService.removeById(bird.getId());
+        }
+        role.setLovePoint((role.getLovePoint() == null ? 0L : role.getLovePoint()) + totalLove);
+        int left = Math.max(0, (role.getBirdNum() == null ? 0 : role.getBirdNum()) - birds.size());
+        role.setBirdNum((short) left);
+        roleService.updateById(role);
+        saveSessionRole(session, role);
+        gameEventService.record(role.getRoleId(),
+                "打开了鸟笼的大门，" + birds.size() + "只小鸟集体飞回了树林（爱心+" + totalLove + "）。");
+        model.addAttribute("message", "一键放生完成：放飞 " + birds.size() + " 只，共获得爱心 " + totalLove + "。");
+        return list(session, model, "weight", null);
+    }
+
+    /** 批量操作确认页：汇总只数与收益，隐藏参数带到执行端。 */
+    @GetMapping("/batchConfirm")
+    public String batchConfirm(HttpSession session, Model model,
+                               @RequestParam String action,
+                               @RequestParam String ids) {
+        Role role = getSessionRole(session);
+        List<StorageBird> birds = resolveOwned(role, ids);
+        String label;
+        long total = 0;
+        switch (action) {
+            case "sell" -> {
+                label = "批量出售";
+                for (StorageBird bird : birds) {
+                    total += sellGain(baseBirdService.getById(bird.getBirdId()), bird);
+                }
+            }
+            case "release" -> {
+                label = "批量放生";
+                for (StorageBird bird : birds) {
+                    total += releaseLove(bird);
+                }
+            }
+            case "lock" -> label = "批量锁定";
+            case "unlock" -> label = "批量解锁";
+            default -> {
+                model.addAttribute("message", "未知操作。");
+                return list(session, model, "weight", null);
+            }
+        }
+        model.addAttribute("action", action);
+        model.addAttribute("actionLabel", label);
+        model.addAttribute("idList", ids);
+        model.addAttribute("count", birds.size());
+        model.addAttribute("total", total);
+        model.addAttribute("unit", "sell".equals(action) ? "金币" : ("release".equals(action) ? "爱心" : ""));
+        return "storage/batchConfirm";
+    }
+
+    /** 执行批量操作（sell/release/lock/unlock）。 */
+    @PostMapping("/batch")
+    public String batch(HttpSession session, Model model,
+                        @RequestParam String action,
+                        @RequestParam String ids) {
+        Role role = getSessionRole(session);
+        List<StorageBird> birds = resolveOwned(role, ids);
+        if (birds.isEmpty()) {
+            model.addAttribute("message", "没有可操作的小鸟。");
+            return list(session, model, "weight", null);
+        }
+        long total = 0;
+        int done = 0;
+        int skipped = 0;
+        for (StorageBird bird : birds) {
+            boolean manualLocked = bird.getIsLock() != null && bird.getIsLock() == LOCK_MANUAL;
+            boolean busy = bird.getIsLock() != null && bird.getIsLock() == 1;
+            switch (action) {
+                case "sell" -> {
+                    if (busy) {
+                        skipped++;
+                        continue;
+                    }
+                    total += sellGain(baseBirdService.getById(bird.getBirdId()), bird);
+                    storageBirdService.removeById(bird.getId());
+                    done++;
+                }
+                case "release" -> {
+                    if (busy) {
+                        skipped++;
+                        continue;
+                    }
+                    total += releaseLove(bird);
+                    storageBirdService.removeById(bird.getId());
+                    done++;
+                }
+                case "lock" -> {
+                    if (bird.getIsLock() != null && bird.getIsLock() != 0) {
+                        skipped++;
+                        continue;
+                    }
+                    bird.setIsLock((byte) LOCK_MANUAL);
+                    storageBirdService.updateById(bird);
+                    done++;
+                }
+                case "unlock" -> {
+                    if (!manualLocked) {
+                        skipped++;
+                        continue;
+                    }
+                    bird.setIsLock((byte) 0);
+                    storageBirdService.updateById(bird);
+                    done++;
+                }
+                default -> {
+                    model.addAttribute("message", "未知操作。");
+                    return list(session, model, "weight", null);
+                }
+            }
+        }
+        if (done > 0 && ("sell".equals(action) || "release".equals(action))) {
+            int left = Math.max(0, (role.getBirdNum() == null ? 0 : role.getBirdNum()) - done);
+            role.setBirdNum((short) left);
+        }
+        if ("sell".equals(action) && total > 0) {
+            role.setCoin(role.getCoin() + total);
+        }
+        if ("release".equals(action) && total > 0) {
+            role.setLovePoint((role.getLovePoint() == null ? 0L : role.getLovePoint()) + total);
+        }
+        if (done > 0) {
+            roleService.updateById(role);
+            saveSessionRole(session, role);
+            if ("sell".equals(action)) {
+                gameEventService.record(role.getRoleId(),
+                        "批量出售了" + done + "只小鸟，进账金币" + total + "。");
+            } else if ("release".equals(action)) {
+                gameEventService.record(role.getRoleId(),
+                        "批量放生了" + done + "只小鸟，收获爱心" + total + "。");
+            }
+        }
+        String actionLabel = "sell".equals(action) ? "出售" : ("release".equals(action) ? "放生"
+                : ("lock".equals(action) ? "锁定" : "解锁"));
+        model.addAttribute("message", "批量" + actionLabel + "完成：成功 " + done
+                + " 只" + (skipped > 0 ? "，跳过 " + skipped + " 只（锁定/状态不符）" : "")
+                + (total > 0 ? "，获得 " + total + ("sell".equals(action) ? " 金币" : " 爱心") : "") + "。");
+        return list(session, model, "weight", null);
+    }
+
+    /** 按「1,2,3」字符串解析并校验归属的小鸟列表。 */
+    private List<StorageBird> resolveOwned(Role role, String ids) {
+        List<StorageBird> result = new java.util.ArrayList<>();
+        if (ids == null || ids.trim().isEmpty()) {
+            return result;
+        }
+        for (String part : ids.split(",")) {
+            try {
+                StorageBird bird = storageBirdService.getById(Integer.parseInt(part.trim()));
+                if (bird != null && role.getRoleId().equals(bird.getRoleId())) {
+                    result.add(bird);
+                }
+            } catch (NumberFormatException ignored) {
+                // 非法 id 忽略
+            }
+        }
+        return result;
+    }
+
     /** 设置出战鸟：战斗时代替角色裸等级出战（与装备的鸟笼共同决定加成）。 */
     @PostMapping("/deploy")
     public String deploy(HttpSession session, Model model, @RequestParam Integer birdId) {

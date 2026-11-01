@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='批量操作确认')}"></head>
+<body>
+
+<div class="main">
+    <div>
+        <div class="pic">
+            <img alt="" src="../../static/images/logo/pack.gif" th:src="@{/assets/images/logo/pack.gif}"/>
+        </div>
+        <div class="panel bg-blue">
+            批量<span th:text="${actionLabel}"></span>确认
+        </div>
+        <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+        <div class="npc-talk">
+            <div th:if="${action == 'sell'}">
+                将出售选中的 <span class="text-darkorange" th:text="${count}"></span> 只小鸟，预计进账
+                <span class="text-darkorange" th:text="${total}"></span> 金币。卖出去可就回不来了！
+            </div>
+            <div th:if="${action == 'release'}">
+                将放归选中的 <span class="text-darkorange" th:text="${count}"></span> 只小鸟，可获得
+                <span class="text-darkorange" th:text="${total}"></span> 爱心。图鉴记录保留。
+            </div>
+            <div th:if="${action == 'lock'}">
+                将锁定选中的 <span class="text-darkorange" th:text="${count}"></span> 只小鸟：出售/放生/一键操作都不会再动它们。
+            </div>
+            <div th:if="${action == 'unlock'}">
+                将解锁选中的 <span class="text-darkorange" th:text="${count}"></span> 只小鸟（训练/配对中的会自动跳过）。
+            </div>
+        </div>
+        <form th:action="@{/storage/batch}" method="post" style="margin-top:8px">
+            <input type="hidden" name="action" th:value="${action}">
+            <input type="hidden" name="ids" th:value="${idList}">
+            <input type="submit" th:value="'确认' + ${actionLabel}">
+            <a th:href="@{/storage/list}">再想想</a>
+        </form>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>
