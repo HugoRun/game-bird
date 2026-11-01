@@ -423,7 +423,7 @@ button.link-btn:hover {
 
 /* ---------------- 导航：胶囊底栏 ---------------- */
 
-.panel.navList {
+.gameNav {
     position: sticky;
     bottom: 8px;
     z-index: 10;
@@ -432,11 +432,11 @@ button.link-btn:hover {
     box-shadow: 0 6px 18px rgba(20, 45, 24, .45);
 }
 
-.panel.navList::before {
+.gameNav::before {
     display: none;
 }
 
-.panel.navList ul {
+.gameNav ul {
     list-style: none;
     margin: 0;
     padding: 6px 4px;
@@ -446,12 +446,12 @@ button.link-btn:hover {
     gap: 2px 4px;
 }
 
-.panel.navList li {
+.gameNav li {
     display: inline-block;
 }
 
-.panel.navList a,
-.panel.navList span {
+.gameNav a,
+.gameNav span {
     display: inline-block;
     padding: 5px 10px;
     border-radius: 999px;
@@ -459,13 +459,13 @@ button.link-btn:hover {
     font-size: 13px;
 }
 
-.panel.navList a:hover {
+.gameNav a:hover {
     background: rgba(255, 255, 255, .16);
     color: #fff !important;
     text-decoration: none;
 }
 
-.panel.navList li:has(> a[href="/game"]) a[href="/game"] {
+.gameNav li:has(> a[href="/game"]) a[href="/game"] {
     background: linear-gradient(135deg, var(--c-gold), #f57f17);
     color: #4e342e !important;
     font-weight: 700;
