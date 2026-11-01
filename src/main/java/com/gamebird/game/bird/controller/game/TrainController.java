@@ -5,8 +5,10 @@ import com.gamebird.game.bird.config.GameConfigGateway;
 import com.gamebird.game.bird.controller.common.BaseController;
 import com.gamebird.game.bird.data.ConstData;
 import com.gamebird.game.bird.model.dbo.BaseBird;
+import com.gamebird.game.bird.model.dbo.BaseProp;
 import com.gamebird.game.bird.model.dbo.BaseTrain;
 import com.gamebird.game.bird.model.dbo.Role;
+import com.gamebird.game.bird.model.dbo.RolePack;
 import com.gamebird.game.bird.model.dbo.RoleTrain;
 import com.gamebird.game.bird.model.dbo.StorageBird;
 import com.gamebird.game.bird.service.GameEventService;
@@ -91,10 +93,11 @@ public class TrainController extends BaseController {
         return "train/start";
     }
 
-    /** 开始训练：锁定小鸟并写入训练时间。 */
+    /** 开始训练：锁定小鸟并写入训练时间（时长可选 1/2/4 小时）。 */
     @PostMapping("/start")
     public String start(HttpSession session, Model model, @RequestParam(defaultValue = "1") int idx,
-                        @RequestParam Integer birdId) {
+                        @RequestParam Integer birdId,
+                        @RequestParam(defaultValue = "4") int hours) {
         Role role = getSessionRole(session);
         RoleTrain slot = getSlot(role, idx);
         if (slot == null) {
@@ -124,11 +127,13 @@ public class TrainController extends BaseController {
             model.addAttribute("message", "该小鸟已达到" + baseTrain.getName() + "的训练上限（" + maxLevel + "级），换个更好的训练场吧。");
             return list(model, role);
         }
+        // 时长档位：1/2/4 小时（其他值按 4 处理），经验按分钟线性结算
+        int trainHours = hours == 1 || hours == 2 ? hours : 4;
         int now = CommonUtils.nowTime();
         slot.setBirdId(bird.getId());
         slot.setBirdBaseId(bird.getBirdId());
         slot.setTrainTime(now);
-        slot.setTrainEndTime(now + ConstData.TRAIN_DURATION_SECONDS);
+        slot.setTrainEndTime(now + trainHours * 3600);
         roleTrainService.updateById(slot);
         // 锁定小鸟（训练期间不可出售/配对）
         bird.setIsLock((byte) 1);
@@ -138,7 +143,7 @@ public class TrainController extends BaseController {
         if (baseBird != null) {
             name = GameUtils.getBirdSexName(bird.getSex()) + baseBird.getName();
         }
-        model.addAttribute("message", name + "开始训练了，" + ConstData.TRAIN_DURATION_SECONDS / 3600 + "小时后回来领取成果。");
+        model.addAttribute("message", name + "开始训练了，" + trainHours + "小时后回来领取成果。");
         return list(model, role);
     }
 
@@ -161,8 +166,9 @@ public class TrainController extends BaseController {
             model.addAttribute("message", "训练尚未完成，请耐心等待。");
             return list(model, role);
         }
-        long reward = settleTrain(role, train, now, false);
-        model.addAttribute("message", "训练完成！小鸟获得经验 " + reward + "。");
+        StringBuilder note = new StringBuilder();
+        long reward = settleTrain(role, train, now, false, note);
+        model.addAttribute("message", "训练完成！小鸟获得经验 " + reward + "。" + note);
         return list(model, role);
     }
 
@@ -180,8 +186,9 @@ public class TrainController extends BaseController {
             model.addAttribute("message", "该槽位没有小鸟在训练。");
             return list(model, role);
         }
-        long reward = settleTrain(role, train, now, true);
-        model.addAttribute("message", "小鸟已取回，按已完成时长获得经验 " + reward + "。");
+        StringBuilder note = new StringBuilder();
+        long reward = settleTrain(role, train, now, true, note);
+        model.addAttribute("message", "小鸟已取回，按已完成时长获得经验 " + reward + "。" + note);
         return list(model, role);
     }
 
@@ -191,7 +198,7 @@ public class TrainController extends BaseController {
      *
      * @return 小鸟获得的经验
      */
-    private long settleTrain(Role role, RoleTrain train, int now, boolean early) {
+    private long settleTrain(Role role, RoleTrain train, int now, boolean early, StringBuilder note) {
         BaseTrain baseTrain = train.getUseTrainId() == null ? null : configGateway.getBaseTrain(train.getUseTrainId());
         int minExp = baseTrain == null || baseTrain.getMinExp() == null ? 1 : baseTrain.getMinExp();
         int maxLevel = baseTrain == null || baseTrain.getMaxLevel() == null ? 100 : baseTrain.getMaxLevel();
@@ -199,6 +206,11 @@ public class TrainController extends BaseController {
         int effectiveEnd = early ? Math.min(now, endTime) : endTime;
         int minutes = Math.max(0, (effectiveEnd - (train.getTrainTime() == null ? 0 : train.getTrainTime())) / 60);
         long expGain = (long) minExp * minutes;
+        // 双倍经验卡（effect_type=22）：结算时自动检测并消耗一张
+        if (expGain > 0 && consumeDoubleExpCard(role)) {
+            expGain *= 2;
+            note.append("双倍经验卡生效，经验翻倍！");
+        }
         StorageBird bird = storageBirdService.getById(train.getBirdId());
         if (bird != null && role.getRoleId().equals(bird.getRoleId())) {
             bird.setExp((bird.getExp() == null ? 0L : bird.getExp()) + expGain);
@@ -247,6 +259,23 @@ public class TrainController extends BaseController {
         wrapper.eq(RoleTrain::getRoleId, role.getRoleId());
         wrapper.eq(RoleTrain::getIdx, idx);
         return roleTrainService.getOne(wrapper);
+    }
+
+    /** 消耗一张双倍经验卡（effect_type=22），没有返回 false。 */
+    private boolean consumeDoubleExpCard(Role role) {
+        LambdaQueryWrapper<RolePack> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(RolePack::getRoleId, role.getRoleId());
+        wrapper.eq(RolePack::getTypeId, ConstData.PACK_TYPE_PROP);
+        wrapper.gt(RolePack::getNum, 0);
+        for (RolePack pack : packService.list(wrapper)) {
+            BaseProp prop = configGateway.getBaseProp(pack.getBaseId());
+            if (prop != null && prop.getEffectType() != null && prop.getEffectType() == 22) {
+                roleValueService.costPackNum(pack, 1);
+                packService.saveOrUpdate(pack);
+                return true;
+            }
+        }
+        return false;
     }
 
     /** 渲染列表页并带上提示。 */

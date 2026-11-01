@@ -23,6 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -81,20 +82,103 @@ public class FightController extends BaseController {
         model.addAttribute("now", now);
         model.addAttribute("cooldownRemain", Math.max(0, cooldownRemain(role.getRoleId(), now)));
         model.addAttribute("cagedBird", getCagedBird(role.getRoleId()));
+        // 战绩统计
+        long total = fightLogService.count(new LambdaQueryWrapper<FightLog>()
+                .eq(FightLog::getRoleId, role.getRoleId()));
+        long wins = countWins(role.getRoleId());
+        model.addAttribute("fightTotal", total);
+        model.addAttribute("fightWins", wins);
+        model.addAttribute("winRate", total == 0 ? 0 : wins * 100 / total);
         return "fight/list";
+    }
+
+    /**
+     * 竞技场：随机生成 3 个候选对手（战力/胜率预估）暂存 session，
+     * 挑战时按序号取用——把「盲抽」变成「看牌选对手」。
+     */
+    @GetMapping("/arena")
+    public String arena(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        java.util.Set<String> shielded = new java.util.HashSet<>(
+                gameEventService.recentShieldRoleIds(12 * 3600));
+        StorageBird myBird = getCagedBird(role.getRoleId());
+        int myBase = (role.getLevel() == null ? 0 : role.getLevel()) * 10;
+        Byte myType = null;
+        if (myBird != null) {
+            myBase += birdPower(myBird) + (myBird.getKo() == null ? 0 : myBird.getKo() / 10);
+            BaseBird myConfig = configGateway.getBaseBird(myBird.getBirdId());
+            myType = myConfig == null ? null : myConfig.getType();
+        }
+        java.util.List<com.gamebird.game.bird.model.vo.FightCandidateVO> candidates = new java.util.ArrayList<>();
+        java.util.Set<Integer> seen = new java.util.HashSet<>();
+        for (int i = 0; i < 60 && candidates.size() < 3; i++) {
+            StorageBird candidate = storageBirdService.getOne(
+                    new LambdaQueryWrapper<StorageBird>().last("ORDER BY RAND() LIMIT 1"));
+            if (candidate == null || role.getRoleId().equals(candidate.getRoleId())
+                    || shielded.contains(candidate.getRoleId()) || !seen.add(candidate.getId())) {
+                continue;
+            }
+            BaseBird config = configGateway.getBaseBird(candidate.getBirdId());
+            Role owner = roleService.getById(candidate.getRoleId());
+            int power = birdPower(candidate)
+                    + (owner == null || owner.getLevel() == null ? 0 : owner.getLevel() * 10)
+                    + (candidate.getKo() == null ? 0 : candidate.getKo() / 10);
+            double multiplier = GameUtils.typeCounterMultiplier(myType, config == null ? null : config.getType());
+            int myPower = (int) Math.round(myBase * multiplier);
+            int winRate = Math.max(15, Math.min(85, myPower * 100 / Math.max(1, myPower + power)));
+            com.gamebird.game.bird.model.vo.FightCandidateVO vo = new com.gamebird.game.bird.model.vo.FightCandidateVO();
+            vo.setBirdId(candidate.getId());
+            vo.setBirdName(config == null ? "神秘小鸟" : config.getName());
+            vo.setOwnerName(owner == null ? "神秘玩家" : owner.getRoleName());
+            vo.setLevel(candidate.getLevel() == null ? 1 : candidate.getLevel());
+            vo.setStarText(GameUtils.getStarName(candidate.getStar()));
+            vo.setPower(power);
+            vo.setWinRate(winRate);
+            vo.setTypeName(config == null || config.getType() == null ? "未知" : typeNameOf(config.getType()));
+            candidates.add(vo);
+        }
+        session.setAttribute(SESSION_CANDIDATES, candidates);
+        model.addAttribute("candidates", candidates);
+        model.addAttribute("hasCagedBird", myBird != null);
+        return "fight/arena";
+    }
+
+    /** session 里暂存候选列表的 key。 */
+    private static final String SESSION_CANDIDATES = "fightCandidates";
+
+    /** 类型 id → 展示名。 */
+    private String typeNameOf(Byte type) {
+        return switch (type) {
+            case 1 -> "敏捷";
+            case 2 -> "力量";
+            case 3 -> "魔法";
+            case 4 -> "幻想";
+            default -> "未知";
+        };
     }
 
     /** 发起挑战：抽对手、算战力、结算奖励。 */
     @PostMapping("/challenge")
-    public String challenge(HttpSession session, Model model) {
+    public String challenge(HttpSession session, Model model,
+                            @RequestParam(required = false) Integer candidate) {
         Role role = getSessionRole(session);
         int now = CommonUtils.nowTime();
         if (cooldownRemain(role.getRoleId(), now) > 0) {
             model.addAttribute("message", "太频繁啦，休息一下再战。");
             return list(session, model);
         }
-        // 随机抽一只别人的鸟
-        StorageBird opponent = pickOpponentBird(role.getRoleId());
+        // 竞技场选中的候选优先；未选则回退随机
+        StorageBird opponent = null;
+        if (candidate != null) {
+            Object cached = session.getAttribute(SESSION_CANDIDATES);
+            if (cached instanceof java.util.List<?> list && candidate >= 0 && candidate < list.size()
+                    && list.get(candidate) instanceof com.gamebird.game.bird.model.vo.FightCandidateVO vo) {
+                opponent = storageBirdService.getById(vo.getBirdId());
+            }
+        }
+        if (opponent == null) {
+            opponent = pickOpponentBird(role.getRoleId());
+        }
         if (opponent == null) {
             model.addAttribute("message", "暂时找不到可挑战的小鸟，请稍后再试。");
             return list(session, model);

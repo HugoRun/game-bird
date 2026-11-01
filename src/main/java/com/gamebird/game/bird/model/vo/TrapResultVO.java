@@ -35,6 +35,8 @@ public class TrapResultVO {
     String homeText;
     // 图鉴新收录文案，非首次收录为 null
     String bookText;
+    // 公会经验加成文案，无公会为 null
+    String guildText;
 
     public boolean isEscaped() {
         return escaped;
@@ -66,6 +68,14 @@ public class TrapResultVO {
 
     public void setBookText(String bookText) {
         this.bookText = bookText;
+    }
+
+    public String getGuildText() {
+        return guildText;
+    }
+
+    public void setGuildText(String guildText) {
+        this.guildText = guildText;
     }
 
     public int getBirdId() {

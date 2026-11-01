@@ -16,10 +16,14 @@
         尚未设置出战小鸟，仅以角色等级应战。去<a th:href="@{/storage/list}">仓库</a>选一只小鸟出战吧。
     </div>
 
+    <p>
+        <a th:href="@{/fight/arena}"><button type="button" class="btn btn-primary">前往竞技场（看牌选对手）</button></a>
+    </p>
     <form th:action="@{/fight/challenge}" method="post" style="margin-top:6px">
-        <button type="submit" class="btn btn-primary" th:disabled="${cooldownRemain > 0}">发起挑战</button>
+        <button type="submit" class="btn btn-primary" th:disabled="${cooldownRemain > 0}">随机挑战</button>
         <span class="text-muted" th:if="${cooldownRemain > 0}" th:text="|冷却中，${cooldownRemain / 60 + 1}分钟后可再战|"></span>
     </form>
+    <p class="text-muted">战绩:共 <span th:text="${fightTotal}"></span> 场，<span th:text="${fightWins}"></span> 胜，胜率 <span th:text="${winRate}"></span>%</p>
     <p class="text-muted">胜利抢对方 1% 金币（封顶1000）并获得经验；失败无损失。胜负由出战鸟与角色等级综合决定。</p>
 
     <h3>战斗记录</h3>

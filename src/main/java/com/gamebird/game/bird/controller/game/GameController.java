@@ -28,6 +28,7 @@ import com.gamebird.game.bird.model.dbo.Role;
 import com.gamebird.game.bird.model.dbo.RoleBirth;
 import com.gamebird.game.bird.model.dbo.RoleCage;
 import com.gamebird.game.bird.model.dbo.RoleTrain;
+import com.gamebird.game.bird.model.dbo.RolePack;
 import com.gamebird.game.bird.model.dbo.RoleTrap;
 import com.gamebird.game.bird.model.dbo.StorageBird;
 import com.gamebird.game.bird.model.dbo.Task;
@@ -77,6 +78,14 @@ public class GameController extends BaseController {
     /** 出战栏位（入侵守卫用）。 */
     @Resource
     public RoleCageService cageService;
+
+    /** 图鉴（角色页统计）。 */
+    @Resource
+    public com.gamebird.game.bird.service.impl.CollectionService collectionService;
+
+    /** 战斗记录（角色页统计）。 */
+    @Resource
+    public com.gamebird.game.bird.service.FightLogService fightLogService;
     // 日志句柄
 
     /**
@@ -174,6 +183,12 @@ public class GameController extends BaseController {
                         .last("LIMIT 1")).stream().findFirst().orElse(null));
         // 福利位：今天是否已签到
         model.addAttribute("signedToday", signInService.isSignedToday(role.getRoleId()));
+        // 诱饵余量（主页空闲陷阱提示）
+        long baitTotal = packService.list(new LambdaQueryWrapper<RolePack>()
+                .eq(RolePack::getRoleId, role.getRoleId())
+                .eq(RolePack::getTypeId, ConstData.PACK_TYPE_BAIT)
+                .gt(RolePack::getNum, 0)).stream().mapToLong(p -> p.getNum() == null ? 0 : p.getNum()).sum();
+        model.addAttribute("baitTotal", baitTotal);
         // 小鸟入侵（守卫 PVE）：以 2 小时为窗口做确定性判定，无需定时器。
         // 同一窗口内每个角色的入侵状态固定；击退后写固定文案事件防重复。
         int windowIndex = CommonUtils.nowTime() / INVASION_WINDOW_SECONDS;
@@ -452,7 +467,30 @@ public class GameController extends BaseController {
      */
     @GetMapping("/profile")
     public String pageProfile(HttpSession session, Model model) {
+        fillProfileStats(session, model);
         return ConstData.VIEW_ROLE_PROFILE;
+    }
+
+    /** 角色页统计：图鉴收集、战斗战绩、最佳宠物（与 RoleController 的 /role/profile 同视图）。 */
+    private void fillProfileStats(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        model.addAttribute("collectedCount", collectionService.countCollected(role.getRoleId()));
+        long total = fightLogService.count(new LambdaQueryWrapper<com.gamebird.game.bird.model.dbo.FightLog>()
+                .eq(com.gamebird.game.bird.model.dbo.FightLog::getRoleId, role.getRoleId()));
+        long wins = fightLogService.count(new LambdaQueryWrapper<com.gamebird.game.bird.model.dbo.FightLog>()
+                .eq(com.gamebird.game.bird.model.dbo.FightLog::getRoleId, role.getRoleId())
+                .eq(com.gamebird.game.bird.model.dbo.FightLog::getResult, 1));
+        model.addAttribute("fightTotal", total);
+        model.addAttribute("fightWins", wins);
+        model.addAttribute("winRate", total == 0 ? 0 : wins * 100 / total);
+        com.gamebird.game.bird.model.dbo.StorageBird best = storageBirdService.getOne(
+                new LambdaQueryWrapper<com.gamebird.game.bird.model.dbo.StorageBird>()
+                        .eq(com.gamebird.game.bird.model.dbo.StorageBird::getRoleId, role.getRoleId())
+                        .orderByDesc(com.gamebird.game.bird.model.dbo.StorageBird::getWeight)
+                        .last("LIMIT 1"));
+        model.addAttribute("bestBird", best);
+        model.addAttribute("bestBirdName", best == null ? "" : (configGateway.getBaseBird(best.getBirdId()) == null
+                ? "神秘小鸟" : configGateway.getBaseBird(best.getBirdId()).getName()));
     }
 
     /**

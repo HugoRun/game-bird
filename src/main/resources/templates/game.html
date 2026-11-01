@@ -54,7 +54,7 @@
                 </div>
                 <div class="list1-info" th:if="${trap.baitId == 0}">
                     <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/pack/trap/items}">更换陷阱</a></span></p>
-                    <p>空闲中</p>
+                    <p>空闲中<span class="text-muted" th:if="${baitTotal == 0}">（没有诱饵了，<a th:href="@{/shop/bait/items}">去买饵</a>）</span><span class="text-muted" th:if="${baitTotal > 0}" th:text="'（诱饵×' + ${baitTotal} + '）'"></span></p>
                     <p><a href="#" th:href="@{/trap/useBait(trapId=${trap.id})}">下饵</a></p>
                 </div>
 

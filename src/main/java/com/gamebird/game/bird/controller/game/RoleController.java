@@ -28,6 +28,7 @@ import com.gamebird.game.bird.model.dbo.RoleTrain;
 import com.gamebird.game.bird.model.dbo.RoleTrap;
 import com.gamebird.game.bird.model.message.MessageLink;
 import com.gamebird.game.bird.model.message.MessageVO;
+import com.gamebird.game.bird.service.GameEventService;
 import com.gamebird.game.bird.service.TaskTriggerService;
 
 /**
@@ -57,6 +58,18 @@ public class RoleController extends BaseController {
     /** 任务触发器（每日登录任务）。 */
     @Resource
     public TaskTriggerService taskTriggerService;
+
+    /** 游戏事件（树林记录/一次性标记）。 */
+    @Resource
+    public GameEventService gameEventService;
+
+    /** 图鉴（角色页统计）。 */
+    @Resource
+    public com.gamebird.game.bird.service.impl.CollectionService collectionService;
+
+    /** 战斗记录（角色页统计）。 */
+    @Resource
+    public com.gamebird.game.bird.service.FightLogService fightLogService;
 
 
     /**
@@ -192,6 +205,8 @@ public class RoleController extends BaseController {
         roleService.saveOrUpdate(role);
         // 每日登录任务触发（当天首次进入创建已完成的登录任务）
         taskTriggerService.onLogin(role);
+        // 银行每日利息：余额的 0.1%（封顶 1000），每天首次进入游戏发放
+        grantDailyInterest(role, session);
         // 更新当前登录角色
         saveSessionRole(session, role);
         return redirectTo("/game");
@@ -205,7 +220,30 @@ public class RoleController extends BaseController {
      */
     @GetMapping("/profile")
     public String pageProfile(HttpSession session, Model model) {
+        fillProfileStats(session, model);
         return ConstData.VIEW_ROLE_PROFILE;
+    }
+
+    /** 角色页统计：图鉴收集、战斗战绩、最佳宠物（与 GameController 的 /profile 同视图）。 */
+    private void fillProfileStats(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        model.addAttribute("collectedCount", collectionService.countCollected(role.getRoleId()));
+        long total = fightLogService.count(new LambdaQueryWrapper<com.gamebird.game.bird.model.dbo.FightLog>()
+                .eq(com.gamebird.game.bird.model.dbo.FightLog::getRoleId, role.getRoleId()));
+        long wins = fightLogService.count(new LambdaQueryWrapper<com.gamebird.game.bird.model.dbo.FightLog>()
+                .eq(com.gamebird.game.bird.model.dbo.FightLog::getRoleId, role.getRoleId())
+                .eq(com.gamebird.game.bird.model.dbo.FightLog::getResult, 1));
+        model.addAttribute("fightTotal", total);
+        model.addAttribute("fightWins", wins);
+        model.addAttribute("winRate", total == 0 ? 0 : wins * 100 / total);
+        com.gamebird.game.bird.model.dbo.StorageBird best = storageBirdService.getOne(
+                new LambdaQueryWrapper<com.gamebird.game.bird.model.dbo.StorageBird>()
+                        .eq(com.gamebird.game.bird.model.dbo.StorageBird::getRoleId, role.getRoleId())
+                        .orderByDesc(com.gamebird.game.bird.model.dbo.StorageBird::getWeight)
+                        .last("LIMIT 1"));
+        model.addAttribute("bestBird", best);
+        model.addAttribute("bestBirdName", best == null ? "" : (configGateway.getBaseBird(best.getBirdId()) == null
+                ? "神秘小鸟" : configGateway.getBaseBird(best.getBirdId()).getName()));
     }
 
     /**
@@ -427,6 +465,34 @@ public class RoleController extends BaseController {
         // 注销当前登录账号数据
         session.removeAttribute("account");
         return redirectTo("/login");
+    }
+
+    /** 利息事件的固定前缀（发放与识别必须同源，勿改字面量）。 */
+    private static final String INTEREST_PREFIX = "银行发放了利息";
+
+    /** 每日利息：今天没发过且余额大于 0 时发放 0.1%（封顶 1000）。 */
+    private void grantDailyInterest(Role role, HttpSession session) {
+        try {
+            if (role.getBankCoin() == null || role.getBankCoin() <= 0) {
+                return;
+            }
+            int dayStart = (int) (java.time.LocalDate.now(java.time.ZoneId.of("Asia/Shanghai"))
+                    .atStartOfDay(java.time.ZoneId.of("Asia/Shanghai")).toEpochSecond());
+            if (gameEventService.hasEventSincePrefix(role.getRoleId(), INTEREST_PREFIX, dayStart)) {
+                return;
+            }
+            long interest = Math.min(1000, role.getBankCoin() / 1000);
+            if (interest <= 0) {
+                return;
+            }
+            role.setBankCoin(role.getBankCoin() + interest);
+            roleService.updateById(role);
+            saveSessionRole(session, role);
+            gameEventService.record(role.getRoleId(),
+                    INTEREST_PREFIX + interest + "金币（余额" + role.getBankCoin() + "）。");
+        } catch (Exception ignored) {
+            // 利息旁路失败不影响登录
+        }
     }
 
     /**

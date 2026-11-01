@@ -69,6 +69,16 @@ public class GameEventService {
     /**
      * 该角色自指定时间起是否产生过指定文案的事件（用于一次性标记，如击退入侵）。
      */
+    /** 该角色自指定时间起是否产生过以指定前缀开头的事件（金额可变的一次性标记）。 */
+    public boolean hasEventSincePrefix(String roleId, String prefix, int sinceTime) {
+        LambdaQueryWrapper<LogTree> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(LogTree::getRoleId, roleId);
+        queryWrapper.likeRight(LogTree::getMessage, prefix);
+        queryWrapper.gt(LogTree::getTime, sinceTime);
+        queryWrapper.last("LIMIT 1");
+        return logTreeService.count(queryWrapper) > 0;
+    }
+
     public boolean hasEventSince(String roleId, String message, int sinceTime) {
         LambdaQueryWrapper<LogTree> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(LogTree::getRoleId, roleId);

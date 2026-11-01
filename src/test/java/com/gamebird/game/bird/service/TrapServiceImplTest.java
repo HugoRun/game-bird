@@ -66,6 +66,8 @@ class TrapServiceImplTest {
         service.taskTriggerService = taskTriggerService;
         service.collectionService = mock(com.gamebird.game.bird.service.impl.CollectionService.class);
         service.activityService = mock(com.gamebird.game.bird.service.ActivityService.class);
+        service.guildMemberService = mock(com.gamebird.game.bird.service.GuildMemberService.class);
+        service.guildService = mock(com.gamebird.game.bird.service.GuildService.class);
         service.birdRaffleService = mock(BirdRaffleService.class);
         service.packService = mock(RolePackService.class);
     }

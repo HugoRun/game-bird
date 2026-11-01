@@ -218,20 +218,24 @@ public class TrapController extends BaseController {
             model.addAttribute("message", MessageVO.error("小鸟已经落网，直接收网即可。"));
             return ConstData.VIEW_MESSAGE;
         }
-        // 剩余时长按小时取整（不足 1 小时按 1 小时计）
+        // 加速按 30 分钟粒度计价（每 30 分钟 5 钻），长等待可小额多次
         int remain = slot.getCatchEndTime() - now;
-        int hours = Math.max(1, (remain + 3599) / 3600);
-        int cost = hours * gameProperties.getHastenDiamondPerHour();
-        if (role.getDiamond() < cost) {
-            model.addAttribute("message", MessageVO.error("缩短" + hours + "小时需要" + cost + "钻石，您的钻石不足。"));
+        int units = Math.max(1, (remain + 1799) / 1800);
+        int minutes = Math.min(remain, units * 1800) / 60;
+        int cost = units * gameProperties.getHastenDiamondPerHour() / 2;
+        if (cost < 1) {
+            cost = 1;
+        }
+        if (role.getDiamond() == null || role.getDiamond() < cost) {
+            model.addAttribute("message", MessageVO.error("缩短" + minutes + "分钟需要" + cost + "钻石，您的钻石不足。"));
             return ConstData.VIEW_MESSAGE;
         }
         roleValueService.costRoleDiamond(role, cost);
-        slot.setCatchEndTime(slot.getCatchEndTime() - Math.min(remain, hours * 3600));
+        slot.setCatchEndTime(slot.getCatchEndTime() - minutes * 60);
         trapService.updateById(slot);
         roleService.updateById(role);
         saveSessionRole(session, role);
-        MessageVO message = MessageVO.success("消耗" + cost + "钻石，捕捉提前完成！");
+        MessageVO message = MessageVO.success("消耗" + cost + "钻石，捕捉提前了约" + minutes + "分钟！");
         message.addLink(new MessageLink("回主页", "/game"));
         model.addAttribute("message", message);
         return ConstData.VIEW_MESSAGE;

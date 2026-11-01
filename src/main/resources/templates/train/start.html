@@ -21,7 +21,10 @@
         <div th:if="${birds.size() > 0}">
             <form th:action="@{/train/start}" method="post">
                 <input type="hidden" name="idx" th:value="${slot.idx}">
-                <p class="text-muted" th:text="|训练时长 ${durationText}，期间小鸟将被锁定。|">训练时长</p>
+                <p class="text-muted">训练时长（经验按分钟线性结算），期间小鸟将被锁定：</p>
+                <label style="margin: 4px 0;"><input type="radio" name="hours" value="1" checked> 1 小时（速成）</label>
+                <label style="margin: 4px 0;"><input type="radio" name="hours" value="2"> 2 小时</label>
+                <label style="margin: 4px 0;"><input type="radio" name="hours" value="4"> 4 小时（一次管够）</label>
                 <label style="margin: 10px 0;">
                     <select name="birdId">
                         <option th:each="bird : ${birds}" th:value="${bird.id}">

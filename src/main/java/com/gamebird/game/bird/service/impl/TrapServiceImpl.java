@@ -22,6 +22,8 @@ import com.gamebird.game.bird.model.dbo.RoleTrap;
 import com.gamebird.game.bird.model.dbo.StorageBird;
 import com.gamebird.game.bird.model.vo.TrapResultVO;
 import com.gamebird.game.bird.service.ActivityService;
+import com.gamebird.game.bird.service.GuildMemberService;
+import com.gamebird.game.bird.service.GuildService;
 import com.gamebird.game.bird.service.BirdRaffleService;
 import com.gamebird.game.bird.service.impl.CollectionService;
 import com.gamebird.game.bird.service.GameEventService;
@@ -93,6 +95,12 @@ public class TrapServiceImpl implements TrapService {
 
     @Resource
     public ActivityService activityService;
+
+    @Resource
+    public GuildMemberService guildMemberService;
+
+    @Resource
+    public GuildService guildService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -234,6 +242,12 @@ public class TrapServiceImpl implements TrapService {
             } else if (bonus.percent() > 0) {
                 resultVO.setCageText("「" + bonus.cageName() + "」重量加成+" + bonus.percent() + "%");
             }
+            // 公会加成：收网经验 +1%×公会等级（上限 10%）
+            int guildPercent = getGuildExpBonus(role.getRoleId());
+            if (guildPercent > 0) {
+                addExp = addExp + addExp * guildPercent / 100;
+                resultVO.setGuildText("公会庇佑，经验加成+" + guildPercent + "%");
+            }
             // 主场捕捉加成：在鸟的归属场景（base_bird.field）收网，经验 +10%
             if (baseBird.getField() != null && role.getFieldId() != null
                     && baseBird.getField().intValue() == role.getFieldId().intValue()) {
@@ -299,13 +313,31 @@ public class TrapServiceImpl implements TrapService {
         return resultVO;
     }
 
+    /** 角色所在公会的经验加成百分比（1%×公会等级，上限 10）；无公会为 0。 */
+    private int getGuildExpBonus(String roleId) {
+        com.gamebird.game.bird.model.dbo.GuildMember member = guildMemberService.getOne(
+                new LambdaQueryWrapper<com.gamebird.game.bird.model.dbo.GuildMember>()
+                        .eq(com.gamebird.game.bird.model.dbo.GuildMember::getRoleId, roleId)
+                        .last("LIMIT 1"));
+        if (member == null || member.getGuildId() == null) {
+            return 0;
+        }
+        com.gamebird.game.bird.model.dbo.Guild guild = guildService.getById(member.getGuildId());
+        if (guild == null || guild.getLevel() == null || guild.getLevel() <= 0) {
+            return 0;
+        }
+        return Math.min(10, guild.getLevel());
+    }
+
     /** 计算出战鸟笼的加成：返回 (百分比, 是否重量笼, 鸟笼名)。 */
     private CageBonus getCageBonus(String roleId) {
         LambdaQueryWrapper<RoleCage> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(RoleCage::getRoleId, roleId);
         wrapper.eq(RoleCage::getIdx, 1);
         RoleCage cage = cageService.getOne(wrapper);
-        if (cage == null || cage.getUseCageId() == null || cage.getUseCageId() <= 0) {
+        if (cage == null || cage.getUseCageId() == null || cage.getUseCageId() <= 0
+                || cage.getUseCageNum0() == null || cage.getUseCageNum0() <= 0) {
+            // 耐久耗尽的鸟笼不再提供加成（修复：原先 0 耐久仍生效）
             return new CageBonus(0, false, "");
         }
         BaseCage baseCage = configGateway.getBaseCage(cage.getUseCageId());
