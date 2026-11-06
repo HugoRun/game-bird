@@ -9,17 +9,17 @@
 <div class="panel bg-blue navList" th:fragment="chatType(type)">
     <ul th:if="${type == 1}">
         <li>▣全部</li>
-        <li><a th:href="@{/chat/list.do(chatType=2)}" href="./chat.html">◻世界</a></li>
-        <li><a th:href="@{/chat/list.do(chatType=3)}" href="./chat.html">◻公会</a></li>
+        <li><a th:href="@{/chat/list(chatType=2)}" href="./chat.html">◻世界</a></li>
+        <li><a th:href="@{/chat/list(chatType=3)}" href="./chat.html">◻公会</a></li>
     </ul>
     <ul th:if="${type == 2}">
-        <li><a th:href="@{/chat/list.do(chatType=1)}" href="./chat.html">◻全部</a></li>
+        <li><a th:href="@{/chat/list(chatType=1)}" href="./chat.html">◻全部</a></li>
         <li>▣世界</li>
-        <li><a th:href="@{/chat/list.do(chatType=3)}" href="./chat.html">◻公会</a></li>
+        <li><a th:href="@{/chat/list(chatType=3)}" href="./chat.html">◻公会</a></li>
     </ul>
     <ul th:if="${type == 3}">
-        <li><a th:href="@{/chat/list.do(chatType=1)}" href="./chat.html">◻全部</a></li>
-        <li><a th:href="@{/chat/list.do(chatType=2)}" href="./chat.html">◻世界</a></li>
+        <li><a th:href="@{/chat/list(chatType=1)}" href="./chat.html">◻全部</a></li>
+        <li><a th:href="@{/chat/list(chatType=2)}" href="./chat.html">◻世界</a></li>
         <li>▣公会</li>
     </ul>
 </div>

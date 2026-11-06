@@ -12,7 +12,7 @@
     <h3>创建角色</h3>
     <form action="" method="post">
         <div class="mb-2"><input type="text" name="roleName"></div>
-        <div class="text-danger text-end mb-2" th:text="${errorMsg}" th:if="${!#strings.isEmpty(errorMsg)}"></div>
+        <div th:if="${message}"><div class="text-danger text-end mb-2" th:utext="${message.message}"></div></div>
         <div class="text-end"><input  class="btn btn-outline-primary" type="submit" value="创建角色"></div>
     </form>
 </div>

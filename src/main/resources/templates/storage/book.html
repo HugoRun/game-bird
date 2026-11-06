@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='小鸟图鉴')}"></head>
+<body>
+
+<div class="main">
+    <div class="panel bg-blue">
+        📖 小鸟图鉴
+        <span class="book-total">
+            已收集 <span class="text-darkorange" th:text="${collectedCount}"></span> /
+            <span th:text="${totalCount}"></span> 种
+        </span>
+        <a th:href="@{/storage/list}">返回仓库</a>
+    </div>
+
+    <!-- 全局进度条 -->
+    <div class="panel bg-yellow">
+        <div class="book-progress">
+            <div class="book-progress-bar"
+                 th:style="|width:${totalCount > 0 ? collectedCount * 100 / totalCount : 0}%|"></div>
+        </div>
+        <div class="text-muted">
+            收网、孵化、试管孵化都会收录新物种；放生与出售不影响图鉴。
+            每收集满 10/30/60/100 种，可在<a th:href="@{/task/list}">任务中心</a>领取成就奖励。
+        </div>
+    </div>
+
+    <!-- 按场景分组，每组带收集进度条 -->
+    <div th:each="group : ${groups}" class="book-scene">
+        <div class="panel bg-green book-scene-head">
+            <span>🌳 <span th:text="${group.key}"></span></span>
+            <span class="book-scene-count">
+                <span th:text="${groupGot[group.key]}"></span> /
+                <span th:text="${#lists.size(group.value)}"></span>
+            </span>
+        </div>
+        <div class="book-progress thin">
+            <div class="book-progress-bar"
+                 th:style="|width:${#lists.size(group.value) > 0 ? groupGot[group.key] * 100 / #lists.size(group.value) : 0}%|"></div>
+        </div>
+        <div class="book-grid">
+            <div th:each="b : ${group.value}"
+                 th:classappend="${collected.contains(b.id)} ? 'book-tile got' : 'book-tile none'">
+                <div class="book-tile-img">
+                    <img alt="" src="../../static/images/bird/1.gif"
+                         th:src="@{|/assets/images/bird/${b.id}.gif|}">
+                    <span th:if="${collected.contains(b.id)}" class="book-got-mark">✔</span>
+                </div>
+                <div class="book-tile-name">
+                    <span th:if="${collected.contains(b.id)}" th:text="${b.name}"></span>
+                    <span th:if="${!collected.contains(b.id)}" class="text-muted">？？？</span>
+                </div>
+                <div class="book-tile-sub">
+                    <span th:if="${collected.contains(b.id)}"
+                          th:text="${b.minWeight / 100.0 + '~' + b.maxWeight / 100.0 + '斤'}"></span>
+                    <span th:if="${!collected.contains(b.id)}" class="text-muted">未收集</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

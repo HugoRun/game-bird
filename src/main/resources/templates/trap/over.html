@@ -1,34 +1,38 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>小鸟情人</title>
-    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
-    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
-</head>
+<head th:replace="~{fragment/head::pageHead(title='小鸟情人')}"></head>
 <body>
 
 <div class="main">
-    <div th:if="result != null">
+    <div th:if="${result != null}">
         <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
-        <div>你悄悄的打开 陷阱，以迅雷不及掩耳之势抓住了笼中之鸟，定睛一看:</div>
-        <div>因为朋友的[[${result.wishNum}]]次祝福，小鸟额外变强壮了0斤</div>
-        <div><img src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${result.birdBaseId}.gif|}" alt=""></div>
-        <div>[[${result.nameText}]]x1</div>
-        <div>类型:力量 变异:无</div>
-        <div>星级:[[${result.starText}]]([[${result.minWeight/100}]]~[[${result.maxWeight/100}]])</div>
-        <div>成长:[[${result.growText}]] <a href="">什么是成长?</a></div>
-        <div>克制:[[${result.koText}]] <a href="">什么是克制?</a></div>
-        <div>松鸡的最大重量为[[${result.maxWeight / 100.0}]]斤，继续加油哦。</div>
-        <div>你大笑两声，将其放入了自家 <a th:href="@{/storage/bird.do}">仓库</a></div>
-        <div>经验+[[${result.addExp}]]</div>
-        <div th:if="${result.newLevel > result.oldLevel}">你升级啦, Lv:[[${result.oldLevel}]]->[[${result.newLevel}]]</div>
-        <div>你还差[[${result.needExp}]]点经验就升级了！</div>
-        <div><a th:href="@{/game.do}">继续收网</a></div>
-        <div><a th:href="@{/storage/bird/sellConfirm.do(birdId=${result.birdId})}">马上出售</a></div>
-        <div><a th:href="@{/storage/bird.do}">前往仓库</a></div>
-        <div><a th:href="@{/game.do}">返回游戏</a></div>
+        <!-- 逃脱分支：无鸟入仓，安慰奖 -->
+        <div th:if="${result.escaped}">
+            <div>你悄悄打开陷阱——糟糕，笼子里空空如也！</div>
+            <div>那只<span th:text="${result.nameText}">小鸟</span>（<span th:text="${result.starText}"></span>）在天亮前挣脱了陷阱，头也不回地飞走了。</div>
+            <div>好在它踩翻了半袋诱饵，你捡回了经验+[[${result.addExp}]]。</div>
+            <div class="text-muted">提示：星越高的鸟越容易挣脱，下饵时可涂抹粘性道具降低逃脱率。</div>
+        </div>
+        <!-- 捕获分支 -->
+        <div th:if="${!result.escaped}">
+            <div>你悄悄的打开 陷阱，以迅雷不及掩耳之势抓住了笼中之鸟，定睛一看:</div>
+            <div><img src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${result.birdBaseId}.gif|}" alt=""></div>
+            <div>[[${result.nameText}]]x1</div>
+            <div>星级:[[${result.starText}]]([[${result.minWeight/100}]]~[[${result.maxWeight/100}]])</div>
+            <div>成长:[[${result.growText}]] <a th:href="@{/help/birds}">什么是成长?</a></div>
+            <div>克制:[[${result.koText}]] <a th:href="@{/help/birds}">什么是克制?</a></div>
+            <div th:if="${result.cageText != null}">[[${result.cageText}]]</div>
+            <div th:if="${result.guildText != null}">[[${result.guildText}]]</div>
+            <div th:if="${result.homeText != null}">[[${result.homeText}]]</div>
+            <div th:if="${result.bookText != null}" class="text-primary">[[${result.bookText}]] <a th:href="@{/storage/book}">查看图鉴</a></div>
+            <div>经验+[[${result.addExp}]]</div>
+            <div th:if="${result.newLevel > result.oldLevel}">你升级啦, Lv:[[${result.oldLevel}]]->[[${result.newLevel}]]</div>
+            <div>你还差[[${result.needExp}]]点经验就升级了！</div>
+            <div>你大笑两声，将其放入了自家 <a th:href="@{/storage/list}">仓库</a></div>
+            <div><a th:href="@{/storage/sellConfirm(birdId=${result.birdId})}">马上出售</a></div>
+            <div><a th:href="@{/storage/list}">前往仓库</a></div>
+        </div>
+        <div><a th:href="@{/game}">返回游戏</a></div>
     </div>
 </div>
 </body>

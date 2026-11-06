@@ -28,12 +28,12 @@
                 <div>密码:</div>
                 <input name="password" type="password"/>
             </div>
-            <div class="text-danger text-end" th:if="${!#strings.isEmpty(errorMsg)}" th:text="${errorMsg}"></div>
+            <div th:if="${message}"><div class="text-danger text-end" th:utext="${message.message}"></div></div>
             <div class="mb-1 text-end">
                 <input class="" type="submit" value="登录">
             </div>
             <div class="text-end">
-                <a href="/register.do">注册账号</a>
+                <a href="/register">注册账号</a>
             </div>
         </div>
     </form>

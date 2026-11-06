@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='谁在玩')}"></head>
+<body>
+
+<div class="main">
+    <div class="panel bg-blue">谁在玩（在线 <span th:text="${roles.size()}"></span> 位玩家）</div>
+    <div th:if="${roles.size() == 0}" class="text-muted">现在只有你自己哦。</div>
+    <ul th:if="${roles.size() > 0}">
+        <li th:each="r : ${roles}">
+            <a th:href="@{/profile}">
+                <span th:text="${r.roleName}"></span>
+            </a>
+            <span class="text-muted" th:text="${r.level + '级'}"></span>
+            <span th:text="${@gameUtils.getSexName(r.sex)}"></span>
+        </li>
+    </ul>
+    <div><a th:href="@{/game}">返回游戏</a></div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

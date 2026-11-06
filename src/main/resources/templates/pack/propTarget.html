@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='选择目标')}"></head>
+<body>
+
+<div class="main">
+    <div>
+        <div class="pic">
+            <img alt="" src="../../static/images/logo/pack.gif" th:src="@{/assets/images/logo/pack.gif}"/>
+        </div>
+        <div class="panel bg-blue">
+            使用「<span th:text="${baseProp == null ? '道具' : baseProp.name}">道具</span>」×<span th:text="${pack.num}"></span>
+            <span th:if="${baseProp != null}" th:text="${baseProp.func}"></span>
+        </div>
+        <form th:action="@{/pack/prop/use}" method="post">
+            <input type="hidden" name="packId" th:value="${pack.id}">
+            <!-- 小鸟目标（天赋/成长/变异药剂 16-18） -->
+            <div th:if="${baseProp != null && baseProp.effectType >= 16 && baseProp.effectType <= 18}">
+                <p>选择一只小鸟：</p>
+                <select name="birdId">
+                    <option th:each="bird : ${birds}" th:value="${bird.id}"
+                            th:text="|${bird.weight / 100.0}斤的${@gameUtils.getBirdSexName(bird.sex)}小鸟(${@gameUtils.getStarName(bird.star)})|">
+                        小鸟
+                    </option>
+                </select>
+            </div>
+            <!-- 陷阱目标（捕捉加速 8-10） -->
+            <div th:if="${baseProp != null && baseProp.effectType >= 8 && baseProp.effectType <= 10}">
+                <p>选择一个正在捕鸟的陷阱：</p>
+                <select name="trapId">
+                    <option th:each="slot : ${trapSlots}" th:value="${slot.id}" th:text="'陷阱槽' + ${slot.idx}">陷阱</option>
+                </select>
+                <p class="text-muted">只对捕捉中的陷阱生效。</p>
+            </div>
+            <!-- 训练槽目标（训练加速卡 15） -->
+            <div th:if="${baseProp != null && baseProp.effectType == 15}">
+                <p>选择一个训练中的槽位：</p>
+                <select name="trainId">
+                    <option th:each="slot : ${trainSlots}" th:value="${slot.id}" th:text="'训练槽' + ${slot.idx}">训练槽</option>
+                </select>
+            </div>
+            <!-- 孵化槽目标（催产剂 19） -->
+            <div th:if="${baseProp != null && baseProp.effectType == 19}">
+                <p>选择一个孵化中的槽位：</p>
+                <select name="birthId">
+                    <option th:each="slot : ${birthSlots}" th:value="${slot.id}" th:text="'孵化槽' + ${slot.idx}">孵化槽</option>
+                </select>
+            </div>
+            <p>
+                <input type="submit" value="确认使用">
+                <a th:href="@{/pack/prop/items}">返回道具包</a>
+            </p>
+        </form>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

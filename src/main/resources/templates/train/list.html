@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='训练场')}"></head>
+<body>
+
+<div class="main">
+    <h2>训练场</h2>
+    <p th:if="${message}" th:text="${message}" class="text-muted"></p>
+
+    <ul class="list1">
+        <li th:each="t : ${trains}">
+            <div class="list1-icon" th:if="${t.birdId == 0}">
+                <img alt="" class="icon-gray-border" src="../../static/images/train/1.gif"
+                     th:src="@{|/assets/images/train/${t.useTrainId == 0 ? 1 : t.useTrainId}.gif|}">
+            </div>
+            <div class="list1-info" th:if="${t.birdId == 0}">
+                <p>[[${t.idx}]]号槽 <span th:text="${@gameConfigGateway.getBaseTrain(t.useTrainId == 0 ? 1 : t.useTrainId) != null ? @gameConfigGateway.getBaseTrain(t.useTrainId == 0 ? 1 : t.useTrainId).name : '训练场'}"></span>
+                    <span th:if="${t.useTrainExpireTime > 0}" th:text="${@gameUtils.getTimeDiff(t.useTrainExpireTime, now) + '后过期'}"></span>
+                </p>
+                <p>空闲中</p>
+                <p class="btl">
+                    <a th:href="@{/train/start(idx=${t.idx})}">开始训练</a>
+                    <a th:href="@{/pack/train/items}">更换场地</a>
+                </p>
+            </div>
+
+            <div class="list1-icon" th:if="${t.birdId > 0}">
+                <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif"
+                     th:src="@{|/assets/images/bird/${t.birdBaseId}.gif|}">
+            </div>
+            <div class="list1-info" th:if="${t.birdId > 0}">
+                <p th:text="${@gameConfigGateway.getBaseTrain(t.useTrainId == 0 ? 1 : t.useTrainId) != null ? @gameConfigGateway.getBaseTrain(t.useTrainId == 0 ? 1 : t.useTrainId).name : '训练场'}"></p>
+                <p th:if="${t.trainEndTime > now}">
+                    <span th:text="|${@gameConfigGateway.getBaseBird(t.birdBaseId) != null ? @gameConfigGateway.getBaseBird(t.birdBaseId).name : '小鸟'}训练中|"></span>
+                    <span th:text="${@gameUtils.getTimeDiff(t.trainEndTime, now) + '后完成'}"></span>
+                </p>
+                <p th:if="${t.trainEndTime <= now}">
+                    <span class="text-primary" th:text="|${@gameConfigGateway.getBaseBird(t.birdBaseId) != null ? @gameConfigGateway.getBaseBird(t.birdBaseId).name : '小鸟'}训练完成|"></span>
+                </p>
+                <p class="btl">
+                    <a th:if="${t.trainEndTime > now}" th:href="@{/train/stop(id=${t.id})}">提前取回</a>
+                    <a th:if="${t.trainEndTime <= now}" th:href="@{/train/collect(id=${t.id})}">领取成果</a>
+                </p>
+            </div>
+        </li>
+    </ul>
+
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

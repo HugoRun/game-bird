@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='树林记录')}"></head>
+<body>
+
+<div class="main">
+    <div class="panel bg-blue">【树林记录】<a th:href="@{/game}">返回</a></div>
+    <div th:if="${eventPage.total == 0}" class="text-muted">还没有动态。</div>
+    <ul th:if="${eventPage.total > 0}">
+        <li th:each="event : ${eventPage.records}">
+            <span th:utext="${event.message}"></span> <span class="text-gray" th:text="|${@gameUtils.getTimeDiff(event.time)}前|"></span>
+        </li>
+    </ul>
+    <div th:if="${eventPage.current > 1}"><a th:href="@{/game/tree(pageNo=${eventPage.current - 1})}">上一页</a></div>
+    <div th:if="${eventPage.current < eventPage.pages}"><a th:href="@{/game/tree(pageNo=${eventPage.current + 1})}">下一页</a></div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

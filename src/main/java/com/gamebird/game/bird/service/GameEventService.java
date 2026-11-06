@@ -1,0 +1,104 @@
+package com.gamebird.game.bird.service;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gamebird.common.util.CommonUtils;
+import com.gamebird.game.bird.model.dbo.LogTree;
+import jakarta.annotation.Resource;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * 游戏事件日志（log_tree）。
+ *
+ * <p>把「收网捕获 / 孵化诞生 / 战斗胜负」等关键事件写入 log_tree，作为主页两个
+ * 面板与动态页的统一数据源：按 role_id 过滤即「树林记录」（个人动态），
+ * 不过滤即「世界动态」（全服事件流）。此前该表无任何写入方，两个面板也一直 hidden。
+ *
+ * <p>事件写入失败不抛出——日志属于旁路，不能让一次成功的收网因为日志写失败
+ * 而给玩家报错。
+ */
+@Service
+public class GameEventService {
+
+    /** 动态页每页条数。 */
+    public static final int FEED_PAGE_SIZE = 10;
+
+    @Resource
+    public LogTreeService logTreeService;
+
+    /**
+     * 记录一条角色事件。
+     *
+     * @param roleId  角色 id
+     * @param message 事件文案（已是最终展示文本，直接入库）
+     */
+    public void record(String roleId, String message) {
+        try {
+            LogTree log = new LogTree();
+            log.setId(0L);
+            log.setRoleId(roleId);
+            log.setMessage(message);
+            log.setTime(CommonUtils.nowTime());
+            logTreeService.save(log);
+        } catch (Exception ignored) {
+            // 日志旁路失败不影响主流程
+        }
+    }
+
+    /** 个人的树林记录（按时间倒序分页）。 */
+    public Page<LogTree> pageByRole(String roleId, int pageNo) {
+        LambdaQueryWrapper<LogTree> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(LogTree::getRoleId, roleId);
+        queryWrapper.orderByDesc(LogTree::getId);
+        Page<LogTree> page = new Page<>();
+        page.setCurrent(Math.max(pageNo, 1));
+        page.setSize(FEED_PAGE_SIZE);
+        return logTreeService.page(page, queryWrapper);
+    }
+
+    /** 全服世界动态（不过滤角色，按时间倒序取前几条）。 */
+    public List<LogTree> latestGlobal(int limit) {
+        LambdaQueryWrapper<LogTree> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.orderByDesc(LogTree::getId);
+        queryWrapper.last("LIMIT " + Math.max(1, limit));
+        return logTreeService.list(queryWrapper);
+    }
+
+    /**
+     * 该角色自指定时间起是否产生过指定文案的事件（用于一次性标记，如击退入侵）。
+     */
+    /** 该角色自指定时间起是否产生过以指定前缀开头的事件（金额可变的一次性标记）。 */
+    public boolean hasEventSincePrefix(String roleId, String prefix, int sinceTime) {
+        LambdaQueryWrapper<LogTree> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(LogTree::getRoleId, roleId);
+        queryWrapper.likeRight(LogTree::getMessage, prefix);
+        queryWrapper.gt(LogTree::getTime, sinceTime);
+        queryWrapper.last("LIMIT 1");
+        return logTreeService.count(queryWrapper) > 0;
+    }
+
+    public boolean hasEventSince(String roleId, String message, int sinceTime) {
+        LambdaQueryWrapper<LogTree> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(LogTree::getRoleId, roleId);
+        queryWrapper.eq(LogTree::getMessage, message);
+        queryWrapper.gt(LogTree::getTime, sinceTime);
+        queryWrapper.last("LIMIT 1");
+        return logTreeService.count(queryWrapper) > 0;
+    }
+
+    /** 免战护盾事件的固定文案（写入与识别必须同源，勿改字面量）。 */
+    public static final String SHIELD_MESSAGE = "开启了免战护盾";
+
+    /**
+     * 近一段时间内开启过免战护盾的角色 id 集合（战斗选对手时排除）。
+     * 识别依据是固定文案（见 {@link #SHIELD_MESSAGE}），写入与匹配同源。
+     */
+    public List<String> recentShieldRoleIds(int withinSeconds) {
+        LambdaQueryWrapper<LogTree> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(LogTree::getMessage, SHIELD_MESSAGE);
+        queryWrapper.gt(LogTree::getTime, CommonUtils.nowTime() - Math.max(0, withinSeconds));
+        return logTreeService.list(queryWrapper).stream().map(LogTree::getRoleId).distinct().toList();
+    }
+}

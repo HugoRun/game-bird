@@ -1,0 +1,394 @@
+package com.gamebird.game.bird.controller.game;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.gamebird.common.util.CommonUtils;
+import com.gamebird.game.bird.config.GameConfigGateway;
+import com.gamebird.game.bird.config.GameProperties;
+import com.gamebird.game.bird.controller.common.BaseController;
+import com.gamebird.game.bird.model.dbo.BaseBird;
+import com.gamebird.game.bird.model.dbo.FightLog;
+import com.gamebird.game.bird.model.dbo.Role;
+import com.gamebird.game.bird.model.dbo.RoleCage;
+import com.gamebird.game.bird.model.dbo.StorageBird;
+import com.gamebird.game.bird.service.FightLogService;
+import com.gamebird.game.bird.service.RoleValueService;
+import com.gamebird.game.bird.service.impl.QuestService;
+import com.gamebird.game.bird.service.TaskTriggerService;
+import com.gamebird.game.bird.service.GameEventService;
+import com.gamebird.game.bird.service.RoleCageService;
+import com.gamebird.game.bird.util.GameUtils;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
+
+/**
+ * 战斗（fight）。
+ *
+ * <p>挑战真实玩家：对手从全服玩家仓库的小鸟中随机抽取（排除自己），胜负由
+ * 「出战鸟数值 + 角色等级」综合计算；胜利抢走对方 1% 金币（封顶 1000）并获得经验，
+ * 失败无损失；冷却期内不能重复挑战。战斗消耗鸟笼耐久。
+ *
+ * <p>原先的实现是随机打一只配置表里的小鸟、胜负只看角色等级——数值与成长系统
+ * 完全不参与，养鸟没有战斗意义；本版让仓库里养的小鸟真正上场。
+ */
+@Controller
+@RequestMapping("/fight")
+public class FightController extends BaseController {
+
+    /** 抢劫金币封顶。 */
+    public static final long STEAL_COIN_CAP = 1000;
+    /** 出战鸟对战力的权重。 */
+    private static final int BIRD_LEVEL_POWER = 20;
+    private static final int BIRD_STAR_POWER = 50;
+
+    @Resource
+    public FightLogService fightLogService;
+
+    @Resource
+    public GameConfigGateway configGateway;
+
+    @Resource
+    public GameProperties gameProperties;
+
+    @Resource
+    public RoleCageService cageService;
+
+    @Resource
+    public GameEventService gameEventService;
+
+    @Resource
+    public RoleValueService roleValueService;
+
+    @Resource
+    public TaskTriggerService taskTriggerService;
+
+    @Resource
+    public QuestService questService;
+
+    @Resource
+    public com.gamebird.game.bird.service.impl.TowerService towerService;
+
+    /** 试炼之塔页：当前层、历史最高、剩余次数。 */
+    @GetMapping("/tower")
+    public String tower(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        com.gamebird.game.bird.model.dbo.TowerRecord record = towerService.record(role.getRoleId());
+        model.addAttribute("record", record);
+        model.addAttribute("remain", towerService.remainAttempts(record));
+        model.addAttribute("dailyLimit", com.gamebird.game.bird.service.impl.TowerService.DAILY_LIMIT);
+        model.addAttribute("cagedBird", getCagedBird(role.getRoleId()));
+        return "fight/tower";
+    }
+
+    /** 试炼之塔挑战。 */
+    @PostMapping("/tower/challenge")
+    public String towerChallenge(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        String result = towerService.challenge(role);
+        saveSessionRole(session, role);
+        if (result == null) {
+            model.addAttribute("message", "今天的 3 次挑战机会已经用完，明天再来。");
+        } else {
+            model.addAttribute("message", result);
+        }
+        return tower(session, model);
+    }
+
+    /** 战斗记录列表：当前角色的战斗记录 + 冷却状态。 */
+    @GetMapping(value = {"", "/list"})
+    public String list(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        LambdaQueryWrapper<FightLog> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FightLog::getRoleId, role.getRoleId());
+        queryWrapper.orderByDesc(FightLog::getFightTime);
+        queryWrapper.last("LIMIT 50");
+        List<FightLog> logs = fightLogService.list(queryWrapper);
+        model.addAttribute("logs", logs);
+        int now = CommonUtils.nowTime();
+        model.addAttribute("now", now);
+        model.addAttribute("cooldownRemain", Math.max(0, cooldownRemain(role.getRoleId(), now)));
+        model.addAttribute("cagedBird", getCagedBird(role.getRoleId()));
+        // 战绩统计
+        long total = fightLogService.count(new LambdaQueryWrapper<FightLog>()
+                .eq(FightLog::getRoleId, role.getRoleId()));
+        long wins = countWins(role.getRoleId());
+        model.addAttribute("fightTotal", total);
+        model.addAttribute("fightWins", wins);
+        model.addAttribute("winRate", total == 0 ? 0 : wins * 100 / total);
+        return "fight/list";
+    }
+
+    /**
+     * 竞技场：随机生成 3 个候选对手（战力/胜率预估）暂存 session，
+     * 挑战时按序号取用——把「盲抽」变成「看牌选对手」。
+     */
+    @GetMapping("/arena")
+    public String arena(HttpSession session, Model model) {
+        Role role = getSessionRole(session);
+        java.util.Set<String> shielded = new java.util.HashSet<>(
+                gameEventService.recentShieldRoleIds(12 * 3600));
+        StorageBird myBird = getCagedBird(role.getRoleId());
+        int myBase = (role.getLevel() == null ? 0 : role.getLevel()) * 10;
+        Byte myType = null;
+        if (myBird != null) {
+            myBase += birdPower(myBird) + (myBird.getKo() == null ? 0 : myBird.getKo() / 10);
+            BaseBird myConfig = configGateway.getBaseBird(myBird.getBirdId());
+            myType = myConfig == null ? null : myConfig.getType();
+        }
+        java.util.List<com.gamebird.game.bird.model.vo.FightCandidateVO> candidates = new java.util.ArrayList<>();
+        java.util.Set<Integer> seen = new java.util.HashSet<>();
+        for (int i = 0; i < 60 && candidates.size() < 3; i++) {
+            StorageBird candidate = storageBirdService.getOne(
+                    new LambdaQueryWrapper<StorageBird>().last("ORDER BY RAND() LIMIT 1"));
+            if (candidate == null || role.getRoleId().equals(candidate.getRoleId())
+                    || shielded.contains(candidate.getRoleId()) || !seen.add(candidate.getId())) {
+                continue;
+            }
+            BaseBird config = configGateway.getBaseBird(candidate.getBirdId());
+            Role owner = roleService.getById(candidate.getRoleId());
+            int power = birdPower(candidate)
+                    + (owner == null || owner.getLevel() == null ? 0 : owner.getLevel() * 10)
+                    + (candidate.getKo() == null ? 0 : candidate.getKo() / 10);
+            double multiplier = GameUtils.typeCounterMultiplier(myType, config == null ? null : config.getType());
+            int myPower = (int) Math.round(myBase * multiplier);
+            int winRate = Math.max(15, Math.min(85, myPower * 100 / Math.max(1, myPower + power)));
+            com.gamebird.game.bird.model.vo.FightCandidateVO vo = new com.gamebird.game.bird.model.vo.FightCandidateVO();
+            vo.setBirdId(candidate.getId());
+            vo.setBirdName(config == null ? "神秘小鸟" : config.getName());
+            vo.setOwnerName(owner == null ? "神秘玩家" : owner.getRoleName());
+            vo.setLevel(candidate.getLevel() == null ? 1 : candidate.getLevel());
+            vo.setStarText(GameUtils.getStarName(candidate.getStar()));
+            vo.setPower(power);
+            vo.setWinRate(winRate);
+            vo.setTypeName(config == null || config.getType() == null ? "未知" : typeNameOf(config.getType()));
+            candidates.add(vo);
+        }
+        session.setAttribute(SESSION_CANDIDATES, candidates);
+        model.addAttribute("candidates", candidates);
+        model.addAttribute("hasCagedBird", myBird != null);
+        return "fight/arena";
+    }
+
+    /** session 里暂存候选列表的 key。 */
+    private static final String SESSION_CANDIDATES = "fightCandidates";
+
+    /** 类型 id → 展示名。 */
+    private String typeNameOf(Byte type) {
+        return switch (type) {
+            case 1 -> "敏捷";
+            case 2 -> "力量";
+            case 3 -> "魔法";
+            case 4 -> "幻想";
+            default -> "未知";
+        };
+    }
+
+    /** 发起挑战：抽对手、算战力、结算奖励。 */
+    @PostMapping("/challenge")
+    public String challenge(HttpSession session, Model model,
+                            @RequestParam(required = false) Integer candidate) {
+        Role role = getSessionRole(session);
+        int now = CommonUtils.nowTime();
+        if (cooldownRemain(role.getRoleId(), now) > 0) {
+            model.addAttribute("message", "太频繁啦，休息一下再战。");
+            return list(session, model);
+        }
+        // 竞技场选中的候选优先；未选则回退随机
+        StorageBird opponent = null;
+        if (candidate != null) {
+            Object cached = session.getAttribute(SESSION_CANDIDATES);
+            if (cached instanceof java.util.List<?> list && candidate >= 0 && candidate < list.size()
+                    && list.get(candidate) instanceof com.gamebird.game.bird.model.vo.FightCandidateVO vo) {
+                opponent = storageBirdService.getById(vo.getBirdId());
+            }
+        }
+        if (opponent == null) {
+            opponent = pickOpponentBird(role.getRoleId());
+        }
+        if (opponent == null) {
+            model.addAttribute("message", "暂时找不到可挑战的小鸟，请稍后再试。");
+            return list(session, model);
+        }
+        Role opponentRole = roleService.getById(opponent.getRoleId());
+        BaseBird opponentConfig = configGateway.getBaseBird(opponent.getBirdId());
+        String opponentName = (opponentConfig == null ? "神秘小鸟" : opponentConfig.getName())
+                + "(" + (opponentRole == null ? "神秘玩家" : opponentRole.getRoleName()) + ")";
+
+        // 战力：出战鸟（等级/星级/成长/克制值）+ 角色等级，再乘类型相克倍率
+        StorageBird myBird = getCagedBird(role.getRoleId());
+        int myPower = (role.getLevel() == null ? 0 : role.getLevel()) * 10;
+        Byte myType = null;
+        if (myBird != null) {
+            myPower += birdPower(myBird);
+            BaseBird myConfig = configGateway.getBaseBird(myBird.getBirdId());
+            myType = myConfig == null ? null : myConfig.getType();
+        }
+        int oppPower = birdPower(opponent) + (opponentRole == null || opponentRole.getLevel() == null ? 0 : opponentRole.getLevel() * 10)
+                + (opponent.getKo() == null ? 0 : opponent.getKo() / 10);
+        double myMultiplier = GameUtils.typeCounterMultiplier(myType, opponentConfig == null ? null : opponentConfig.getType());
+        myPower = (int) Math.round((myPower + (myBird == null || myBird.getKo() == null ? 0 : myBird.getKo() / 10)) * myMultiplier);
+        // 胜率 = 我方战力占比，限制在 15%~85%
+        int winRate = Math.max(15, Math.min(85, myPower * 100 / Math.max(1, myPower + oppPower)));
+        boolean win = CommonUtils.randNum(1, 100) <= winRate;
+        String counterText = "";
+        if (myMultiplier > 1.0) {
+            counterText = "你的出战鸟属性克制对方！";
+        } else if (myMultiplier < 1.0) {
+            counterText = "对方属性克制你的出战鸟，小心！";
+        }
+
+        FightLog log = new FightLog();
+        log.setRoleId(role.getRoleId());
+        log.setOpponentName(opponentName);
+        log.setFightTime(now);
+        String text;
+        if (win) {
+            long steal = 0;
+            if (opponentRole != null && opponentRole.getCoin() != null && opponentRole.getCoin() > 0) {
+                steal = Math.min(STEAL_COIN_CAP, Math.max(1, opponentRole.getCoin() / 100));
+                opponentRole.setCoin(opponentRole.getCoin() - steal);
+                roleService.updateById(opponentRole);
+            }
+            long exp = 30 + (opponent.getLevel() == null ? 1 : opponent.getLevel()) * 10;
+            addRoleExp(role, exp);
+            roleService.updateById(role);
+            saveSessionRole(session, role);
+            log.setResult(1);
+            log.setRewardCoin(steal);
+            // 连胜里程碑（含本次，从最近记录倒推连续胜利数）
+            int streak = currentWinStreak(role.getRoleId()) + 1;
+            long bonus = streak == 3 ? 300 : (streak == 5 ? 800 : (streak == 10 ? 2000 : 0));
+            text = counterText + "挑战 " + opponentName + " 胜利！抢到金币 " + steal + "，经验 +" + exp
+                    + "。（胜率 " + winRate + "%，已连胜" + streak + "场）";
+            if (bonus > 0) {
+                roleValueService.addRoleCoin(role, bonus);
+                roleService.updateById(role);
+                saveSessionRole(session, role);
+                text += " 连胜" + streak + "场里程碑，额外奖励金币" + bonus + "！";
+                gameEventService.record(role.getRoleId(), "达成了" + streak + "场连胜，额外获得金币" + bonus + "。");
+            }
+            gameEventService.record(role.getRoleId(), "在战斗中击败了" + opponentName + "，抢到金币" + steal + "。");
+            // 被挑战方的战报通知（个人树林记录）
+            if (opponentRole != null) {
+                gameEventService.record(opponentRole.getRoleId(),
+                        role.getRoleName() + " 挑战了你的" + (opponentConfig == null ? "小鸟" : opponentConfig.getName())
+                                + "并获胜，被抢走金币 " + steal + "。快去强化出战鸟反击吧！");
+            }
+            taskTriggerService.onFightWinCount(role, countWins(role.getRoleId()));
+            taskTriggerService.onWealth(role);
+            questService.onEvent(role, QuestService.EV_FIGHT_WIN, 1);
+            questService.onEvent(role, QuestService.EV_LEVEL, 0);
+        } else {
+            log.setResult(0);
+            log.setRewardCoin(0L);
+            text = counterText + "挑战 " + opponentName + " 失败，对方的" + (opponentConfig == null ? "小鸟" : opponentConfig.getName())
+                    + "实在凶悍。（胜率 " + winRate + "%，失败无损失）";
+            if (opponentRole != null) {
+                gameEventService.record(opponentRole.getRoleId(),
+                        role.getRoleName() + " 挑战了你的" + (opponentConfig == null ? "小鸟" : opponentConfig.getName())
+                                + "，被你轻松击退。");
+            }
+        }
+        fightLogService.save(log);
+        // 战斗消耗鸟笼耐久（有装备且有余量时）
+        costCageDurability(role.getRoleId());
+        model.addAttribute("message", text);
+        return list(session, model);
+    }
+
+    // ==================== 私有工具 ====================
+
+    /** 小鸟战力：等级×20 + 星级×50 + 成长/10。 */
+    private int birdPower(StorageBird bird) {
+        return (bird.getLevel() == null ? 1 : bird.getLevel()) * BIRD_LEVEL_POWER
+                + (bird.getStar() == null ? 0 : bird.getStar()) * BIRD_STAR_POWER
+                + (bird.getGrow() == null ? 0 : bird.getGrow()) / 10;
+    }
+
+    /** 随机抽一只别人的鸟（排除自己与免战中的玩家），没有可抽的返回 null。 */
+    private StorageBird pickOpponentBird(String myRoleId) {
+        java.util.Set<String> shielded = new java.util.HashSet<>(
+                gameEventService.recentShieldRoleIds(12 * 3600));
+        for (int i = 0; i < 10; i++) {
+            StorageBird candidate = storageBirdService.getOne(
+                    new LambdaQueryWrapper<StorageBird>()
+                            .ne(StorageBird::getRoleId, myRoleId)
+                            .last("ORDER BY RAND() LIMIT 1"));
+            if (candidate != null && !shielded.contains(candidate.getRoleId())) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+
+    /** 从最近 10 条记录倒推当前连胜数（不含本次）。 */
+    private int currentWinStreak(String roleId) {
+        LambdaQueryWrapper<FightLog> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(FightLog::getRoleId, roleId);
+        wrapper.orderByDesc(FightLog::getFightTime);
+        wrapper.last("LIMIT 10");
+        int streak = 0;
+        for (FightLog item : fightLogService.list(wrapper)) {
+            if (item.getResult() == null || item.getResult() != 1) {
+                break;
+            }
+            streak++;
+        }
+        return streak;
+    }
+
+    /** 累计胜场数（成就用）。 */
+    private long countWins(String roleId) {
+        return fightLogService.count(new LambdaQueryWrapper<FightLog>()
+                .eq(FightLog::getRoleId, roleId)
+                .eq(FightLog::getResult, 1));
+    }
+
+    /** 战斗冷却剩余秒数（以最后一条战斗记录计）。 */
+    private int cooldownRemain(String roleId, int now) {
+        LambdaQueryWrapper<FightLog> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(FightLog::getRoleId, roleId);
+        wrapper.orderByDesc(FightLog::getFightTime);
+        wrapper.last("LIMIT 1");
+        FightLog last = fightLogService.getOne(wrapper);
+        if (last == null || last.getFightTime() == null) {
+            return 0;
+        }
+        return Math.max(0, gameProperties.getFightCooldownSeconds() - (now - last.getFightTime()));
+    }
+
+    /** 出战鸟（鸟笼栏位里登记的那只）。 */
+    private StorageBird getCagedBird(String roleId) {
+        RoleCage cage = getCageSlot(roleId);
+        if (cage == null || cage.getBirdId() == null || cage.getBirdId() <= 0) {
+            return null;
+        }
+        StorageBird bird = storageBirdService.getById(cage.getBirdId());
+        return bird != null && roleId.equals(bird.getRoleId()) ? bird : null;
+    }
+
+    /** 战斗后扣鸟笼耐久（装备中且有余量）。 */
+    private void costCageDurability(String roleId) {
+        RoleCage cage = getCageSlot(roleId);
+        if (cage != null && cage.getUseCageId() != null && cage.getUseCageId() > 0
+                && cage.getUseCageNum0() != null && cage.getUseCageNum0() > 0) {
+            cage.setUseCageNum0(cage.getUseCageNum0() - 1);
+            cageService.updateById(cage);
+        }
+    }
+
+    /** 出战栏位（role_cage idx=1），无则返回 null（战斗不强制需要鸟笼）。 */
+    private RoleCage getCageSlot(String roleId) {
+        LambdaQueryWrapper<RoleCage> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(RoleCage::getRoleId, roleId);
+        wrapper.eq(RoleCage::getIdx, 1);
+        return cageService.getOne(wrapper);
+    }
+}

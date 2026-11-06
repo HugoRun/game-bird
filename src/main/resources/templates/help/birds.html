@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='小鸟百科')}"></head>
+<body>
+
+<div class="main">
+    <div class="panel bg-blue">📖 小鸟百科</div>
+    <p class="text-muted">养鸟路上的所有数值，这里一次讲明白。</p>
+
+    <div class="panel bg-green">
+        <div class="help-title">⭐ 星级</div>
+        <div class="help-body">
+            捕捉时按<b>体重占该物种上限的比例</b>评定：越接近物种最大体重，星级越高（0~5 星）。<br/>
+            星级越高越值钱、越能打——但<b>也越容易挣脱陷阱</b>（每星 +5% 逃脱率），下饵时涂抹粘性道具可以减半。
+        </div>
+    </div>
+
+    <div class="panel bg-green">
+        <div class="help-title">📈 成长（显示为百分比）</div>
+        <div class="help-body">
+            小鸟的<b>成长潜力</b>，捕获/孵化时随机生成（5%~15%）。<br/>
+            成长会影响它在<b>战斗中的战力权重</b>（成长越高越能打），也是繁殖选种的重要指标。<br/>
+            不满意？<b>成长药剂</b>可以重新随机一次。
+        </div>
+    </div>
+
+    <div class="panel bg-green">
+        <div class="help-title">⚔️ 克制（显示为百分比）</div>
+        <div class="help-body">
+            小鸟的<b>克制天性</b>，捕获时随机生成（0~1%）。<br/>
+            战斗时按 克制值/10 计入战力，克制值是锦上添花的小加成；真正的胜负手是<b>属性相克</b>：<br/>
+            <span class="text-primary">敏捷 克 魔法</span>、<span class="text-primary">魔法 克 力量</span>、<span class="text-primary">力量 克 敏捷</span>（克者战力 +20%，被克 -15%）；<br/>
+            <span class="text-primary">幻想</span>系与三系互为克制（双方各 +10%）。<br/>
+            不满意？<b>天赋药剂</b>可以重置克制值。
+        </div>
+    </div>
+
+    <div class="panel bg-green">
+        <div class="help-title">⚖️ 体重与身价</div>
+        <div class="help-body">
+            体重以<b>斤</b>计（内部数值 ÷100）。出售价 = <b>物种单价 × 体重</b>，所以一只重鸟可能价值连城。<br/>
+            体重 also 决定星级——想卖钱就追重，想战力就追成长与克制。
+        </div>
+    </div>
+
+    <div class="panel bg-green">
+        <div class="help-title">💞 配对遗传</div>
+        <div class="help-body">
+            同种产同种、异种产低阶一方；<b>星级 = 父母均值 ±1</b>，体重 = 父母均值 ±25%（叠加巢穴与婚姻加成）。<br/>
+            想要高星后代？先攒两只高星亲鸟，再挑一个好巢穴。
+        </div>
+    </div>
+
+    <div><a th:href="@{/game}">回主页</a></div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

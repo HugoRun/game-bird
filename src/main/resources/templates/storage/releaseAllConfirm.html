@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='一键放生')}"></head>
+<body>
+
+<div class="main">
+    <div>
+        <div class="pic">
+            <img alt="" src="../../static/images/logo/pack.gif" th:src="@{/assets/images/logo/pack.gif}"/>
+        </div>
+        <div class="panel bg-blue">一键放生确认</div>
+        <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+        <div class="npc-talk">
+            <div>将放归仓库里<b>全部未锁定</b>的小鸟，共 <span class="text-darkorange" th:text="${count}"></span> 只，可获得
+                <span class="text-darkorange" th:text="${totalLove}"></span> 爱心。</div>
+            <div>训练中/配对中的小鸟已被锁定保护；图鉴记录不受影响。</div>
+            <div class="text-muted">想留几只？先去勾选它们点「锁定」，再回来一键放生。</div>
+        </div>
+        <form th:action="@{/storage/releaseAll}" method="post" style="margin-top:8px">
+            <input type="submit" value="确认全部放生">
+            <a th:href="@{/storage/list}">再想想</a>
+        </form>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

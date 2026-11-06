@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='放生小鸟')}"></head>
+<body>
+
+<div class="main">
+    <div>
+        <div class="pic">
+            <img alt="" src="../../static/images/logo/pack.gif" th:src="@{/assets/images/logo/pack.gif}"/>
+        </div>
+        <div class="panel bg-blue">放生确认</div>
+        <div th:if="${bird != null}">
+            <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
+            <div class="npc-talk">
+                <div>
+                    <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${bird.birdId}.gif|}">
+                    <span th:text="${baseBird != null ? baseBird.name : '未知小鸟'}"></span>
+                    <span th:text="${@gameUtils.getBirdSexName(bird.sex)}"></span>
+                    <span th:text="${@gameUtils.getStarName(bird.star)}"></span>
+                    <span th:text="${#numbers.formatDecimal(bird.weight/100.0, 1, 2)} + '斤'"></span>
+                </div>
+                <div>放归树林可获得 <span class="text-darkorange" th:text="${loveBack}"></span> 爱心；图鉴记录保留。</div>
+                <div class="text-muted">和出售不同——放生没有金币，但它自由了。</div>
+            </div>
+            <form th:action="@{/storage/release}" method="post" style="margin-top:8px">
+                <input type="hidden" name="birdId" th:value="${bird.id}">
+                <input type="submit" value="确认放生">
+                <a th:href="@{/storage/list}">再想想</a>
+            </form>
+        </div>
+    </div>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

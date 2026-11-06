@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='竞技场')}"></head>
+<body>
+
+<div class="main">
+    <div class="panel bg-blue">竞技场 · 看牌选对手 <a th:href="@{/fight/list}">返回战斗</a></div>
+    <div class="text-muted" th:if="${!hasCagedBird}">
+        尚未设置出战小鸟，仅以角色等级应战。去<a th:href="@{/storage/list}">仓库</a>选一只小鸟出战吧。
+    </div>
+    <div th:if="${candidates.size() == 0}" class="text-muted">暂时没有合适的对手，稍后再来。</div>
+    <ul class="list1">
+        <li th:each="c, stat : ${candidates}">
+            <div class="list1-info">
+                <p>
+                    <span class="text-primary" th:text="${c.birdName}"></span>
+                    <span th:text="${c.starText}"></span>
+                    <span class="text-muted" th:text="|${c.level}级 · ${c.typeName}系|"></span>
+                </p>
+                <p class="text-muted" th:text="|主人：${c.ownerName} · 战力 ${c.power}|"></p>
+                <p>
+                    预估胜率:<span th:class="${c.winRate >= 60 ? 'text-primary' : (c.winRate >= 40 ? '' : 'text-danger')}"
+                                  th:text="${c.winRate + '%'}"></span>
+                    <span class="text-muted" th:if="${c.winRate >= 60}">（有把握）</span>
+                    <span class="text-muted" th:if="${c.winRate < 40}">（风险高）</span>
+                </p>
+                <form th:action="@{/fight/challenge}" method="post">
+                    <input type="hidden" name="candidate" th:value="${stat.index}">
+                    <input type="submit" th:value="'挑战这只'" th:disabled="${false}">
+                </form>
+            </div>
+        </li>
+    </ul>
+    <p class="text-muted">提示：候选名单保存在本次会话中，挑好就直接打；随机挑战则完全碰运气。</p>
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

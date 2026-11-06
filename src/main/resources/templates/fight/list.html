@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='战斗')}"></head>
+<body>
+
+<div class="main">
+    <h2>⚔️ 战斗竞技</h2>
+    <p th:if="${message}" th:text="${message}" class="text-muted"></p>
+
+    <div class="text-muted" th:if="${cagedBird != null}">
+        出战小鸟:<span th:text="${@gameConfigGateway.getBaseBird(cagedBird.birdId) != null ? @gameConfigGateway.getBaseBird(cagedBird.birdId).name : '神秘小鸟'}"></span>
+        <span th:text="${cagedBird.level + '级 ' + @gameUtils.getStarName(cagedBird.star)}"></span>
+        <a th:href="@{/storage/list}">更换出战</a>
+    </div>
+    <div class="text-muted" th:if="${cagedBird == null}">
+        尚未设置出战小鸟，仅以角色等级应战。去<a th:href="@{/storage/list}">仓库</a>选一只小鸟出战吧。
+    </div>
+
+    <p>
+        <a th:href="@{/fight/arena}"><button type="button" class="btn btn-primary">竞技场</button></a>
+        <a th:href="@{/fight/tower}"><button type="button" class="btn btn-primary">试炼之塔（PVE）</button></a>
+    </p>
+    <form th:action="@{/fight/challenge}" method="post" style="margin-top:6px">
+        <button type="submit" class="btn btn-primary" th:disabled="${cooldownRemain > 0}">随机挑战</button>
+        <span class="text-muted" th:if="${cooldownRemain > 0}" th:text="|冷却中，${cooldownRemain / 60 + 1}分钟后可再战|"></span>
+    </form>
+    <p class="text-muted">战绩:共 <span th:text="${fightTotal}"></span> 场，<span th:text="${fightWins}"></span> 胜，胜率 <span th:text="${winRate}"></span>%</p>
+    <p class="text-muted">胜利抢对方 1% 金币（封顶1000）并获得经验；失败无损失。胜负由出战鸟与角色等级综合决定。</p>
+
+    <h3>战斗记录</h3>
+    <ul class="list1" th:if="${!#lists.isEmpty(logs)}">
+        <li th:each="log : ${logs}">
+            <div class="list1-info">
+                <p>
+                    <span th:class="${log.result == 1 ? 'text-primary' : 'text-muted'}"
+                          th:text="${log.result == 1 ? '胜' : '负'}"></span>
+                    对手: <span th:text="${log.opponentName}"></span>
+                    <span th:if="${log.result == 1 && log.rewardCoin > 0}" th:text="|抢到${log.rewardCoin}金币|"></span>
+                </p>
+                <p class="text-gray" th:text="${@gameUtils.getTimeDiff(log.fightTime, now) + '前'}"></p>
+            </div>
+        </li>
+    </ul>
+    <p th:if="${#lists.isEmpty(logs)}" class="text-muted">暂无战斗记录，点击上方「发起挑战」试试吧！</p>
+
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>
