@@ -1,24 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>小鸟情人</title>
-    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-    <link href="../../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
-    <link href="../../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
-</head>
+<head th:replace="~{fragment/head::pageHead(title='小鸟情人')}"></head>
 <body>
 <div class="main">
     <div>
-        <div class="pic">
-            <img alt="" src="../../static/images/logo/shop.gif" th:src="@{/assets/images/logo/shop.gif}"/>
-        </div>
-        <div th:replace="~{fragment/shop::shopInfo}"></div>
-        <div th:replace="~{fragment/shop::shopType(type='train')}"></div>
-        <div th:replace="~{fragment/feeTypeFilter::feeTypeFilter}"></div>
+        <div th:replace="~{fragment/shop::shopHeader(type='train')}"></div>
         <div th:if="${page.getTotal() == 0}">
-            <div class="npc-pic"><img alt="球球" src="../../static/images/icon/npc.gif" th:src="@{/assets/images/icon/npc.gif}"/>球球:</div>
-            <div class="npc-talk">商店现在还没有开门哦。</div>
+            <div th:replace="~{fragment/shop::shopEmpty}"></div>
         </div>
         <div th:if="${page.getTotal() > 0}">
             <ul class="list1">
@@ -31,7 +19,7 @@
                         <p>功能:<span th:text="${baseTrain.func}"></span></p>
                         <p>价格:<span th:text="${baseTrain.getFeePrice()}"></span><span th:text="${@gameUtils.getFeeTypeName(baseTrain.getFeeType())}"></span></p>
                         <div class="btl">
-                            <form class="inline-block" method="post" th:action="@{/shop/train/buy.do}">
+                            <form class="inline-block" method="post" th:action="@{/shop/train/purchase}">
                                 <input name="id" th:value="${baseTrain.id}" type="hidden">
                                 购买:<input class="mini-input" maxlength="3" name="payNum" th:value="1" type="text">份 <input class="mini-button" th:value="确定购买" type="submit"/>
                             </form>

@@ -5,19 +5,21 @@
     <title>Title</title>
 </head>
 <body>
-<div th:fragment="common-pagination">
-    <div th:if="${page.pages > 1}">
-        <div>
-            <a th:href="@{${url}(pageNo=1)}" th:if="${page.current != 1}">首页</a>
-            <a th:href="@{${url}(pageNo=${page.current - 1})}" th:if="${page.current > 1}">上页</a>
-            <a th:href="@{${url}(pageNo=${page.current + 1})}" th:if="${page.current < page.pages}">下页</a>
-            <a th:href="@{${url}(pageNo=${page.pages})}" th:if="${page.current < page.pages}">最后一页</a>
-            <form action="" class="inline-block">第 <input name="pageNo" th:value="${page.getCurrent()}" type="text"> 页 <input class="mini-button" type="submit" value="前往"></form>
-        </div>
-        <div><span class="panel" th:text="|(共${page.getTotal()}条数据, 当前第${page.current}/${page.pages}页)|"></span></div>
-    </div>
-</div>
-<div th:fragment="pack-pagination">
+<!--
+  带筛选参数的分页（U12 新增：唯一实现）。
+
+  抽出前，同一段分页 HTML 存在三份逐字相同的副本：
+    fragment/shop.html::pagination      被 6 个 shop 页引用
+    fragment/pack.html::pagination      被 6 个 pack 页引用
+    本文件原有的 pack-pagination         零引用（死 fragment）
+
+  现在 fee-type-pagination 是唯一实现，其余 fragment 名全部保留为一行转发，
+  14 处调用点一行未改 —— fragment 名是不可对外的契约，不因内部重构而变动。
+
+  与 common-pagination 的区别：本片段翻页时保留当前筛选参数 feeType；
+  common-pagination 不带任何参数。
+-->
+<div th:fragment="fee-type-pagination">
     <div th:if="${page.pages > 1}">
         <a th:href="@{${url}(feeType=${feeType}, pageNo=1)}" th:if="${page.current != 1}">首页</a>
         <a th:href="@{${url}(feeType=${feeType}, pageNo=${page.current - 1})}" th:if="${page.current > 1}">上页</a>
@@ -31,5 +33,18 @@
         <span class="panel" th:text="|(共${page.getTotal()}条数据, 当前第${page.current}/${page.pages}页)|"></span>
     </div>
 </div>
+<div th:fragment="common-pagination">
+    <div th:if="${page.pages > 1}">
+        <div>
+            <a th:href="@{${url}(pageNo=1)}" th:if="${page.current != 1}">首页</a>
+            <a th:href="@{${url}(pageNo=${page.current - 1})}" th:if="${page.current > 1}">上页</a>
+            <a th:href="@{${url}(pageNo=${page.current + 1})}" th:if="${page.current < page.pages}">下页</a>
+            <a th:href="@{${url}(pageNo=${page.pages})}" th:if="${page.current < page.pages}">最后一页</a>
+            <form action="" class="inline-block">第 <input name="pageNo" th:value="${page.getCurrent()}" type="text"> 页 <input class="mini-button" type="submit" value="前往"></form>
+        </div>
+        <div><span class="panel" th:text="|(共${page.getTotal()}条数据, 当前第${page.current}/${page.pages}页)|"></span></div>
+    </div>
+</div>
+<div th:fragment="pack-pagination" th:replace="~{fragment/pagination::fee-type-pagination}"></div>
 </body>
 </html>

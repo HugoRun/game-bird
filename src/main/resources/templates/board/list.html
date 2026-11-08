@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='公告栏')}"></head>
+<body>
+
+<div class="main">
+    <h2>公告栏</h2>
+
+    <ul class="list1">
+        <li th:each="b : ${boards}">
+            <div class="list1-info">
+                <p th:text="${b.title}"></p>
+                <p th:text="${b.content}"></p>
+                <p class="text-muted" th:text="'发布于 ' + ${@gameUtils.getTimeDiff(b.createTime, now)} + ' 前'"></p>
+            </div>
+        </li>
+    </ul>
+
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

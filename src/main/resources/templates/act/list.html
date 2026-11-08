@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/head::pageHead(title='活动中心')}"></head>
+<body>
+
+<div class="main">
+    <h2>活动中心</h2>
+    <p th:if="${message}" th:text="${message}" class="text-muted"></p>
+
+    <ul class="list1" th:if="${!#lists.isEmpty(activities)}">
+        <li th:each="act : ${activities}">
+            <div class="list1-info">
+                <p th:text="${act.title}" class="text-title"></p>
+                <p th:text="${act.content}"></p>
+                <p>距结束: <span th:text="${@gameUtils.getTimeDiff(act.endTime, now)}"></span></p>
+            </div>
+        </li>
+    </ul>
+    <p th:if="${#lists.isEmpty(activities)}" class="text-muted">当前暂无进行中的活动。</p>
+
+    <div th:replace="~{fragment/navigation::navigation}"></div>
+    <div th:replace="~{fragment/footDate::footDate}"></div>
+</div>
+</body>
+</html>

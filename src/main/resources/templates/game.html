@@ -1,25 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>小鸟情人</title>
-    <meta content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-    <link href="../static/css/bootstrap5.3.2.css" rel="stylesheet" th:href="@{/assets/css/bootstrap5.3.2.css}">
-    <link href="../static/css/style.css" rel="stylesheet" th:href="@{/assets/css/style.css}">
-</head>
+<head th:replace="~{fragment/head::pageHead(title='小鸟情人')}"></head>
 <body>
 <div class="main">
     <div class="panel bg-green">
-        <div>公告:<img src="../../static/images/icon/guide.gif" th:src="@{/assets/images/icon/guide.gif}"/><a href="./notice/detail.do" th:href="@{/notice/detail.do(id=0)}">真爱至上</a></div>
-        <div>主线:<i class="task-a"></i><a href="./task/list.html" th:href="@{/task/list.do}">挑战祥瑞之地</a></div>
+        <div>公告:<img src="../../static/images/icon/guide.gif" th:src="@{/assets/images/icon/guide.gif}"/><span class="text-muted" title="功能开发中，暂不可用">真爱至上</span></div>
+        <div>主线:<i class="task-a"></i><span class="text-muted" title="功能开发中，暂不可用">挑战祥瑞之地</span></div>
         <div>任务:<i class="task-a"></i><a href="#">愤怒的传奇(未完成)</a></div>
-        <div>福利:<a href="./weal/sign.html" th:href="@{/weal/sign.do}">签到</a>(未签到)</div>
+        <div>福利:<span class="text-muted" title="功能开发中，暂不可用">签到</span>(未签到)</div>
     </div>
     <div>
         <div class="panel bg-blue">"<span href="#" th:text="|小菜鸟|"></span>" <span href="#" th:text="|${session.sRole.roleName}|"></span> <a href="#" onclick="toggleShow('p1')">收起</a></div>
         <div id="p1">
-            <div>等级:<span th:text="|${session.sRole.level}|"></span>级(20%) <img alt="" class="vip-icon" src="../../static/images/vip/vip_3.png" th:src="|/assets/images/vip/vip_${session.sRole.vip}.png|"/> <a th:href="@{/profile.do}">详情</a></div>
-            <div>爱心:<span th:text="|${session.sRole.lovePoint}|"></span> 金币:<span th:text="|${session.sRole.coin}|"></span> <a th:href="@{/bank.do}">存款</a></div>
+            <div>等级:<span th:text="|${session.sRole.level}|"></span>级(20%) <img alt="" class="vip-icon" src="../../static/images/vip/vip_3.png" th:src="|/assets/images/vip/vip_${session.sRole.vip}.png|"/> <a th:href="@{/profile}">详情</a></div>
+            <div>爱心:<span th:text="|${session.sRole.lovePoint}|"></span> 金币:<span th:text="|${session.sRole.coin}|"></span> <a th:href="@{/bank}">存款</a></div>
             <div>鲜花:<span th:text="|${session.sRole.diamond}|"></span> 钻石:<span th:text="|${session.sRole.diamond}|"></span></div>
             <div th:if="${session.sRole.marriageType > 0}">爱人:<span><a href="#" th:text="|这段情、|">详情</a></span></div>
             <div hidden="hidden">徒弟:<span><a href="#" th:text="|丂①花花世界的爱情|">详情</a></span> <span><a href="#" th:text="|丂①花花世界的爱情|">详情</a></span> <span><a href="#" th:text="|丂①花花世界的爱情|">详情</a></span></div>
@@ -29,12 +23,12 @@
     </div>
     <div>
         <div class="panel bg-blue">
-            【<a href="./myField.html" th:href="@{/field/info.do(fieldId=${session.sRole.fieldId})}" th:text="${@gameUtils.getFieldName(session.sRole.fieldId)}">彩虹树林</a>】 <a th:href="@{/trap/autoUseBait.do}">一键下饵</a>
+            【<a href="./myField.html" th:href="@{/field/info(fieldId=${session.sRole.fieldId})}" th:text="${@gameUtils.getFieldName(session.sRole.fieldId)}">彩虹树林</a>】 <a th:href="@{/trap/autoUseBait}">一键下饵</a>
         </div>
         <div>
             <div>
                 <img class="icon-gray-border" src="../../static/images/field/1.gif" th:alt="${@gameUtils.getFieldName(session.sRole.fieldId)}" th:src="|/assets/images/field/${session.sRole.fieldId}.gif|">
-                <a th:href="@{/game.do}">刷新</a>
+                <a th:href="@{/game}">刷新</a>
             </div>
             <div hidden="hidden">守卫:5小时后小鸟入侵</div>
             <div hidden="hidden">出征:抢夺敌人财富 <a href="#">出征</a></div>
@@ -54,25 +48,25 @@
                     <img alt="" class="icon-gray-border" src="../../static/images/trap/1.gif" th:src="@{|/assets/images/trap/${trap.useTrap.id}.gif|}">
                 </div>
                 <div class="list1-info" th:if="${trap.baitId == 0}">
-                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/trap/change.do(trapId=${trap.id})}">更换陷阱</a></span></p>
+                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><span class="text-muted" title="功能开发中，暂不可用">更换陷阱</span></span></p>
                     <p>空闲中</p>
-                    <p><a href="#" th:href="@{/trap/useBait.do(trapId=${trap.id})}">下饵</a></p>
+                    <p><a href="#" th:href="@{/trap/useBait(trapId=${trap.id})}">下饵</a></p>
                 </div>
 
                 <div class="list1-icon" th:if="${trap.baitId > 0}">
                     <img alt="" class="icon-gray-border" src="../../static/images/bird/1.gif" th:src="@{|/assets/images/bird/${trap.catchBirdId}.gif|}">
                 </div>
                 <div class="list1-info" th:if="${trap.baitId > 0 && trap.catchEndTime > nowTime}">
-                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/trap/birdInfo.do(birdId=${trap.catchBird.id})}" th:text="${trap.catchBird.name}">麻雀</a> <th:block
+                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/trap/birdInfo(birdId=${trap.catchBird.id})}" th:text="${trap.catchBird.name}">麻雀</a> <th:block
                             th:text="${@gameUtils.getStarName(trap.catchBirdStar)}"></th:block></span></p>
                     <p><th:block th:text="${@gameUtils.getTimeDiff(trap.catchEndTime, nowTime)}"></th:block>后捕获</p>
-                    <p><a th:href="@{/trap/hasten.do(trapId=${trap.id})}">加速</a></p>
+                    <p><span class="text-muted" title="功能开发中，暂不可用">加速</span></p>
                 </div>
                 <div class="list1-info" th:if="${trap.baitId > 0 && trap.catchEndTime <= nowTime}">
-                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/trap/birdInfo.do(birdId=${trap.catchBird.id})}" th:text="${trap.catchBird.name}">麻雀</a> <th:block
+                    <p>([[${stat.count}]])[[${trap.useTrap.name}]] <span th:if="${trap.useTrapId > 0}" th:text="|(剩余${trap.useTrapNum}次)|"></span> <span><a th:href="@{/trap/birdInfo(birdId=${trap.catchBird.id})}" th:text="${trap.catchBird.name}">麻雀</a> <th:block
                             th:text="${@gameUtils.getStarName(trap.catchBirdStar)}"></th:block></span></p>
                     <p>已捕获</p>
-                    <p><a href="#" th:href="@{/trap/over.do(trapId=${trap.id})}">去收网</a></p>
+                    <p><a href="#" th:href="@{/trap/over(trapId=${trap.id})}">去收网</a></p>
                 </div>
             </li>
         </ul>
@@ -136,7 +130,7 @@
         </ul>
     </div>
     <div>
-        <div class="panel bg-blue">【世界喊话】<a href="/chat/list.do">我要喊话</a></div>
+        <div class="panel bg-blue">【世界喊话】<a th:href="@{/chat/list}">我要喊话</a></div>
         <div th:if="${chatMessageList != null && chatMessageList.size() == 0}">暂未开放</div>
         <ul th:if="${chatMessageList.size() > 0}">
             <li th:each="message, stat : ${chatMessageList}">

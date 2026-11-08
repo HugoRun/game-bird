@@ -1,0 +1,21 @@
+package com.gamebird.game.bird.service.impl;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
+
+import com.gamebird.game.bird.mapper.BaseLevelMapper;
+import com.gamebird.game.bird.model.dbo.BaseLevel;
+import com.gamebird.game.bird.service.BaseLevelService;
+
+/**
+ * <p>
+ * 角色等级配置表 服务实现类
+ * </p>
+ *
+ * @author HugoRun
+ * @since 2024-11-17
+ */
+@Service
+public class BaseLevelServiceImpl extends ServiceImpl<BaseLevelMapper, BaseLevel> implements BaseLevelService {
+
+}
